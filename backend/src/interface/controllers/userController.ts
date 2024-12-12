@@ -6,12 +6,17 @@ import { validateOtp } from "../../application/useCases/validateOTP";
 import { generateOtp } from "../../application/useCases/generateOtp";
 import passport from "../../interface/middleware/passportConfig";
 import UserModel from "../../infrastructure/database/models/userModels";
-
+import { ForgotPasswordDto } from "../../domain/entities/ForgotPasswordDto";
+import { sendResetLink } from "../../application/useCases/passwordResent";
 import jwt from 'jsonwebtoken'
 import { OAuth2Client } from "google-auth-library";
 import verifyGoogleToken from "../../infrastructure/services/GoogleAuthService";
 import { googleLogin } from "../../application/useCases/googleLogin";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); 
+
+
+
+
 export const userController = {
     register: async (req: Request , res: Response) => {
         try{
@@ -82,6 +87,24 @@ export const userController = {
 
         }catch (error : any) {
             res.status(400).json({ error: error.message });
+        }
+    },
+
+     forgotPassword :async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { email } = req.body;
+    
+            if (!email) {
+                res.status(400).json({ message: 'Email is required' });
+                return;
+            }
+            await sendResetLink(email);
+    
+            // Add logic to handle password reset
+            res.status(200).json({ message: 'Password reset link sent successfully.' });
+        } catch (error: any) {
+            console.error('Error in forgotPassword:', error.message);
+            res.status(500).json({ message: 'Internal server error' });
         }
     }
 }

@@ -9,5 +9,6 @@ router.post("/login",userController.login)
 router.post("/verify-otp",userController.validateOtp)
 router.post("/resend-otp",userController.resendOtp)
 router.post('/google',userController.googleLoginHandler)
+router.post('/forgot-password',userController.forgotPassword)
 
 export default router;
