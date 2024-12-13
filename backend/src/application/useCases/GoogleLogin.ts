@@ -25,9 +25,10 @@ export const googleLogin = async (
             lastName: googleUser.lastName,
             email: googleUser.email,
             googleId: googleUser.googleId,
-            isVerified: 1,
+            isVerified: true,
             mobileNumber: "",
             password: "",
+            
         };
 
         user = await userRepository.createUser(newUser);

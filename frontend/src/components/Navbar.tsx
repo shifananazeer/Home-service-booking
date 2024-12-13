@@ -27,13 +27,21 @@ const Navbar = () => {
    const handleProfileClick = () => {
      navigate('/profile');
    }
-
+const handleSignupWorkerClick = () => {
+    navigate('/register-worker')
+}
 
 
   return (
     <nav className="navbar bg-gray-900 text-white p-4 flex justify-between">
     <div className="navbar-brand text-lg font-bold">YourBrand</div>
     <div className="flex items-center space-x-4">
+    <button
+                    className="bg-green-600 px-4 py-2 rounded hover:bg-green-500"
+                    onClick={handleSignupWorkerClick}
+                >
+                    Sign Up as Worker
+                </button>
         {!userData ? (
             <>
                 <button

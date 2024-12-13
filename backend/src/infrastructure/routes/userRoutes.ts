@@ -12,4 +12,5 @@ router.post('/forgot-password',userController.forgotPassword)
 router.get('/reset-password/:token', userController.validateResetToken);
 router.post('/reset-password', userController.resetPassword);
 
+
 export default router;

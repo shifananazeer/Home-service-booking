@@ -4,11 +4,7 @@ import { UserRepositoryImpl } from "../../infrastructure/database/repositories/U
 import { loginUser } from "../../application/useCases/loginUser";
 import { validateOtp } from "../../application/useCases/validateOTP";
 import { generateOtp } from "../../application/useCases/generateOtp";
-import passport from "../../interface/middleware/passportConfig";
-import UserModel from "../../infrastructure/database/models/userModels";
-import { ForgotPasswordDto } from "../../domain/entities/ForgotPasswordDto";
 import { sendResetLink } from "../../application/useCases/passwordResent";
-import jwt from 'jsonwebtoken'
 import { OAuth2Client } from "google-auth-library";
 import verifyGoogleToken from "../../infrastructure/services/GoogleAuthService";
 import { googleLogin } from "../../application/useCases/GoogleLogin";
@@ -141,4 +137,6 @@ export const userController = {
             res.status(500).json({ message: error.message });
         }
     },
+   
 };
+

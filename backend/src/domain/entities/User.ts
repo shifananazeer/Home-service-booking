@@ -6,10 +6,11 @@ export interface User{
     password:string;
     otp?:string,
     otpExpiresAt?:Date,
-    isVerified?:number,
-    isApproved?:number,
+    isVerified?:Boolean,
+    isBlocked?:Boolean,
     latitude?: number;
     longitude?: number;
     locationName?:string;
     googleId?: string;
+
 }
