@@ -4,7 +4,7 @@ import { WorkerRepositoryImpl } from '../../infrastructure/database/repositories
 import { generateOtp } from '../../application/useCases/generateOtp';
 import { registerWorker } from '../../application/useCases/registerWorker';
 import { validateOtp } from '../../application/useCases/validateOTP';
-
+import { loginWorker } from '../../application/useCases/loginWorker';
 
 export const workerController  = {
     signupWorker: async (req :Request , res: Response) =>{
@@ -28,6 +28,15 @@ export const workerController  = {
           res.status(200).json({ message: 'OTP verified Successfully. You can Log in ', token})
         }catch (error:any) {
            res.status(400).json({ message: error.message})
+        }
+    },
+    login: async(req:Request , res:Response) => {
+        try{
+            const token = await loginWorker(WorkerRepositoryImpl,req.body.email , req.body.password)
+            res.cookie('auth_token', token, {httpOnly:true , maxAge: 86400000});
+            res.status(200).json({message:" You can Now log in ", token});
+        }catch(error:any) {
+            res.status(400).json({message:error.message})
         }
     }
 }
