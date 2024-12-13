@@ -64,11 +64,11 @@ const OTPverification = () => {
                         onChange={(e) => setOtp(e.target.value)}
                         placeholder="Enter OTP"
                         required
-                        className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-gray-600"
                     />
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+                        className="bg-gray-900 text-white py-2 rounded hover:bg-gray-600 transition duration-200"
                     >
                         Verify
                     </button>
@@ -80,7 +80,7 @@ const OTPverification = () => {
                     <button
                         onClick={handleResendOtp}
                         disabled={isResending}
-                        className={`mt-2 text-blue-600 hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`mt-2 text-blue-500 hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isResending ? 'Resending...' : 'Resend OTP'}
                     </button>

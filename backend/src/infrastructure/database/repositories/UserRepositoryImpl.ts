@@ -13,5 +13,8 @@ export const UserRepositoryImpl: UserRepository = {
     },
     async findByGoogleId(googleId: string): Promise<User | null> {
         return await UserModel.findOne({ googleId });
+    },
+    async updatePassword(email: string, newPassword: string): Promise<void> {
+        await UserModel.updateOne({ email }, { password: newPassword });
     }
 }

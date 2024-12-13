@@ -43,7 +43,7 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 required
-                className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-gray-700"
             />
             <input
                 type="password"
@@ -51,12 +51,12 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 required
-                className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-gray-700"
             />
             <button
                 type="submit"
                 disabled={isLoading}
-                className={`bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-gray-900 text-white py-2 rounded hover:bg-gray-700 transition duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {isLoading ? 'Logging in...' : 'Login'}
             </button>

@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import OTPverification from "./pages/User/OTPverification";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ForgotPassword from "./pages/User/ForgotPassword";
+import ResetPassword from "./pages/User/ResetPassword";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
+    <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
     </GoogleOAuthProvider>
    </Router>

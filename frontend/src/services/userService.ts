@@ -63,3 +63,12 @@ export const sendResetLink = async (email: string): Promise<any> => {
         throw error;
     }
 };
+
+export const resetPassword = async (token: string, newPassword: string): Promise<string> => {
+    try {
+        const response = await axiosInstance.post('/auth/reset-password', { token, newPassword });
+        return response.data.message;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Failed to reset password.');
+    }
+};

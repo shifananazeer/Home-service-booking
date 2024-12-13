@@ -3,6 +3,9 @@ import { UserRepository } from "../../domain/repositories/userRepository";
 import { User } from "../../domain/entities/User";
 import jwt from 'jsonwebtoken'
 import { sendResetEmail } from "../../infrastructure/services/passwordEmail";
+import { verifyToken } from "../../utils/TokenGenerator";
+import bcrypt from 'bcrypt'
+
 export const sendResetLink = async (email:string) : Promise<void> => {
     const user = await UserRepositoryImpl.findByEmail(email);
     if(!user) {
@@ -22,3 +25,17 @@ const generateResetToken = (user : User) : string => {
 )
 return token;
 }
+
+export const validateToken = async (token: string): Promise<boolean> => {
+    return verifyToken(token);
+};
+
+export const resetUserPassword = async (token: string, newPassword: string): Promise<void> => {
+    const payload = verifyToken(token);
+    if (!payload) {
+        throw new Error('Invalid or expired token');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await UserRepositoryImpl.updatePassword(payload.email, hashedPassword);
+};

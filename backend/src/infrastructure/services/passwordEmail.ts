@@ -28,11 +28,11 @@ export const sendResetEmail = async (email: string, token: string): Promise<void
             subject: 'Password Reset Request',
             text: `You requested a password reset. Click here to reset your password: ${resetLink}`,
             html: `
-                <p>You requested a password reset.</p>
-                <p>Click the link below to reset your password:</p>
-                <a href="${resetLink}">${resetLink}</a>
-                <p>If you did not request this, please ignore this email.</p>
-            `,
+            <p>You requested a password reset.</p>
+            <p>Click the link below to reset your password:</p>
+            <a href="${resetLink}">Reset Password</a>
+            <p>This link is valid for 1 hour.</p>
+        `,
         });
         console.log('Email sent successfully');
     } catch (error) {

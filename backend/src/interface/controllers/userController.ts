@@ -11,7 +11,9 @@ import { sendResetLink } from "../../application/useCases/passwordResent";
 import jwt from 'jsonwebtoken'
 import { OAuth2Client } from "google-auth-library";
 import verifyGoogleToken from "../../infrastructure/services/GoogleAuthService";
-import { googleLogin } from "../../application/useCases/googleLogin";
+import { googleLogin } from "../../application/useCases/GoogleLogin";
+import { resetUserPassword } from "../../application/useCases/passwordResent";
+import { validateToken } from "../../application/useCases/passwordResent";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); 
 
 
@@ -106,5 +108,35 @@ export const userController = {
             console.error('Error in forgotPassword:', error.message);
             res.status(500).json({ message: 'Internal server error' });
         }
-    }
-}
+    },
+    validateResetToken: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { token } = req.params;
+
+            const isValid = await validateToken(token);
+            if (!isValid) {
+                res.status(400).json({ message: 'Invalid token' });
+                return;
+            }
+
+            res.status(200).json({ message: 'Token is valid' });
+        } catch (error: any) {
+            console.error('Error in validateResetToken:', error.message);
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    resetPassword: async (req: Request, res: Response): Promise<void> => {
+        console.log("body",req.body)
+        try {
+            const { token, newPassword } = req.body;
+
+            await resetUserPassword(token, newPassword);
+
+            res.status(200).json({ message: 'Password reset successfully' });
+        } catch (error: any) {
+            console.error('Error in resetPassword:', error.message);
+            res.status(500).json({ message: error.message });
+        }
+    },
+};
