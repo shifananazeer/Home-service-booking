@@ -7,12 +7,14 @@ import OTPverification from "./pages/User/OTPverification";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ForgotPassword from "./pages/User/ForgotPassword";
 import ResetPassword from "./pages/User/ResetPassword";
+import Navbar from "./components/Navbar";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
   return (
    
    <Router>
+    <Navbar/>
      <GoogleOAuthProvider clientId={clientId}>
       {/* <Toaster position="top-right" reverseOrder={false} />  */}
     <Routes>

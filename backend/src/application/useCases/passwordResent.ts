@@ -4,7 +4,7 @@ import { User } from "../../domain/entities/User";
 import jwt from 'jsonwebtoken'
 import { sendResetEmail } from "../../infrastructure/services/passwordEmail";
 import { verifyToken } from "../../utils/TokenGenerator";
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export const sendResetLink = async (email:string) : Promise<void> => {
     const user = await UserRepositoryImpl.findByEmail(email);

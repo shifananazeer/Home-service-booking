@@ -47,7 +47,7 @@ export const loginUser = async (credentials: { email: string; password: string }
                 'Content-Type': 'application/json', // Ensure Content-Type is set to application/json
             },
         });
-        return response.data;
+        return response;
     } catch (error: any) {
         errorHandler(error);
         throw error;

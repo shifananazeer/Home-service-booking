@@ -174,14 +174,14 @@ const SignupForm: React.FC = () => {
                 {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
 
                 {/* Google Sign-In button */}
-                <div className="mt-4">
+                {/* <div className="mt-4">
                     <button 
                         onClick={handleGoogleLogin} 
                         className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out w-full"
                     >
                         Sign in with Google
                     </button>
-                </div>
+                </div> */}
                 <p className="text-center mt-4">Already You have Account? <a href="/login" className="text-blue-600 hover:underline">Login</a> </p>
             </form>
         </div>

@@ -20,18 +20,19 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
 export const userController = {
-    register: async (req: Request , res: Response) => {
-        try{
-            const user = await registerUser(UserRepositoryImpl,req.body);
-            await generateOtp(user.email)
-            res
+    register: async (req: Request, res: Response) => {
+        try {
+          const user = await registerUser(UserRepositoryImpl, req.body);
+          await generateOtp(user.email);
+          res
             .status(200)
             .json({ message: "User registered. OTP sent to your email." });
-        }catch (error: any) {
-            res.status(400).json({ message: error.message });
+        } catch (error: any) {
+          res.status(400).json({ message: error.message });
         }
-    },
+      },
     login: async (req:Request , res: Response) => {
+        console.log("Request body:", req.body);
         try {
             const token = await loginUser (
                 UserRepositoryImpl,
@@ -43,11 +44,12 @@ export const userController = {
                 secure: process.env.NODE_ENV === 'production',
                 maxAge:86400000
             });
-            res.status(200).json({ message: "You can now log in.", token });
-        }catch (error:any) {
-            res.status(400).json({message: error.message})
-        }
-    },
+            res.cookie("auth_token", token, { httpOnly: true, maxAge: 86400000 });
+      res.status(200).json({ message: "You can now log in.", token });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  },
     validateOtp: async (req: Request, res: Response) => {
         try {
             const isValid = await validateOtp(req.body.email, req.body.otp);
