@@ -20,8 +20,7 @@ const SignupForm: React.FC = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [isGoogleApiLoaded, setGoogleApiLoaded] = useState(false);
-
+  
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -56,49 +55,9 @@ const SignupForm: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        const loadGoogleAPI = () => {
-            const script = document.createElement('script');
-            script.src = 'https://apis.google.com/js/api.js';
-            script.async = true;
-            script.onload = () => {
-                window.gapi.load('auth2', () => {
-                    window.gapi.auth2.init({
-                        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
-                    
-                    }).then(() => {
-                        console.log('Google API initialized successfully.');
-                        setGoogleApiLoaded(true);  // Set the state when loaded
-                    }).catch((error: any) => {
-                        console.error('Error initializing Google API:', error);
-                    });
-                });
-            };
-            document.body.appendChild(script);
-        };
+    
 
-        loadGoogleAPI();
-    }, []);
-
-    const handleGoogleLogin = async () => {
-        try {
-            const response = await window.gapi.auth2.getAuthInstance().signIn();
-            const token = response.getAuthResponse().id_token;
-            const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-
-            if (!clientId) {
-                throw new Error('Google Client ID is not defined');
-            }
-
-            const res = await axiosInstance.post('/auth/google', { token });
-            console.log('Login successful:', res.data);
-            // Dispatch user data or perform further actions
-        } catch (error:any) {
-            console.error('Google login error:', error.message);
-            toast.error('Google login failed.');
-        }
-    };
-
+    
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <form

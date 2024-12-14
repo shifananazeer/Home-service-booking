@@ -3,6 +3,7 @@ import { SignupInterface } from "../interfaces/userInterface";
 import errorHandler from "../utils/errorHandler";
 
 
+
 export const registerUser = async (userDetails : SignupInterface) => {
     try{
         const response = await axiosInstance.post('/auth/register', userDetails);
@@ -16,7 +17,8 @@ export const registerUser = async (userDetails : SignupInterface) => {
 
 export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
     try{
-        const response = await axiosInstance.post('/auth/verify-otp', {otp , email});
+        const response = await axiosInstance.post('/auth/verify-otp', {otp , email });
+        console.log("res",response)
         return response.data;
     }catch(error: any) {
         errorHandler(error);

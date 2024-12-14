@@ -1,27 +1,20 @@
-import mongoose, { Schema, Document } from 'mongoose';
+// models/WorkerModel.ts
+import mongoose, { Schema } from 'mongoose';
+import { Worker } from '../../../domain/entities/worker'
 
-// Define the WorkerDocument interface extending Mongoose's Document
-export interface WorkerDocument extends Document {
-    name: string;
-    email: string;
-    phone: string;
-    skills: string;
-    password: string;
-    isVerified: boolean;
-}
-
-// Define the Worker schema
-const WorkerSchema = new Schema<WorkerDocument>({
+const WorkerSchema = new Schema<Worker>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
-    skills: { type: String, required: true },
+    skills: { type: [String], required: true }, // Matches `string[]` in the interface
     password: { type: String, required: true },
     isVerified: { type: Boolean, default: false },
+    role: { type: String, enum: ['user', 'worker'], default: 'user' } ,
+    locationName: { type: String, required: false },
+    latitude: { type: Number, required: false },
+    longitude: { type: Number, required: false }
 });
 
-// Create the Worker model
-const WorkerModel = mongoose.model<WorkerDocument>('Worker', WorkerSchema);
+const WorkerModel = mongoose.model<Worker>('Worker', WorkerSchema);
 
-// Export the model and the WorkerDocument interface
 export default WorkerModel;

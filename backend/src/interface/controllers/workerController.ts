@@ -11,7 +11,7 @@ export const workerController  = {
        try{
        const worker = await registerWorker(WorkerRepositoryImpl , req.body);
        console.log("worker email" , worker.email)
-       await generateOtp(worker.email);
+       await generateOtp(worker.email , 0);
        res.status(200).json({message: " worker OTP send to your email"})
 
        }catch (error : any) {
@@ -23,9 +23,13 @@ export const workerController  = {
         console.log("otp body",req.body)
         try{
           console.log(req.body.email)
-          const token = await validateOtp (req.body.email, req.body.otp) ;
-          res.cookie('auth_token', token , {httpOnly:true, maxAge:8400000});
-          res.status(200).json({ message: 'OTP verified Successfully. You can Log in ', token})
+          const result  = await validateOtp (req.body.email, req.body.otp , 0) ;
+          res.cookie('auth_token', result.token , {httpOnly:true, maxAge:8400000});
+          res.status(200).json({
+            message: 'OTP verified Successfully. You can Log in',
+            valid: result.valid, // Include this for clarity
+            role: result.role // Include the role
+        });
         }catch (error:any) {
            res.status(400).json({ message: error.message})
         }

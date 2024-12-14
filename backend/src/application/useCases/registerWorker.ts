@@ -6,6 +6,7 @@ export const registerWorker = async(workerRepository : WorkerRepository , worker
     const existingWorker = await workerRepository.findByEmail(workerData.email)
     if(existingWorker) throw new Error ('Email already Exist')
         const hashedPassword = await bcrypt.hash(workerData.password , 10)
+    workerData.role = 'worker'
     workerData.password = hashedPassword
     return workerRepository.createWorker(workerData)
 }

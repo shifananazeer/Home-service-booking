@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { resendOtp, verifyOtp } from '../../services/userService';
 import toast from 'react-hot-toast';
 
-const OTPverification = () => {
+
+const WorkerOtp = () => {
     const navigate = useNavigate();
     const [otp, setOtp] = useState<string>('');
     const [timer, setTimer] = useState<number>(300);
@@ -50,7 +51,7 @@ const OTPverification = () => {
             if (response.role === 'worker') {
                 navigate('/dashboard/worker');
             } else {
-                navigate('/')
+                navigate('/worker/dashboard')
             }
         } catch (error: any) {
             console.log(error.response?.data?.message);
@@ -92,7 +93,7 @@ const OTPverification = () => {
                 </div>
             </div>
         </div>
-    );
+  )
 }
 
-export default OTPverification;
+export default WorkerOtp

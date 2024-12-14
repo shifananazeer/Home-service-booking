@@ -8,8 +8,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import ForgotPassword from "./pages/User/ForgotPassword";
 import ResetPassword from "./pages/User/ResetPassword";
 import Navbar from "./components/Navbar";
-
+import WorkerOtp from "./pages/Worker/workerOtp";
 import WorkerSignup from "./pages/Worker/WorkerSignup";
+import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
@@ -26,6 +27,8 @@ const App = () => {
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/register-worker" element={<WorkerSignup />} />
+    <Route path="/worker/dashboard" element={<WorkerDashboard/>}/>
+    <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     </Routes>
     </GoogleOAuthProvider>
    </Router>
