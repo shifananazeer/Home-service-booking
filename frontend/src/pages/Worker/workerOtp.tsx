@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { resendOtp, verifyOtp } from '../../services/userService';
+import { WorkerVerifyOtp , WorkerResendOtp } from '../../services/workerService';
 import toast from 'react-hot-toast';
 
 
@@ -31,7 +31,7 @@ const WorkerOtp = () => {
     const handleResendOtp = async () => {
         setIsResending(true);
         try {
-            await resendOtp(email);
+            await WorkerResendOtp(email);
             toast.success('OTP Resent successfully');
             setTimer(300);
         } catch (error: any) {
@@ -45,14 +45,10 @@ const WorkerOtp = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-        const response = await  verifyOtp(otp, email );
+        const response = await  WorkerVerifyOtp(otp, email );
            console.log("response", response)
             toast.success('OTP Verified Successfully');
-            if (response.role === 'worker') {
-                navigate('/dashboard/worker');
-            } else {
-                navigate('/worker/dashboard')
-            }
+            navigate('/worker/dashboard')
         } catch (error: any) {
             console.log(error.response?.data?.message);
             toast.error('Verification failed');

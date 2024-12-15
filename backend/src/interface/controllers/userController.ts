@@ -6,7 +6,7 @@ import { validateOtp } from "../../application/useCases/validateOTP";
 import { generateOtp } from "../../application/useCases/generateOtp";
 import { sendResetLink } from "../../application/useCases/passwordResent";
 
-import { resetUserPassword } from "../../application/useCases/passwordResent";
+import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
 
 
@@ -71,7 +71,7 @@ export const userController = {
                 res.status(400).json({ message: 'Email is required' });
                 return;
             }
-            await sendResetLink(email);
+            await sendResetLink(email , 1);
     
             // Add logic to handle password reset
             res.status(200).json({ message: 'Password reset link sent successfully.' });
@@ -102,7 +102,7 @@ export const userController = {
         try {
             const { token, newPassword } = req.body;
 
-            await resetUserPassword(token, newPassword);
+            await resetPassword(token, newPassword);
 
             res.status(200).json({ message: 'Password reset successfully' });
         } catch (error: any) {

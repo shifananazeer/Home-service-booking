@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export const sendResetEmail = async (email: string, token: string): Promise<void> => {
+export const sendResetEmail = async (email: string, token: string , personType: number): Promise<void> => {
     if (!email || !token) {
         throw new Error('Email and token are required to send a reset email.');
     }
@@ -19,8 +19,13 @@ export const sendResetEmail = async (email: string, token: string): Promise<void
         },
     });
 
-    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
-    
+    let resetLink = '';
+        if (personType === 0) { // Worker
+            resetLink = `http://localhost:5173/worker/reset-password?token=${token}`;
+        } else { // User (assuming 1 for user)
+            resetLink = `http://localhost:5173/reset-password?token=${token}`;
+        }
+
     try {
         await transporter.sendMail({
             from: '"ServiceHub" <shifananazeer209@gmail.com>', // Sender's email

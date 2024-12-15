@@ -6,6 +6,7 @@ export const registerUser=async(userRepository:UserRepository,userData:User):Pro
     const existingUser=await userRepository.findByEmail(userData.email)
     if(existingUser) throw new Error("Email already exists")
     const hashedPassword=await bcrypt.hash(userData.password,10)
+    userData.role = 'user'
     userData.password=hashedPassword
     return userRepository.createUser(userData)
 }
