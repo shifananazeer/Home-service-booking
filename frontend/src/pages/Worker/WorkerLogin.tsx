@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' // Adjust the import path as necessary
 import { LoginWorker } from '../../services/workerService'; // Import your API function for logging in
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { RootState } from '../../app/store';
 
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
@@ -12,6 +13,12 @@ const WorkerLogin: React.FC = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const token = useSelector((state: RootState) => state.worker.token);
+
+    // If token exists, redirect to the worker dashboard
+    if (token) {
+        return <Navigate to="/worker/dashboard" replace />;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -1,8 +1,17 @@
 import React from 'react'
 import WorkerNavbar from './WorkerNavbar'
 import WorkerSidebar from './WorkerSidebar'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../app/store'
+import { useNavigate } from 'react-router-dom'
 
 const WorkerDashboard = () => {
+  const current = useSelector((state:RootState) => state.worker.token)
+  const navigate = useNavigate()
+  console.log("curr",current)
+  if(!current) {
+    navigate('/worker/login')
+  }
   return (
     <div className="flex flex-col h-screen">
             <WorkerNavbar />

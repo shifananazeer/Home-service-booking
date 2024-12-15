@@ -5,12 +5,13 @@ interface WorkerState {
     success: boolean;
     token: string | null; // Added token to the state
 }
+const tokenFromStorage = localStorage.getItem('worker_token');
 
 const initialState: WorkerState = {
     isLoading: false,
     error: null,
     success: false,
-    token: null, // Initialize token as null
+    token: tokenFromStorage, // Initialize token as null
 };
 
 const workerSlice = createSlice({

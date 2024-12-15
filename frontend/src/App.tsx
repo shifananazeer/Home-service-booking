@@ -16,13 +16,11 @@ import { WorkerResendOtp } from "./services/workerService";
 import WorkerResetPassword from "./pages/Worker/WorkerResetPassword";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import withAuth from "./components/withAuth";
+import ProtectWorkerRoute from "./components/ProtectedWorkerRoute";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
-  const ProtectedAdminRoute = withAuth(AdminDashboard, "/admin/login", true);
-  const AdminLoginProtection = withAuth(AdminLogin, "/admin/dashboard", false)
-  
+ 
   return (
    
    <Router>
@@ -36,13 +34,21 @@ const App = () => {
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/register-worker" element={<WorkerSignup />} />
-    <Route path="/worker/dashboard" element={<WorkerDashboard/>}/>
+    {/* Protected Route */}
+    <Route
+        path="/worker/dashboard"
+        element={
+            <ProtectWorkerRoute>
+                <WorkerDashboard />
+            </ProtectWorkerRoute>
+        }
+    />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/admin/login" element={ <AdminLogin/>}/>
-    <Route path="/admin/dashboard" element={<ProtectedAdminRoute />} />
+    <Route path="/admin/dashboard" element={<AdminDashboard />} />
   </Routes>
    
    </Router>
