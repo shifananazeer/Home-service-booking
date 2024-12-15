@@ -16,21 +16,13 @@ import { WorkerResendOtp } from "./services/workerService";
 import WorkerResetPassword from "./pages/Worker/WorkerResetPassword";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import withAuth from "./components/withAuth";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
+  const ProtectedAdminRoute = withAuth(AdminDashboard, "/admin/login", true);
+  const AdminLoginProtection = withAuth(AdminLogin, "/admin/dashboard", false)
   
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-    const [isWorkerLoggedIn, setIsWorkerLoggedIn] = useState(false);
-
-    useEffect(() => {
-        // Check if admin token exists
-        const adminToken = localStorage.getItem('admin_token');
-        const workerToken = localStorage.getItem('worker_token');
-        setIsAdminLoggedIn(!!adminToken);
-        setIsWorkerLoggedIn(!!workerToken);
-    }, []);
-    
   return (
    
    <Router>
@@ -50,8 +42,8 @@ const App = () => {
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/admin/login" element={ <AdminLogin/>}/>
-    <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
-    </Routes>
+    <Route path="/admin/dashboard" element={<ProtectedAdminRoute />} />
+  </Routes>
    
    </Router>
   )

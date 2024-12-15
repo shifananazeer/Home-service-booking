@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' // Adjust the import path as necessary
+import { LoginWorker } from '../../services/workerService'; // Import your API function for logging in
 import { useNavigate } from 'react-router-dom';
-import { loginSuccess, loginFailure, loginStart } from '../../features/user/userSlice.'; // Import Redux actions
-import { LoginWorker } from '../../services/workerService';
+import toast from 'react-hot-toast';
 
-const WorkerLogin = () => {
-    const dispatch = useDispatch(); // Initialize dispatch
-    const navigate = useNavigate();
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+const WorkerLogin: React.FC = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
+    const { isLoading, error, success } = useSelector((state: any) => state.worker); // Adjust the state type as necessary
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
         dispatch(loginStart()); // Start loading
 
         try {
@@ -22,29 +22,20 @@ const WorkerLogin = () => {
             if (!response || !response.data) {
                 throw new Error('Invalid response from server');
             }
-
-            const userData = {
-                name: response.data.name,
-                email: response.data.email,
-                token: response.data.token,
-            };
-
-            toast.success('Login Successful');
-            localStorage.setItem('userData', JSON.stringify(userData));
-            dispatch(loginSuccess(userData)); // Dispatch successful login action
-            navigate('/'); // Navigate to home
+            console.log("respo",response)
+            const token = response.data.token;
+            dispatch(loginSuccess(token));
+            toast.success("login successfull")
+            navigate('/worker/dashboard')
+            // Optionally handle successful login, e.g., redirect or show success message
         } catch (error: any) {
-            console.error('Login error:', error);
-            toast.error('Login failed: ' + (error.response?.data?.message || 'Please try again'));
-            dispatch(loginFailure(error.response?.data?.message || 'Login failed')); // Dispatch failure action
-        } finally {
-            setIsLoading(false);
+            dispatch(loginFail(error.message)); // Handle login failure
+            toast.error("login failed")
         }
     };
-
     const handleForgotPassword = () => {
         navigate('/worker/forgotPassword');
-    };
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -80,7 +71,7 @@ const WorkerLogin = () => {
                 </button>
                 <div className="mt-4 text-center">
                     <p className="text-gray-600">
-                        Don't have an account? <a href="/register-worker" className="text-blue-600 hover:underline">Register</a>
+                        Don't have an account? <a href="/workerregister" className="text-blue-600 hover:underline">Register</a>
                     </p>
                 </div>
             </div>

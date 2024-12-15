@@ -41,8 +41,9 @@ const handleSubmit = async (e:React.FormEvent)=> {
     e.preventDefault();
     dispatch(signupStart());
     try {
-        await registerWorker(formData); // Send the whole form data directly
-        dispatch(signupSuccess());
+       const response =  await registerWorker(formData); // Send the whole form data directly
+       const token = response.data.token;
+        dispatch(signupSuccess(token));
         toast.success('worker Registerd successfully')
         navigate('/worker/verify-otp')
     } catch (error) {

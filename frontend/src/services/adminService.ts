@@ -9,7 +9,7 @@ export const adminLogin = async (credentials: { email: string; password: string 
         console.log("tokent",token)
         
         // Save the token to local storage
-        localStorage.setItem('adminToken', token);
+        localStorage.setItem('admin_token', token);
         return response;
     } catch (error: any) {
         throw new Error(error.response?.data?.message || 'Login failed');

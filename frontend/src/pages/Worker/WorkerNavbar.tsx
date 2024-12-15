@@ -1,8 +1,16 @@
 import React from 'react'
+import { useDispatch } from 'react-redux';
+import { logout } from '../../features/worker/workerSlice';
+import { useNavigate } from 'react-router-dom';
 
 const WorkerNavbar = () => {
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
     const handleLogout = () => {
-        // Implement logout logic (e.g., clear token, redirect to login page)
+        dispatch(logout()); // Clear Redux state and localStorage
+        navigate('/worker/login'); // Redirect to the login page
         console.log("Logging out...");
     };
 

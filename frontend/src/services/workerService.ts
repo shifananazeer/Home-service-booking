@@ -19,7 +19,10 @@ export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
     try{
         const response = await axiosInstance.post('/workers/verify-otp', {otp , email });
         console.log("res",response)
-        return response.data;
+        
+        localStorage.setItem('worker_token', response.data.token);
+        console.log("workerToken",response.data.token)
+        return response;
     }catch(error: any) {
         errorHandler(error);
         throw error;
@@ -33,6 +36,7 @@ export const LoginWorker = async (credentials: { email: string; password: string
                 'Content-Type': 'application/json', // Ensure Content-Type is set to application/json
             },
         });
+        
         localStorage.setItem('worker_token', response.data.token);
         console.log("workerToken",response.data.token)
         return response;

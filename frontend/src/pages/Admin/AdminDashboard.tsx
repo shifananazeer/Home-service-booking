@@ -8,15 +8,7 @@ import toast from "react-hot-toast";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    React.useEffect(() => {
-        // Check if the admin is logged in
-        if (!isAdminLoggedIn()) {
-            toast.error('You need to log in first.');
-            navigate('/admin/login'); // Redirect to login if not logged in
-        }else{
-            navigate('/admin/dashboard')
-        }
-    }, [navigate]);
+    
     return (
         <div className="flex flex-col h-screen">
             <AdminNavbar />
