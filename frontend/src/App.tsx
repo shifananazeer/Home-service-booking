@@ -17,6 +17,8 @@ import WorkerResetPassword from "./pages/Worker/WorkerResetPassword";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ProtectWorkerRoute from "./components/ProtectedWorkerRoute";
+import ProtectAdminRoute from "./components/ProtectedAdminRoutes";
+import UserManagement from "./components/admin/UserManagement";
 
 const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
 const App = () => {
@@ -48,7 +50,15 @@ const App = () => {
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/admin/login" element={ <AdminLogin/>}/>
-    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectAdminRoute>
+                            <AdminDashboard />
+                        </ProtectAdminRoute>
+                    }
+                />
+              
   </Routes>
    
    </Router>
@@ -65,12 +75,14 @@ const ConditionalNavbar = () => {
 
   // Define routes where Navbar should NOT appear
   const hideNavbarRoutes = [
+    '/register-worker',
     "/worker/dashboard",
     "/worker/login",
     "/worker/reset-password",
     "/worker/forgotPassword",
     "/admin/dashboard",
-    "/admin/login"
+    "/admin/login",
+    
   ];
 
   // Check if the current path is in the list of routes to hide the Navbar

@@ -7,4 +7,5 @@ export interface UserRepository {
     updatePassword(email: string, newPassword: string): Promise<void>;
     updateUser(user: User): Promise<User | null>;
     setVerifiedFalse(email: string): Promise<void>;
+    updateBlockStatus(userId: string, isBlocked: boolean): Promise<User | null>; 
 }

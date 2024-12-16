@@ -1,10 +1,15 @@
 // src/components/AdminNavbar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../../features/admin/adminSlice";
+import { useDispatch } from "react-redux";
 
 const AdminNavbar = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const handleLogout = () => {
-        // Implement logout logic (e.g., clear token, redirect to login page)
+        dispatch(logout()); // Clear Redux state and localStorage
+               navigate('/admin/login');
         console.log("Logging out...");
     };
 

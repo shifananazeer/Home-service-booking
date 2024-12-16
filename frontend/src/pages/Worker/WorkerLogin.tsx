@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' // Adjust the import path as necessary
-import { LoginWorker } from '../../services/workerService'; // Import your API function for logging in
+import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' 
+import { LoginWorker } from '../../services/workerService'; 
 import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RootState } from '../../app/store';
@@ -9,21 +9,24 @@ import { RootState } from '../../app/store';
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const { isLoading, error, success } = useSelector((state: any) => state.worker); // Adjust the state type as necessary
-
+   
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const token = useSelector((state: RootState) => state.worker.token);
+    const { isLoading , error , success } = useSelector((state: any) => state.worker); 
+
+
 
     // If token exists, redirect to the worker dashboard
     if (token) {
         return <Navigate to="/worker/dashboard" replace />;
     }
 
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        dispatch(loginStart()); // Start loading
-
+        dispatch(loginStart()); 
         try {
             const response = await LoginWorker({ email, password });
             if (!response || !response.data) {
@@ -34,7 +37,7 @@ const WorkerLogin: React.FC = () => {
             dispatch(loginSuccess(token));
             toast.success("login successfull")
             navigate('/worker/dashboard')
-            // Optionally handle successful login, e.g., redirect or show success message
+            
         } catch (error: any) {
             dispatch(loginFail(error.message)); // Handle login failure
             toast.error("login failed")
@@ -44,10 +47,13 @@ const WorkerLogin: React.FC = () => {
         navigate('/worker/forgotPassword');
     }
 
+
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white shadow-md rounded-lg p-6 w-96">
                 <h2 className="text-xl font-semibold text-center mb-4">Login</h2>
+                {success && <p className="text-green-500">Login successful!</p>}
+                {error && <p className="text-red-500">{error}</p>}
                 <form onSubmit={handleSubmit} className="flex flex-col">
                     <input
                         type="email"
@@ -78,7 +84,7 @@ const WorkerLogin: React.FC = () => {
                 </button>
                 <div className="mt-4 text-center">
                     <p className="text-gray-600">
-                        Don't have an account? <a href="/workerregister" className="text-blue-600 hover:underline">Register</a>
+                        Don't have an account? <a href="/register-worker" className="text-blue-600 hover:underline">Register</a>
                     </p>
                 </div>
             </div>

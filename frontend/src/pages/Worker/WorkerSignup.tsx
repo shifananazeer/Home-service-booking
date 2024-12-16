@@ -53,7 +53,7 @@ const handleSubmit = async (e:React.FormEvent)=> {
 
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 border rounded-lg shadow-lg">
+    <div className="items-center  max-w-md mx-auto mt-10 p-4 border rounded-lg shadow-lg justify-center">
     <h2 className="text-lg font-bold mb-4">Sign Up as Worker</h2>
     {error && <p className="text-red-500 mb-4">{error}</p>}
     {success && <p className="text-green-500 mb-4">Signup successful! Redirecting...</p>}
@@ -104,7 +104,7 @@ const handleSubmit = async (e:React.FormEvent)=> {
                 onChange={handleChange}
                 required
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., JavaScript, React, Node.js"
+                placeholder="e.g., Plumbing , Cleaning , Repair"
             />
         </div>
         <div className="mb-4">
@@ -129,6 +129,11 @@ const handleSubmit = async (e:React.FormEvent)=> {
             {isLoading ? 'Signing Up...' : 'Sign Up'}
         </button>
     </form>
+    <div className="mt-4 text-center">
+                    <p className="text-gray-600">
+                         Already You have Account? <a href="/worker/login" className="text-blue-600 hover:underline">Register</a>
+                    </p>
+                </div>
 </div>
   )
 }

@@ -9,7 +9,7 @@ import { sendResetLink } from "../../application/useCases/passwordResent";
 import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
 
-
+import { blockUser,unblockUser } from "../../application/useCases/user/blockUser";
 
 
 
@@ -111,5 +111,36 @@ export const userController = {
         }
     },
    
+    blockUser : async (req: Request, res: Response): Promise<void> => {
+        const { userId } = req.params;
+    
+        try {
+            const updatedUser = await blockUser(userId);
+            if (!updatedUser) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+            res.json({ message: 'User blocked successfully', user: updatedUser });
+        } catch (error) {
+            console.error('Error blocking user:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+    unblockUser : async (req: Request, res: Response): Promise<void> => {
+        const { userId } = req.params;
+    
+        try {
+            const updatedUser = await unblockUser(userId);
+            if (!updatedUser) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+            res.json({ message: 'User unblocked successfully', user: updatedUser });
+        } catch (error) {
+            console.error('Error unblocking user:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
 };
 
