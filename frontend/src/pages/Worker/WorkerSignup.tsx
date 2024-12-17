@@ -24,10 +24,10 @@ const navigate = useNavigate();
 const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === 'skills') {
-        // Split the skills input into an array
+       
         setFormData({
             ...formData,
-            skills: value.split(',').map(skill => skill.trim()), // Split by comma and trim spaces
+            skills: value.split(',').map(skill => skill.trim()), 
         });
     } else {
         setFormData({
@@ -41,9 +41,9 @@ const handleSubmit = async (e:React.FormEvent)=> {
     e.preventDefault();
     dispatch(signupStart());
     try {
-       const response =  await registerWorker(formData); // Send the whole form data directly
-       const token = response.data.token;
-        dispatch(signupSuccess(token));
+       const response =  await registerWorker(formData); 
+      
+        dispatch(signupSuccess());
         toast.success('worker Registerd successfully')
         navigate('/worker/verify-otp')
     } catch (error) {
@@ -100,7 +100,7 @@ const handleSubmit = async (e:React.FormEvent)=> {
                 type="text"
                 id="skills"
                 name="skills"
-                value={formData.skills.join(', ')} // Join skills array for input display
+                value={formData.skills.join(', ')} 
                 onChange={handleChange}
                 required
                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"

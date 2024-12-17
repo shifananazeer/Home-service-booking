@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 
 interface ValidateOtpResponse {
     valid: boolean;
-    role?: string; // Optional, since role may not be available in all cases
+    role?: string; 
     token?:string;
 }
 export const validateOtp = async (email:string,otp:string,person: number): Promise<ValidateOtpResponse> => {
@@ -24,37 +24,44 @@ export const validateOtp = async (email:string,otp:string,person: number): Promi
         }
         
 
-        // If OTP is valid and not expired, you may want to delete it
+       
         await OTPModel.deleteOne({ _id: otpEntry._id });
 
         let userRole: string;
-       
-        if (person === 1) { // For User
+       // For User
+        if (person === 1) { 
             const user = await UserModel.findOne({ email });
             if (!user) {
                 throw new Error('User not found');
             }
-            // Update the user's verification status
+         
             user.isVerified = true;
-            await user.save(); // Save the changes
-            userRole = 'user'; // Set role
-        } else if (person === 0) { // For Worker
+            await user.save(); 
+            userRole = 'user'; 
+
+            // For Worker
+        } else if (person === 0) { 
             const worker = await WorkerModel.findOne({ email });
             if (!worker) {
                 throw new Error('Worker not found');
             }
-            // Update the worker's verification status
+            
             worker.isVerified = true;
-            await worker.save(); // Save the changes
-            userRole = 'worker'; // Set role
+            await worker.save(); 
+            userRole = 'worker'; 
         } else {
             throw new Error('Invalid person type');
         }
 
-        // Create a JWT token
-        const token = jwt.sign({ email, role: userRole }, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+        const secretKey = process.env.JWT_SECRET_KEY;
+        if (!secretKey) {
+            throw new Error('JWT secret key is not defined');
+        }
 
-        // Return success with role and token
+        
+        const token = jwt.sign({ email, role: userRole }, secretKey, { expiresIn: '1h' });
+
+        
         return { valid: true, role: userRole, token };
     } catch (error: any) {
         throw new Error(error.message);

@@ -30,7 +30,7 @@ export const resendOtp = async (email: string) : Promise<any> => {
     try{
         const response = await axiosInstance.post('/auth/resend-otp',{email},{
             headers: {
-                'Content-Type': 'application/json', // Ensure Content-Type is set to application/json
+                'Content-Type': 'application/json', 
             }
         })
         return response.data;
@@ -46,7 +46,7 @@ export const loginUser = async (credentials: { email: string; password: string }
         console.log('Login credentials:', credentials); 
         const response = await axiosInstance.post('/auth/login', credentials, {
             headers: {
-                'Content-Type': 'application/json', // Ensure Content-Type is set to application/json
+                'Content-Type': 'application/json', 
             },
         });
         return response;

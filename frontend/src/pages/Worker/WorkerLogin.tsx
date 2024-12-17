@@ -17,7 +17,7 @@ const WorkerLogin: React.FC = () => {
 
 
 
-    // If token exists, redirect to the worker dashboard
+    
     if (token) {
         return <Navigate to="/worker/dashboard" replace />;
     }

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { loginSuccess, loginFailure, loginStart } from '../../features/user/userSlice.'; // Import Redux actions
+import { loginSuccess, loginFailure, loginStart } from '../../features/user/userSlice.'; 
 import { loginUser } from '../../services/userService';
 
 const Login = () => {
-    const dispatch = useDispatch(); // Initialize dispatch
+    const dispatch = useDispatch(); 
     const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -15,7 +15,7 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        dispatch(loginStart()); // Start loading
+        dispatch(loginStart()); 
 
         try {
             const response = await loginUser({ email, password });
@@ -31,12 +31,12 @@ const Login = () => {
 
             toast.success('Login Successful');
             localStorage.setItem('userData', JSON.stringify(userData));
-            dispatch(loginSuccess(userData)); // Dispatch successful login action
-            navigate('/'); // Navigate to home
+            dispatch(loginSuccess(userData)); 
+            navigate('/'); 
         } catch (error: any) {
             console.error('Login error:', error);
             toast.error('Login failed: ' + (error.response?.data?.message || 'Please try again'));
-            dispatch(loginFailure(error.response?.data?.message || 'Login failed')); // Dispatch failure action
+            dispatch(loginFailure(error.response?.data?.message || 'Login failed')); 
         } finally {
             setIsLoading(false);
         }

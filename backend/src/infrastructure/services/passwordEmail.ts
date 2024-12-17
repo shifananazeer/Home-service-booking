@@ -8,27 +8,27 @@ export const sendResetEmail = async (email: string, token: string , personType: 
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
-        secure: false, // Use true for 465, false for other ports
+        secure: false, 
         requireTLS: true,
         auth: {
-            user: process.env.EMAIL_USER, // Your Gmail address
-            pass: process.env.EMAIL_PASS, // Your App Password
+            user: process.env.EMAIL_USER, 
+            pass: process.env.EMAIL_PASS, 
         },
         tls: {
-            rejectUnauthorized: false, // Accept self-signed certificates (if necessary)
+            rejectUnauthorized: false, 
         },
     });
 
     let resetLink = '';
-        if (personType === 0) { // Worker
+        if (personType === 0) { 
             resetLink = `http://localhost:5173/worker/reset-password?token=${token}`;
-        } else { // User (assuming 1 for user)
+        } else { 
             resetLink = `http://localhost:5173/reset-password?token=${token}`;
         }
 
     try {
         await transporter.sendMail({
-            from: '"ServiceHub" <shifananazeer209@gmail.com>', // Sender's email
+            from: '"ServiceHub" <shifananazeer209@gmail.com>', 
             to: email,
             subject: 'Password Reset Request',
             text: `You requested a password reset. Click here to reset your password: ${resetLink}`,

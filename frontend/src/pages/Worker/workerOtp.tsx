@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { WorkerVerifyOtp , WorkerResendOtp } from '../../services/workerService';
+import { WorkerVerifyOtp , WorkerResendOtp  } from '../../services/workerService';
+import { otpVerifySuccess } from '../../features/worker/workerSlice';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 
 const WorkerOtp = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [otp, setOtp] = useState<string>('');
     const [timer, setTimer] = useState<number>(300);
     const [isResending, setIsResending] = useState(false);
     const [email, setEmail] = useState<string>(() => {
-      const storedEmail = localStorage.getItem('email') || ''; // Example using localStorage
-      console.log('Retrieved email:', storedEmail); // Debugging line
+      const storedEmail = localStorage.getItem('email') || ''; 
+      console.log('Retrieved email:', storedEmail); 
       return storedEmail;
   });
     useEffect(() => {
@@ -47,6 +50,9 @@ const WorkerOtp = () => {
         try {
         const response = await  WorkerVerifyOtp(otp, email );
            console.log("response", response)
+           const token = response.data.token;
+           console.log(token)
+        dispatch(otpVerifySuccess(token));
             toast.success('OTP Verified Successfully');
             navigate('/worker/dashboard')
         } catch (error: any) {

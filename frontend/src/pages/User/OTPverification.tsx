@@ -9,8 +9,8 @@ const OTPverification = () => {
     const [timer, setTimer] = useState<number>(300);
     const [isResending, setIsResending] = useState(false);
     const [email, setEmail] = useState<string>(() => {
-      const storedEmail = localStorage.getItem('email') || ''; // Example using localStorage
-      console.log('Retrieved email:', storedEmail); // Debugging line
+      const storedEmail = localStorage.getItem('email') || ''; 
+      console.log('Retrieved email:', storedEmail); 
       return storedEmail;
   });
     useEffect(() => {

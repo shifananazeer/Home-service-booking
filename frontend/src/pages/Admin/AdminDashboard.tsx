@@ -5,21 +5,21 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import toast from "react-hot-toast";
-import UserManagement from "../../components/admin/UserManagement"; // Import UserManagement
+import UserManagement from "../../components/admin/UserManagement"; 
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const current = useSelector((state: RootState) => state.admin.token);
-    const [currentComponent, setCurrentComponent] = useState("userManagement"); // Set default to userManagement
+    const [currentComponent, setCurrentComponent] = useState("dashboard"); 
 
     useEffect(() => {
         if (!current) {
             navigate('/admin/login');
-            toast.error("Please log in to access the admin dashboard.");
+            // toast.error("Please log in to access the admin dashboard.");
         }
     }, [current, navigate]);
 
-    // Function to render the correct component based on the state
+   
     const renderComponent = () => {
         switch (currentComponent) {
             case "userManagement":

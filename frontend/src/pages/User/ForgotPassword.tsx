@@ -13,6 +13,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
         await sendResetLink(email);
         toast.success('Password reset link sent to your mail');
+        setSubmitted(true);
     }catch (error: any) {
         console.error('Error sending reset link:', error);
        

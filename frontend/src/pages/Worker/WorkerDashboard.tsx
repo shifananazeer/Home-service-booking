@@ -18,9 +18,9 @@ const WorkerDashboard = () => {
             <div className="flex flex-1">
                 <WorkerSidebar />
                 <div className="flex-1 p-6 bg-gray-100">
-                    <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                    <p className="mt-4">Welcome to your admin dashboard!</p>
-                    {/* Add your dashboard content here */}
+                    <h1 className="text-2xl font-bold">Worker Dashboard</h1>
+                    <p className="mt-4">Welcome to your worker dashboard!</p>
+                    
                 </div>
             </div>
         </div>

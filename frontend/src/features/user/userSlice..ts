@@ -4,7 +4,7 @@ interface UserData {
     name: string;
     email: string;
     token: string;
-    // Add other properties as necessary
+    
 }
 
 interface UserState {
@@ -13,7 +13,7 @@ interface UserState {
     error: string | null;
 }
 
-// Get stored user data safely
+
 const getStoredUserData = (): UserData | null => {
     try {
         const storedUserData = localStorage.getItem('userData');
@@ -25,28 +25,27 @@ const getStoredUserData = (): UserData | null => {
 };
 
 const initialState: UserState = {
-    userData: getStoredUserData(), // Use the safe function
+    userData: getStoredUserData(), 
     loading: false,
     error: null,
 };
 
-// User Slice
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        // Handles the start of the login process
+        
         loginStart: (state) => {
             state.loading = true;
-            state.error = null; // Clear any previous errors
+            state.error = null; 
         },
 
-        // Handles a successful login
+        
         loginSuccess: (state, action: PayloadAction<UserData>) => {
             state.userData = action.payload;
-            state.loading = false; // Stop loading
-            state.error = null; // Clear any previous errors
-
+            state.loading = false; 
+            state.error = null; 
             try {
                 localStorage.setItem('userData', JSON.stringify(action.payload));
             } catch (error) {
@@ -54,16 +53,16 @@ const userSlice = createSlice({
             }
         },
 
-        // Handles a login failure
+        
         loginFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false; // Stop loading
-            state.error = action.payload; // Set the error message
+            state.loading = false; 
+            state.error = action.payload; 
         },
 
-        // Handles logout and clearing user data
+       
         logout: (state) => {
             state.userData = null;
-            state.error = null; // Clear error on logout
+            state.error = null; 
 
             try {
                 localStorage.removeItem('userData');
@@ -72,7 +71,7 @@ const userSlice = createSlice({
             }
         },
 
-        // Clear user data explicitly (optional action)
+        
         clearUserData: (state) => {
             state.userData = null;
             state.error = null;
@@ -84,7 +83,6 @@ const userSlice = createSlice({
             }
         },
 
-        // Set user data explicitly (e.g., for rehydration or updates)
         setUserData: (state, action: PayloadAction<UserData>) => {
             state.userData = action.payload;
             try {

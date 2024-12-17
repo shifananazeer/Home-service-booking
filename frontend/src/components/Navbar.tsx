@@ -7,7 +7,7 @@ import { logout } from '../features/user/userSlice.';
 
 const Navbar = () => {
 
-    const userData = useAppSelector((state) => state.user.userData); // Access user data
+    const userData = useAppSelector((state) => state.user.userData); 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -33,8 +33,17 @@ const handleSignupWorkerClick = () => {
 
 
   return (
-    <nav className="navbar bg-gray-900 text-white p-4 flex justify-between">
-    <div className="navbar-brand text-lg font-bold">YourBrand</div>
+    <nav className="bg-gray-800 text-white flex justify-between items-center p-2 shadow-md">
+    <div className="flex items-center">
+    <img 
+src="/logo.png" 
+alt="Logo"
+className="h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16" 
+/>
+
+
+        <span className="text-lg font-bold">ServiceHub</span>
+    </div>
     <div className="flex items-center space-x-4">
     <button
                     className="bg-green-600 px-4 py-2 rounded hover:bg-green-500"

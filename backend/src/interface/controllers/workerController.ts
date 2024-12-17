@@ -7,6 +7,9 @@ import { validateOtp } from '../../application/useCases/validateOTP';
 import { loginWorker } from '../../application/useCases/loginWorker';
 import { resetPassword, sendResetLink } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
+
+
+
 export const workerController  = {
     signupWorker: async (req :Request , res: Response) =>{
        try{
@@ -28,8 +31,9 @@ export const workerController  = {
           res.cookie('auth_token', result.token , {httpOnly:true, maxAge:8400000});
           res.status(200).json({
             message: 'OTP verified Successfully. You can Log in',
-            valid: result.valid, // Include this for clarity
-            role: result.role // Include the role
+            valid: result.valid, 
+            role: result.role, 
+            token : result.token
         });
         }catch (error:any) {
            res.status(400).json({ message: error.message})

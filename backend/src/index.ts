@@ -5,12 +5,18 @@ import userRoutes from './infrastructure/routes/userRoutes'
 import workerRoutes from './infrastructure/routes/workerRoutes'
 import adminRoutes from './infrastructure/routes/adminRoutes'
 import cors from 'cors'
+import morgan from 'morgan';
+
+
+
 dotenv.config();
 
 const app = express();
+
+app.use(morgan('dev'));
 app.use(express.json());
 
-//cors middleware to connect fronte
+//cors middleware to connect frontend
 app.use(cors({
   origin: 'http://localhost:5173', 
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 

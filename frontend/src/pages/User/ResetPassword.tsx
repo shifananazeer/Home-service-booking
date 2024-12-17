@@ -25,18 +25,18 @@ const ResetPassword = () => {
             return;
         }
 
-        setLoading(true); // Start loading state
+        setLoading(true); 
 
         try {
             const message = await resetPassword(token, newPassword);
             setSuccess(message);
             setError('');
-            setTimeout(() => navigate('/login'), 3000); // Redirect to login after 3 seconds
+            setTimeout(() => navigate('/login'), 3000); 
         } catch (err: any) {
             setError(err.message);
             setSuccess('');
         } finally {
-            setLoading(false); // Stop loading state
+            setLoading(false); 
         }
     };
 
@@ -76,7 +76,7 @@ const ResetPassword = () => {
                 >
                     {loading ? 'Resetting...' : 'Reset Password'}
                 </button>
-                {loading && <p className="text-gray-500 text-center mt-2">Loading...</p>} {/* Loading message */}
+                {loading && <p className="text-gray-500 text-center mt-2">Loading...</p>} 
             </form>
         </div>
     </div>

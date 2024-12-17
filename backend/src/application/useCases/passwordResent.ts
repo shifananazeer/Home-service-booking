@@ -12,20 +12,23 @@ import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories
 
 interface TokenPayload {
     email: string;
-    role: 'user' | 'worker'; // Adjust this based on your role definitions
-    iat?: number; // Optional: Issued at timestamp
-    exp?: number; // Optional: Expiration timestamp
+    role: 'user' | 'worker'; 
+    iat?: number; 
+    exp?: number; 
 }
 
 export const sendResetLink = async (email: string, personType: number): Promise<void> => {
+    console.log("email", email)
+    console.log("type",personType)
     let entity;
-
-    if (personType === 1) { // User
+    // User
+    if (personType === 1) { 
         entity = await UserRepositoryImpl.findByEmail(email);
         if (!entity) {
             throw new Error('User not found');
         }
-    } else if (personType === 0) { // Worker
+         // Worker
+    } else if (personType === 0) {
         entity = await WorkerRepositoryImpl.findByEmail(email);
         if (!entity) {
             throw new Error('Worker not found');
@@ -43,12 +46,12 @@ export const sendResetLink = async (email: string, personType: number): Promise<
 type UserOrWorker = User | Worker;
 
 export const generateResetToken = (entity: UserOrWorker): string => {
-    const role = 'role' in entity ? entity.role : 'unknown'; // Default to 'unknown' if role is not found
+    const role = 'role' in entity ? entity.role : 'unknown'; 
     console.log("Generated Role:", role);
     const token = jwt.sign(
         {
             email: entity.email,
-            role: role, // Include role in the token
+            role: role, 
         },
         process.env.JWT_SECRET_KEY as string,
         { expiresIn: "1d" }
@@ -60,15 +63,15 @@ export const generateResetToken = (entity: UserOrWorker): string => {
 export const validateToken = (token: string): TokenPayload | null => {
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as TokenPayload;
-        return payload; // Return the payload if verification is successful
+        return payload; 
     } catch (error) {
         console.error('Token verification failed:', error);
-        return null; // Return null if verification fails
+        return null; 
     }
 };
 
 export const resetPassword = async (token: string, newPassword: string): Promise<void> => {
-    const payload = validateToken(token); // Ensure this retrieves the payload correctly
+    const payload = validateToken(token); 
     console.log("Payload from token:", payload); 
     if (!payload) {
         throw new Error('Invalid or expired token');
@@ -76,7 +79,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Determine the type of user (user or worker) and call the appropriate repository method
+    
     if (payload.role === 'user') {
         await UserRepositoryImpl.updatePassword(payload.email, hashedPassword);
     } else if (payload.role === 'worker') {

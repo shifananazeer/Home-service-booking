@@ -9,14 +9,13 @@ interface ProtectWorkerRouteProps {
 
 const ProtectWorkerRoute: React.FC<ProtectWorkerRouteProps> = ({ children }) => {
     const token = useSelector((state: RootState) => state.worker.token);
-    console.log("Token in ProtectWorkerRoute:", token); // Debugging log
+    console.log("Token in ProtectWorkerRoute:", token); 
 
-    // If no token, redirect to login
+   
     if (!token) {
         return <Navigate to="/worker/login" replace />;
     }
 
-    // If token exists, render the child components
     return <>{children}</>;
 };
 

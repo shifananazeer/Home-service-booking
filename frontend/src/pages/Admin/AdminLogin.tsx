@@ -2,50 +2,58 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { loginStart, loginSuccess, loginFail } from '../../features/admin/adminSlice'; // Import actions
-import { adminLogin } from '../../services/adminService'; // Assuming this is your API service
-import { RootState } from '../../app/store'; // Adjust the import path
+import { loginStart, loginSuccess, loginFail } from '../../features/admin/adminSlice'; 
+import { adminLogin } from '../../services/adminService'; 
+import { RootState } from '../../app/store'; 
 
 const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isLoading, error } = useSelector((state: RootState) => state.admin); // Access admin state
+    const { isLoading, error } = useSelector((state: RootState) => state.admin); 
     const token = useSelector((state: RootState) => state.admin.token);
 
-    // Redirect to dashboard if token exists
-    if (token) {
-        return <Navigate to="/admin/dashboard" replace />;
-    }
+    
+    // if (token) {
+    //     return <Navigate to="/admin/dashboard" replace />;
+    // }
+
+    useEffect(() => {
+        if (!token) {
+            navigate('/admin/login');
+            // toast.error("Please log in to access the admin dashboard.");
+        }
+    }, [token, navigate]);
+
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        dispatch(loginStart()); // Start login process
+        dispatch(loginStart()); 
 
         try {
-            // Validate email format
+           
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 toast.error('Please enter a valid email address.');
                 dispatch(loginFail('Invalid email format'));
                 return;
             }
 
-            // Call the admin login service
+           
             const response = await adminLogin({ email, password });
 
             if (response.status === 200) {
-                dispatch(loginSuccess(response.data.token)); // Dispatch success action with token
+                dispatch(loginSuccess(response.data.token)); 
                 toast.success('Login successful!');
-                navigate('/admin/dashboard'); // Navigate to the admin dashboard upon successful login
+                navigate('/admin/dashboard'); 
             } else {
                 toast.error(response.message || 'Login failed. Please try again.');
-                dispatch(loginFail(response.message)); // Dispatch failure action
+                dispatch(loginFail(response.message)); 
             }
         } catch (error: any) {
             console.error('Error during admin login:', error);
             toast.error('Failed to log in. Please try again.');
-            dispatch(loginFail('Failed to log in. Please try again.')); // Dispatch failure action
+            dispatch(loginFail('Failed to log in. Please try again.')); 
         }
     };
 
@@ -53,8 +61,8 @@ const AdminLogin = () => {
         <div className="container mx-auto flex justify-center items-center min-h-screen">
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
                 <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
-                {isLoading && <p className="text-center text-gray-500">Loading...</p>} {/* Show loading state */}
-                {error && <p className="text-red-500 text-center">{error}</p>} {/* Show error message */}
+                {isLoading && <p className="text-center text-gray-500">Loading...</p>} 
+                {error && <p className="text-red-500 text-center">{error}</p>} 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <input
@@ -79,7 +87,7 @@ const AdminLogin = () => {
                     <button
                         type="submit"
                         className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md w-full hover:bg-blue-600 transition"
-                        disabled={isLoading} // Disable button while loading
+                        disabled={isLoading} 
                     >
                         Login
                     </button>

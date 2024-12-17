@@ -1,9 +1,9 @@
 // src/components/AdminSidebar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+
 
 interface AdminSidebarProps {
-    setCurrentComponent: (component: string) => void; // Define the type for setCurrentComponent
+    setCurrentComponent: (component: string) => void; 
 }
 
 

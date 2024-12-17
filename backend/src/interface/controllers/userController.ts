@@ -72,8 +72,7 @@ export const userController = {
                 return;
             }
             await sendResetLink(email , 1);
-    
-            // Add logic to handle password reset
+
             res.status(200).json({ message: 'Password reset link sent successfully.' });
         } catch (error: any) {
             console.error('Error in forgotPassword:', error.message);

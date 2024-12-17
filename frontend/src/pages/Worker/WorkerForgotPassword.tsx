@@ -17,7 +17,7 @@ const WorkerForgotPassword = () => {
            console.log("email",email)            
             await WorkerSendResetLink(email);
             toast.success('Password reset link sent to your mail');
-            setSubmitted(true); // Update the state
+            setSubmitted(true); 
         }catch (error: any) {
             console.error('Error sending reset link:', error);
            

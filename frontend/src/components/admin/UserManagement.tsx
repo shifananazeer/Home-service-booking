@@ -36,10 +36,10 @@ const UserManagement = () => {
 
     const handleToggleBlock = async (userId: string, isBlocked: boolean) => {
         try {
-            setLoadingStatus((prev) => ({ ...prev, [userId]: true })); // Indicate loading state for this user
+            setLoadingStatus((prev) => ({ ...prev, [userId]: true })); 
             let response;
 
-            // Call the appropriate service based on current block status
+            
             if (isBlocked) {
                 response = await unblockUser(userId);
                 toast.success(`User ${response.user.name} has been unblocked.`);
@@ -48,7 +48,7 @@ const UserManagement = () => {
                 toast.success(`User ${response.user.name} has been blocked.`);
             }
 
-            // Update the users state with the updated user
+            
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
                     user._id === response.user._id ? { ...user, isBlocked: response.user.isBlocked } : user
@@ -58,7 +58,7 @@ const UserManagement = () => {
             console.error('Failed to update user status:', error);
             setError('Failed to update user status. Please try again later.');
         } finally {
-            setLoadingStatus((prev) => ({ ...prev, [userId]: false })); // Reset loading state
+            setLoadingStatus((prev) => ({ ...prev, [userId]: false })); 
         }
     };
     if (loading) {
@@ -75,23 +75,29 @@ const UserManagement = () => {
             <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b">Name</th>
-                        <th className="py-2 px-4 border-b">Email</th>
-                        <th className="py-2 px-4 border-b">Action</th>
+                        <th className="py-2 px-4 border-b text-center">Name</th>
+                        <th className="py-2 px-4 border-b text-center">Email</th>
+                        <th className="py-2 px-4 border-b text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Array.isArray(users) && users.map((user) => (
                         <tr key={user._id} className="hover:bg-gray-100 transition-colors duration-200">
-                            <td className="py-2 px-4 border-b">{user.firstName}</td>
-                            <td className="py-2 px-4 border-b">{user.email}</td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4 border-b text-center">{user.firstName}</td>
+                            <td className="py-2 px-4 border-b text-center">{user.email}</td>
+                            <td className="py-2 px-4 border-b text-center">
                                 <button
                                     onClick={() => handleToggleBlock(user._id, user.isBlocked)}
-                                    className={`py-1 px-3 rounded ${user.isBlocked ? 'bg-red-500' : 'bg-green-500'} text-white`}
-                                    disabled={loadingStatus[user._id]} // Disable button while loading
+                                    className={`py-1 px-3 rounded ${
+                                        user.isBlocked ? 'bg-red-500' : 'bg-green-500'
+                                    } text-white`}
+                                    disabled={loadingStatus[user._id]}
                                 >
-                                    {loadingStatus[user._id] ? 'Loading...' : (user.isBlocked ? 'Unblock' : 'Block')}
+                                    {loadingStatus[user._id]
+                                        ? 'Loading...'
+                                        : user.isBlocked
+                                        ? 'Unblock'
+                                        : 'Block'}
                                 </button>
                             </td>
                         </tr>
@@ -100,6 +106,7 @@ const UserManagement = () => {
             </table>
         </div>
     );
+    
 }
 
 export default UserManagement;

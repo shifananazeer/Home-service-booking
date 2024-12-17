@@ -1,7 +1,7 @@
-// src/infrastructure/repositories/userRepositoryImpl.ts
+
 import { User } from "../../../domain/entities/User";
 import { UserRepository } from "../../../domain/repositories/userRepository";
-import UserModel from "../models/userModels"; // Ensure the path is correct
+import UserModel from "../models/userModels"; 
 
 export const UserRepositoryImpl: UserRepository = {
     async createUser(user: User): Promise<User> {
@@ -21,9 +21,9 @@ export const UserRepositoryImpl: UserRepository = {
     },
     async updateUser(user: User): Promise<User | null> {
         const updatedUser = await UserModel.findOneAndUpdate(
-            { email: user.email }, // Update by email (consider using userId instead)
-            { isVerified: user.isVerified }, // Update the isVerified field
-            { new: true } // Return the updated document
+            { email: user.email }, 
+            { isVerified: user.isVerified }, 
+            { new: true } 
         );
         return updatedUser ? updatedUser.toObject() : null;
     },
@@ -34,4 +34,5 @@ export const UserRepositoryImpl: UserRepository = {
         const updatedUser = await UserModel.findByIdAndUpdate(userId, { isBlocked }, { new: true });
         return updatedUser ? updatedUser.toObject() : null;
     }
+    
 };

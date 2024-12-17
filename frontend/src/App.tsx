@@ -20,7 +20,7 @@ import ProtectWorkerRoute from "./components/ProtectedWorkerRoute";
 import ProtectAdminRoute from "./components/ProtectedAdminRoutes";
 import UserManagement from "./components/admin/UserManagement";
 
-const clientId="956524607160-vodmtluum57mr6flh23semp00hdenu3g.apps.googleusercontent.com"
+
 const App = () => {
  
   return (
@@ -73,8 +73,9 @@ export default App;
 const ConditionalNavbar = () => {
   const location = useLocation();
 
-  // Define routes where Navbar should NOT appear
+  //  Navbar should NOT appear
   const hideNavbarRoutes = [
+    '/worker/verify-otp',
     '/register-worker',
     "/worker/dashboard",
     "/worker/login",

@@ -12,9 +12,9 @@ export const loginAdmin = async (email: string, password: string): Promise<strin
             email: email,
             role: "admin"
         },
-        process.env.JWT_SECRET_KEY as string, // Make sure the environment variable name is correct
+        process.env.JWT_SECRET_KEY as string, 
         {
-            expiresIn: '1d' // Corrected 'expiredIn' to 'expiresIn'
+            expiresIn: '1d' 
         }
     );
 

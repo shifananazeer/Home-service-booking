@@ -5,7 +5,7 @@ const WorkerSidebar = () => {
     return (
         <div className="bg-gray-800 text-white w-64 min-h-screen flex flex-col">
             <div className="p-4 border-b border-gray-700">
-                <h2 className="text-lg font-bold">Admin Menu</h2>
+                <h2 className="text-lg font-bold">Worker Menu</h2>
             </div>
             <nav className="flex-1 p-4">
                 <ul className="space-y-2">

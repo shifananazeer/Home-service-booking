@@ -3,7 +3,7 @@ interface WorkerState {
     isLoading: boolean;
     error: string | null;
     success: boolean;
-    token: string | null; // Added token to the state
+    token: string | null; 
 }
 const tokenFromStorage = localStorage.getItem('worker_token');
 
@@ -11,7 +11,7 @@ const initialState: WorkerState = {
     isLoading: false,
     error: null,
     success: false,
-    token: tokenFromStorage, // Initialize token as null
+    token: tokenFromStorage, 
 };
 
 const workerSlice = createSlice({
@@ -24,11 +24,9 @@ const workerSlice = createSlice({
             state.error = null;
             state.success = false;
         },
-        signupSuccess: (state,action: PayloadAction<string>) => {
+        signupSuccess: (state) => {
             state.isLoading = false;
             state.success = true;
-            state.token = action.payload; // Save token
-            localStorage.setItem('worker_token', action.payload); // Persist token
         },
         signupFail: (state, action) => {
             state.isLoading = false;
@@ -40,8 +38,12 @@ const workerSlice = createSlice({
             state.success = false;
             state.token = null;
         },
+        otpVerifySuccess: (state, action) => {
+            state.token = action.payload; 
+            state.success = true;
+        },
         
-        // Login actions
+       
         loginStart: (state) => {
             state.isLoading = true;
             state.error = null;
@@ -50,14 +52,14 @@ const workerSlice = createSlice({
         loginSuccess: (state,action: PayloadAction<string>) => {
             state.isLoading = false;
             state.success = true;
-            state.token = action.payload; // Save token
-            localStorage.setItem('worker_token', action.payload); // Persist token
+            state.token = action.payload; 
+            localStorage.setItem('worker_token', action.payload); 
         },
         loginFail: (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
             state.token = null;
-            localStorage.removeItem('worker_token'); // Remove token from storage
+            localStorage.removeItem('worker_token'); 
         },
         resetLoginState: (state) => {
             state.isLoading = false;
@@ -65,9 +67,9 @@ const workerSlice = createSlice({
             state.success = false;
         },
         logout: (state) => {
-            state.token = null; // Clear token
-            state.success = false; // Reset success state
-            localStorage.removeItem('worker_token'); // Remove token from local storage
+            state.token = null; 
+            state.success = false; 
+            localStorage.removeItem('worker_token'); 
         },
     },
 });
@@ -82,6 +84,7 @@ export const {
     loginFail,
     resetLoginState,
     logout,
+    otpVerifySuccess,
 } = workerSlice.actions;
 
 export default workerSlice.reducer;

@@ -9,20 +9,22 @@ const WorkerNavbar = () => {
     const navigate = useNavigate()
 
     const handleLogout = () => {
-        dispatch(logout()); // Clear Redux state and localStorage
-        navigate('/worker/login'); // Redirect to the login page
+        dispatch(logout()); 
+        navigate('/worker/login'); 
         console.log("Logging out...");
     };
 
     return (
-        <nav className="bg-gray-800 text-white flex justify-between items-center p-4 shadow-md">
+        <nav className="bg-gray-800 text-white flex justify-between items-center p-2 shadow-md">
             <div className="flex items-center">
-                <img
-                    src="/path/to/logo.png" // Replace with your logo path
-                    alt="Logo"
-                    className="h-8 w-8 mr-2" // Adjust logo size as needed
-                />
-                <span className="text-lg font-bold">Admin Panel</span>
+            <img 
+    src="/logo.png" 
+    alt="Logo"
+    className="h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16" 
+/>
+
+
+                <span className="text-lg font-bold">Workers Area</span>
             </div>
             <button
                 onClick={handleLogout}
