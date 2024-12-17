@@ -9,7 +9,8 @@ import jwt from 'jsonwebtoken'
 interface ValidateOtpResponse {
     valid: boolean;
     role?: string; 
-    token?:string;
+    accessToken?: string;
+    refreshToken?: string;
 }
 export const validateOtp = async (email:string,otp:string,person: number): Promise<ValidateOtpResponse> => {
 
@@ -53,16 +54,16 @@ export const validateOtp = async (email:string,otp:string,person: number): Promi
             throw new Error('Invalid person type');
         }
 
-        const secretKey = process.env.JWT_SECRET_KEY;
-        if (!secretKey) {
-            throw new Error('JWT secret key is not defined');
+        const secretKey = process.env.ACCESS_TOKEN_SECRET;
+        const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET;
+        if (!secretKey || !refreshSecretKey) {
+            throw new Error('JWT secret keys are not defined');
         }
 
-        
-        const token = jwt.sign({ email, role: userRole }, secretKey, { expiresIn: '1h' });
+        const accessToken = jwt.sign({ email, role: userRole }, secretKey, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({ email, role: userRole }, refreshSecretKey, { expiresIn: '7d' });
 
-        
-        return { valid: true, role: userRole, token };
+        return { valid: true, role: userRole, accessToken, refreshToken };
     } catch (error: any) {
         throw new Error(error.message);
     }

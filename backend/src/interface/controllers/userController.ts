@@ -5,13 +5,11 @@ import { loginUser } from "../../application/useCases/loginUser";
 import { validateOtp } from "../../application/useCases/validateOTP";
 import { generateOtp } from "../../application/useCases/generateOtp";
 import { sendResetLink } from "../../application/useCases/passwordResent";
-
 import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
-
 import { blockUser,unblockUser } from "../../application/useCases/user/blockUser";
 
-
+import jwt from 'jsonwebtoken'
 
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -26,28 +24,37 @@ export const userController = {
         }
       },
     login: async (req: Request, res: Response) => {
+        console.log('Login request received:', req.body);
         try {
-          const token = await loginUser(
+            const { accessToken, refreshToken }= await loginUser(
             UserRepositoryImpl,
             req.body.email,
             req.body.password
           );
-          res.cookie("auth_token", token, { httpOnly: true, maxAge: 86400000 });
-          res.status(200).json({ message: "You can now log in.", token });
+          console.log('Tokens generated:', { accessToken, refreshToken });
+          res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+          res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+          res.status(200).json({ accessToken, refreshToken });
         } catch (error: any) {
           res.status(400).json({ message: error.message });
         }
       },
     validateOtp: async (req: Request, res: Response) => {
         try {
-            const result = await validateOtp(req.body.email, req.body.otp , 1);
-            res.cookie('auth_token', result.token, { httpOnly: true, maxAge: 8400000 });
-            res.status(200).json({
-                message: 'OTP verified Successfully. You can Log in',
-                valid: result.valid,
-                role: result.role, // Include the role
-            });
+            const { accessToken, refreshToken, role, valid } = await validateOtp(req.body.email, req.body.otp, 1);
+
+        // Set tokens in cookies
+        res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+        res.status(200).json({
+            message: 'OTP verified Successfully. You can Log in',
+            valid,
+            role,
+            accessToken,
+            refreshToken
+        });
         } catch (error: any) {
+            console.error("Error verifying OTP:", error.message);
             res.status(400).json({ message: error.message });
         }
     },
@@ -139,6 +146,27 @@ export const userController = {
         } catch (error) {
             console.error('Error unblocking user:', error);
             res.status(500).json({ message: 'Server error' });
+        }
+    },
+    refreshAccessToken : async (req:Request , res: Response) => {
+        try{
+         const refreshToken = req.cookies.refresh_token;
+         if(!refreshToken) throw new Error ('Refresh Token not provided');
+
+         const decoded : any = jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN_SECRET as string
+         )
+
+         const newAccessToken = jwt.sign(
+            {email: decoded.email , role: "user"},
+            process.env.ACCESS_TOKEN_SECRET as string,
+            { expiresIn :"15m"}
+         )
+         res.cookie('auth_token', newAccessToken , {httpOnly:true , maxAge:15 * 60 * 1000 })
+         res.status(200).json({ message: "Access token refreshed." });
+        }catch (error) {
+            res.status(401).json({ message: "Invalid Refresh Token" });
         }
     }
 };

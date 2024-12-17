@@ -16,8 +16,7 @@ import { WorkerResendOtp } from "./services/workerService";
 import WorkerResetPassword from "./pages/Worker/WorkerResetPassword";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import ProtectWorkerRoute from "./components/ProtectedWorkerRoute";
-import ProtectAdminRoute from "./components/ProtectedAdminRoutes";
+
 import UserManagement from "./components/admin/UserManagement";
 
 
@@ -40,9 +39,9 @@ const App = () => {
     <Route
         path="/worker/dashboard"
         element={
-            <ProtectWorkerRoute>
+           
                 <WorkerDashboard />
-            </ProtectWorkerRoute>
+           
         }
     />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
@@ -53,9 +52,9 @@ const App = () => {
     <Route
                     path="/admin/dashboard"
                     element={
-                        <ProtectAdminRoute>
+                      
                             <AdminDashboard />
-                        </ProtectAdminRoute>
+                       
                     }
                 />
               

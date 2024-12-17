@@ -48,15 +48,20 @@ const WorkerOtp = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-        const response = await  WorkerVerifyOtp(otp, email );
-           console.log("response", response)
-           const token = response.data.token;
-           console.log(token)
-        dispatch(otpVerifySuccess(token));
+            const response = await WorkerVerifyOtp(otp, email);
+            console.log('Response:', response);
+
+            // Save tokens securely
+            const { accessToken, refreshToken } = response.data;
+           
+            // Dispatch to Redux
+            dispatch(otpVerifySuccess(accessToken));
             toast.success('OTP Verified Successfully');
-            navigate('/worker/dashboard')
+
+            // Navigate to worker dashboard
+            navigate('/worker/dashboard');
         } catch (error: any) {
-            console.log(error.response?.data?.message);
+            console.error('Verification Failed:', error.response?.data?.message);
             toast.error('Verification failed');
         }
     };

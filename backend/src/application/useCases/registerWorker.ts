@@ -5,7 +5,12 @@ import bcrypt from 'bcryptjs'
 export const registerWorker = async(workerRepository : WorkerRepository , workerData:Worker): Promise<Worker> => {
     const existingWorker = await workerRepository.findByEmail(workerData.email)
     if(existingWorker) throw new Error ('Email already Exist')
+        if (workerData.password.length < 6) {
+            throw new Error('Password must be at least 6 characters long.');
+        }
+    
         const hashedPassword = await bcrypt.hash(workerData.password , 10)
+        
     workerData.role = 'worker'
     workerData.password = hashedPassword
     return workerRepository.createWorker(workerData)

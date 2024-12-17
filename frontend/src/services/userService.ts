@@ -18,8 +18,10 @@ export const registerUser = async (userDetails : SignupInterface) => {
 export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
     try{
         const response = await axiosInstance.post('/auth/verify-otp', {otp , email });
-        console.log("res",response)
-        return response.data;
+        console.log('Verification Success:', response.data);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        return response;
     }catch(error: any) {
         errorHandler(error);
         throw error;
@@ -49,7 +51,10 @@ export const loginUser = async (credentials: { email: string; password: string }
                 'Content-Type': 'application/json', 
             },
         });
-        return response;
+        console.log('Login Response:', response.data);
+        const { accessToken, refreshToken, name, email } = response.data;
+
+        return { accessToken, refreshToken, name, email }; // Return necessary data
     } catch (error: any) {
         errorHandler(error);
         throw error;
@@ -72,5 +77,23 @@ export const resetPassword = async (token: string, newPassword: string): Promise
         return response.data.message;
     } catch (error: any) {
         throw new Error(error.response?.data?.message || 'Failed to reset password.');
+    }
+};
+
+export const refreshAccessToken = async (): Promise<string | null> => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) return null; // No refresh token available
+
+    try {
+        const response = await axiosInstance.post('/auth/refresh-token', { refreshToken });
+        const { accessToken } = response.data;
+
+        // Store the new access token
+        localStorage.setItem('accessToken', accessToken);
+
+        return accessToken; // Return the new access token
+    } catch (error) {
+        console.error('Failed to refresh access token:', error);
+        return null; // Return null if refreshing fails
     }
 };

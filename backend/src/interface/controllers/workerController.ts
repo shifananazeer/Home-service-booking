@@ -27,23 +27,42 @@ export const workerController  = {
         console.log("otp body",req.body)
         try{
           console.log(req.body.email)
-          const result  = await validateOtp (req.body.email, req.body.otp , 0) ;
-          res.cookie('auth_token', result.token , {httpOnly:true, maxAge:8400000});
-          res.status(200).json({
+          const { accessToken, refreshToken, role, valid } = await validateOtp(req.body.email, req.body.otp, 0);
+
+        // Set tokens in cookies
+        res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+
+        // Send tokens and role in the response
+        res.status(200).json({
             message: 'OTP verified Successfully. You can Log in',
-            valid: result.valid, 
-            role: result.role, 
-            token : result.token
+            valid,
+            role,
+            accessToken,
+            refreshToken
+    
         });
         }catch (error:any) {
+            console.error("Error verifying OTP:", error.message);
            res.status(400).json({ message: error.message})
         }
     },
-    login: async(req:Request , res:Response) => {
-        try{
-            const token = await loginWorker(WorkerRepositoryImpl,req.body.email , req.body.password)
-            res.cookie('auth_token', token, {httpOnly:true , maxAge: 86400000});
-            res.status(200).json({message:" You can Now log in ", token});
+     login : async (req: Request, res: Response) => {
+        try {
+          
+            const { accessToken, refreshToken } = await loginWorker(WorkerRepositoryImpl, req.body.email, req.body.password);
+            
+           
+            res.cookie('access_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
+    
+          
+            res.cookie('refresh_token', refreshToken, { httpOnly: true, maxAge: 604800000 }); // 7 days
+    
+            res.status(200).json({
+                message: "You can now log in",
+                accessToken,
+                refreshToken,
+            });
         }catch(error:any) {
             res.status(400).json({message:error.message})
         }

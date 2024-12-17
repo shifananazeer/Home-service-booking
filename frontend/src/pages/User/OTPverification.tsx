@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resendOtp, verifyOtp } from '../../services/userService';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../../features/user/userSlice.';
 
 const OTPverification = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [otp, setOtp] = useState<string>('');
     const [timer, setTimer] = useState<number>(300);
     const [isResending, setIsResending] = useState(false);
@@ -47,6 +50,9 @@ const OTPverification = () => {
         const response = await  verifyOtp(otp, email );
            console.log("response", response)
             toast.success('OTP Verified Successfully');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            dispatch(setUserData(userData));
+
             if (response.role === 'worker') {
                 navigate('/dashboard/worker');
             } else {

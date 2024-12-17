@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' 
+import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice';
 import { LoginWorker } from '../../services/workerService'; 
 import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -8,21 +8,16 @@ import { RootState } from '../../app/store';
 
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const token = useSelector((state: RootState) => state.worker.token);
-    const { isLoading , error , success } = useSelector((state: any) => state.worker); 
+    const accessToken = useSelector((state: RootState) => state.worker.accessToken);
+    const { isLoading, error, success } = useSelector((state: RootState) => state.worker); 
 
-
-
-    
-    if (token) {
+    if (accessToken) {
         return <Navigate to="/worker/dashboard" replace />;
     }
-
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,21 +27,21 @@ const WorkerLogin: React.FC = () => {
             if (!response || !response.data) {
                 throw new Error('Invalid response from server');
             }
-            console.log("respo",response)
-            const token = response.data.token;
-            dispatch(loginSuccess(token));
-            toast.success("login successfull")
-            navigate('/worker/dashboard')
+            console.log("respo", response);
+            const { accessToken, refreshToken } = response.data; // Destructure both tokens
+            dispatch(loginSuccess({ accessToken, refreshToken })); // Pass both tokens to the success action
+            toast.success("Login successful");
+            navigate('/worker/dashboard');
             
         } catch (error: any) {
             dispatch(loginFail(error.message)); // Handle login failure
-            toast.error("login failed")
+            toast.error("Login failed");
         }
     };
+
     const handleForgotPassword = () => {
         navigate('/worker/forgotPassword');
-    }
-
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">

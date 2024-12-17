@@ -15,33 +15,49 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        dispatch(loginStart()); 
-
+        dispatch(loginStart());
+        console.log('Dispatching loginStart');
+    
         try {
+            // Call the login service
             const response = await loginUser({ email, password });
-            if (!response || !response.data) {
-                throw new Error('Invalid response from server');
-            }
-
+    
+            // Access the tokens and user details from response
+            const { accessToken, refreshToken, name, email: userEmail } = response;
+    
+            // Store tokens in local storage
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+    
+            // User data to save in Redux
             const userData = {
-                name: response.data.name,
-                email: response.data.email,
-                token: response.data.token,
+                name,
+                email: userEmail,
+                refreshToken: refreshToken,
+                accessToken: accessToken
             };
-
+    
+            // Show success toast
             toast.success('Login Successful');
-            localStorage.setItem('userData', JSON.stringify(userData));
-            dispatch(loginSuccess(userData)); 
-            navigate('/'); 
+            console.log('Dispatching loginSuccess:', userData);
+    
+            // Save to Redux store
+            dispatch(loginSuccess(userData));
+    
+            // Navigate to home page
+            navigate('/');
         } catch (error: any) {
             console.error('Login error:', error);
-            toast.error('Login failed: ' + (error.response?.data?.message || 'Please try again'));
-            dispatch(loginFailure(error.response?.data?.message || 'Login failed')); 
+    
+            // Show error toast and dispatch failure
+            const errorMessage = error.response?.data?.message || 'Login failed';
+            toast.error(errorMessage);
+            dispatch(loginFailure(errorMessage));
         } finally {
             setIsLoading(false);
         }
     };
-
+    
     const handleForgotPassword = () => {
         navigate('/forgot-password');
     };

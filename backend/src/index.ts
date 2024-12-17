@@ -15,12 +15,14 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //cors middleware to connect frontend
 app.use(cors({
   origin: 'http://localhost:5173', 
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 
   credentials: true, 
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 

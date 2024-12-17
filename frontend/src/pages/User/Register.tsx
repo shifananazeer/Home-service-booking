@@ -35,7 +35,7 @@ const SignupForm: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            const userData = await registerUser({
+          const userData =   await registerUser({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
@@ -43,8 +43,8 @@ const SignupForm: React.FC = () => {
                 password: formData.password,
                 confirmpassword: '',
             });
-            dispatch(setUserData(userData));
-            toast.success('Registration successful!');
+            localStorage.setItem('userData', JSON.stringify(userData));
+            toast.success('Registration successful! Please verify your OTP.');
             localStorage.setItem('email', formData.email);
             navigate('/verify-otp');
         } catch (error: any) {

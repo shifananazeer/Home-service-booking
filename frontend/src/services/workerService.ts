@@ -31,14 +31,17 @@ export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
 export const LoginWorker = async (credentials: { email: string; password: string }): Promise<any> => {
     try {
         console.log('Login credentials:', credentials); 
-        const response = await axiosInstance.post('/auth/login', credentials, {
+        const response = await axiosInstance.post('/workers/login', credentials, {
             headers: {
                 'Content-Type': 'application/json', 
             },
         });
+        const { accessToken, refreshToken } = response.data;
+      
         
-        localStorage.setItem('worker_token', response.data.token);
-        console.log("workerToken",response.data.token)
+        console.log("Access Token:", accessToken);
+        console.log("Refresh Token:", refreshToken);
+        
         return response;
     } catch (error: any) {
         errorHandler(error);
@@ -49,7 +52,9 @@ export const LoginWorker = async (credentials: { email: string; password: string
 export const WorkerVerifyOtp = async (otp:string , email:string) : Promise<any> => {
     try{
         const response = await axiosInstance.post('/workers/verify-otp', {otp , email });
-        console.log("res",response)
+        console.log('Verification Success:', response.data);
+        localStorage.setItem('worker_access_token', response.data.accessToken);
+        localStorage.setItem('worker_refresh_token', response.data.refreshToken);
         return response;
     }catch(error: any) {
         errorHandler(error);

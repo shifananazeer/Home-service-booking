@@ -10,6 +10,7 @@ router.post("/resend-otp",userController.resendOtp)
 router.post('/forgot-password',userController.forgotPassword)
 router.get('/reset-password/:token', userController.validateResetToken);
 router.post('/reset-password', userController.resetPassword);
+router.post("/refresh-token", userController.refreshAccessToken);
 
 
 export default router;
