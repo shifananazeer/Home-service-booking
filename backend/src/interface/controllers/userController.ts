@@ -10,6 +10,8 @@ import { validateToken } from "../../application/useCases/passwordResent";
 import { blockUser,unblockUser } from "../../application/useCases/user/blockUser";
 
 import jwt from 'jsonwebtoken'
+import { userProfile } from "../../application/useCases/user/userProfile";
+import { DecodedUser } from "../../middleware/auth";
 
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -168,6 +170,29 @@ export const userController = {
         }catch (error) {
             res.status(401).json({ message: "Invalid Refresh Token" });
         }
-    }
-};
+    },
+    getUserProfile : async (req:Request , res: Response) : Promise <void>=> {
+        console.log("body",req.body)
+        try {
+            const user = req.user as DecodedUser; 
+            // Validate user existence
+            if (!user || !user.email) {
+                res.status(400).json({ message: "User information is missing" });
+                return;
+              }
+          
+              const profileData = await userProfile(user.email); // This should now work
+              
+              res.status(200).json({
+                message: "Profile fetched successfully",
+                data: profileData,
+              });
+          } catch (error: any) {
+            console.error("Error in getUserProfile:", error); // Log error for debugging
+            res.status(500).json({
+              message: error.message || "Internal server error",
+            });
+}
+}
+}
 

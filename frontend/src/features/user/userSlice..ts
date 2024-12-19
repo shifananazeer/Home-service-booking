@@ -63,12 +63,15 @@ const userSlice = createSlice({
        
         logout: (state) => {
             state.userData = null;
-            state.error = null; 
+            state.error = null;
+            state.loading = false;
 
             try {
                 localStorage.removeItem('userData');
+                localStorage.removeItem('worker_access_token'); // Clear access token
+                localStorage.removeItem('worker_refresh_token'); // Clear refresh token
             } catch (error) {
-                console.error('Error removing userData from localStorage:', error);
+                console.error('Error removing data from localStorage during logout:', error);
             }
         },
 

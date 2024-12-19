@@ -10,6 +10,7 @@ const Navbar = () => {
     const userData = useAppSelector((state) => state.user.userData); 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    console.log('userdata', userData?.accessToken)
 
 
     const handleLoginClick = () => {
@@ -51,7 +52,7 @@ className="h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16"
                 >
                     Sign Up as Worker
                 </button>
-        {!userData ? (
+        {! userData?.accessToken ? (
             <>
                 <button
                     className="bg-gray-700 px-4 py-2 rounded hover:bg-gray-600"
