@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import WorkerNavbar from './WorkerNavbar'
 import WorkerSidebar from './WorkerSidebar'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../app/store'
 import { Navigate, useNavigate } from 'react-router-dom'
+import WorkerProfile from '../../components/worker/WorkerProfile'
 
 const WorkerDashboard = () => {
  
@@ -12,19 +13,38 @@ const WorkerDashboard = () => {
   if(!accessToken) {
     return <Navigate to="/worker/login" replace />;
   }
-  
+   const [currentComponent, setCurrentComponent] = useState("profile"); 
+   const renderComponent = () => {
+    switch (currentComponent) {
+        case "profile":
+            return <WorkerProfile />;
+        case "dashboard":
+            return (
+                <>
+                    <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+                    <p className="mt-4">Welcome to your admin dashboard!</p>
+                </>
+            );
+        default:
+            return <h1 className="text-2xl font-bold">Component Not Found</h1>;
+    }
+};
   return (
     <div className="flex flex-col h-screen">
-            <WorkerNavbar />
-            <div className="flex flex-1">
-                <WorkerSidebar />
-                <div className="flex-1 p-6 bg-gray-100">
-                    <h1 className="text-2xl font-bold">Worker Dashboard</h1>
-                    <p className="mt-4">Welcome to your worker dashboard!</p>
-                    
-                </div>
-            </div>
+    {/* Admin Navbar */}
+    <WorkerNavbar />
+
+    {/* Admin Sidebar and Main Content */}
+    <div className="flex flex-1">
+        {/* Sidebar */}
+        <WorkerSidebar setCurrentComponent={setCurrentComponent} />
+
+        {/* Main Content */}
+        <div className="flex-1 p-6 bg-gray-100">
+            {renderComponent()}
         </div>
+    </div>
+</div>
   )
 }
 

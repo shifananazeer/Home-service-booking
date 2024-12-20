@@ -94,7 +94,7 @@ const UserProfile = () => {
                     <div className="flex items-center space-x-4">
                         <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
                         <img
-                            src={userProfile.profilePic || '/avatar.jpeg'}
+                            src={userProfile.profilePic || '/avathar.jpeg'}
                             alt="Profile"
                             className="h-24 w-24 object-cover rounded-full border-4 border-gray-300 shadow-md"
                         />

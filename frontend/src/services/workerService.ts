@@ -1,4 +1,5 @@
 
+import axios from "axios";
 import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
@@ -95,3 +96,18 @@ export const resetPassword = async (token: string, newPassword: string): Promise
         throw new Error(error.response?.data?.message || 'Failed to reset password.');
     }
 };
+
+
+export const getWorkerProfile = async () : Promise <any> => {
+    const token = localStorage.getItem('worker_access_token');
+    try{
+      const response = await axiosInstance.get('/workers/profile',{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        }
+      })
+      return response.data
+    }catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Error fetching user profile');
+    }
+}

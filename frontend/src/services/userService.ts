@@ -1,6 +1,7 @@
 import axiosInstance from "../utils/axiosInstance";
 import { SignupInterface, UserProfileInterface } from "../interfaces/userInterface";
 import errorHandler from "../utils/errorHandler";
+import axios from "axios";
 
 
 
@@ -115,3 +116,5 @@ try{
     throw error;
 }
 }
+
+

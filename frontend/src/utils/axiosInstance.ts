@@ -11,14 +11,15 @@ const axiosInstance = axios.create({
 });
 
 let isRefreshing = false; // Track whether a refresh token request is in progress
-let pendingRequests: any[] = []; // Store requests waiting for a new token
+type PendingRequestCallback = (token: string) => void;
+let pendingRequests: PendingRequestCallback[] = []; // Store requests waiting for a new token
 
 const onRefreshed = (token: string) => {
     pendingRequests.forEach((callback) => callback(token)); // Call all pending requests with the new token
     pendingRequests = []; // Clear pending requests
 };
 
-const addPendingRequest = (callback: any) => {
+const addPendingRequest = (callback: PendingRequestCallback) => {
     pendingRequests.push(callback); // Add request to pending requests
 };
 
@@ -42,13 +43,14 @@ axiosInstance.interceptors.response.use(
                 } catch (refreshError) {
                     console.error('Token refresh error:', refreshError);
                     // Optionally, redirect to login or perform logout action here
+                    // e.g., window.location.href = '/login';
                 } finally {
                     isRefreshing = false; // Reset the refreshing status
                 }
             }
 
             // If refreshing is in progress, return a promise that resolves when the new token is available
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 addPendingRequest((token: string) => {
                     originalRequest.headers['Authorization'] = `Bearer ${token}`;
                     resolve(axios(originalRequest)); // Retry the original request with new token
