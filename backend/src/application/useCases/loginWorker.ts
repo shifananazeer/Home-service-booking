@@ -17,7 +17,7 @@ export const loginWorker = async (workerRepository:WorkerRepository, email:strin
         );
     
         const refreshToken = jwt.sign(
-            { email: user.email, role: 'worker' },
+            { email: user.email, role: user.role },
             process.env.REFRESH_TOKEN_SECRET as string, // Use a different secret for refresh tokens
             { expiresIn: '7d' } // Longer lifespan for refresh token
         );

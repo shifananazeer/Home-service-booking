@@ -18,10 +18,18 @@ import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 import UserManagement from "./components/admin/UserManagement";
+import UserProfile from "./pages/User/UserProfile";
+import EditUserProfile from "./pages/User/EditUserProfile";
+
+
+
+
 
 
 const App = () => {
- 
+  
+
+
   return (
    
    <Router>
@@ -35,6 +43,8 @@ const App = () => {
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/register-worker" element={<WorkerSignup />} />
+    <Route path="/user/profile" element={<UserProfile/>}/>
+    <Route path="/user/edit-profile" element={<EditUserProfile />} />
     {/* Protected Route */}
     <Route
         path="/worker/dashboard"

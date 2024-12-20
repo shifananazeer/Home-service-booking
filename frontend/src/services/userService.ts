@@ -1,5 +1,5 @@
 import axiosInstance from "../utils/axiosInstance";
-import { SignupInterface } from "../interfaces/userInterface";
+import { SignupInterface, UserProfileInterface } from "../interfaces/userInterface";
 import errorHandler from "../utils/errorHandler";
 
 
@@ -54,7 +54,7 @@ export const loginUser = async (credentials: { email: string; password: string }
         console.log('Login Response:', response.data);
         const { accessToken, refreshToken, name, email } = response.data;
 
-        return { accessToken, refreshToken, name, email }; // Return necessary data
+        return { accessToken, refreshToken, name, email }; 
     } catch (error: any) {
         errorHandler(error);
         throw error;
@@ -80,22 +80,38 @@ export const resetPassword = async (token: string, newPassword: string): Promise
     }
 };
 
-export const refreshAccessToken = async (): Promise<string | null> => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) return null; // No refresh token available
 
+
+export const getUserProfile = async () : Promise<any> => {
+    const token = localStorage.getItem('accessToken');
     try {
-        const response = await axiosInstance.post('/auth/refresh-token', { refreshToken });
-        const { accessToken } = response.data;
-
-        // Store the new access token
-        localStorage.setItem('accessToken', accessToken);
-
-        return accessToken; // Return the new access token
-    } catch (error) {
-        console.error('Failed to refresh access token:', error);
-        return null; // Return null if refreshing fails
+        const response = await axiosInstance.get('/auth/profile',{
+            headers: {
+             
+                'Authorization': `Bearer ${token}`, 
+            },
+        }); 
+        console.log("response" , response)
+        return response.data 
+    } catch (error:any) {
+        throw new Error(error.response?.data?.message || 'Error fetching user profile');
     }
-};
+}
 
 
+export const updateUserProfile = async (formData : FormData) : Promise <{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('accessToken');
+    console.log("token", token)
+try{
+   const response = await axiosInstance.put('/auth/profile/edit',formData,{
+    headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`, 
+    },
+   })
+   return { success: true, message: 'Profile updated successfully!' };
+}catch (error) {
+    errorHandler(error);
+    throw error;
+}
+}

@@ -26,7 +26,7 @@ const Navbar = () => {
        navigate('/')
     }
    const handleProfileClick = () => {
-     navigate('/profile');
+     navigate('/user/profile');
    }
 const handleSignupWorkerClick = () => {
     navigate('/register-worker')

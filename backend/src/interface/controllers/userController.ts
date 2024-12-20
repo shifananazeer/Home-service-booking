@@ -11,7 +11,10 @@ import { blockUser,unblockUser } from "../../application/useCases/user/blockUser
 
 import jwt from 'jsonwebtoken'
 import { userProfile } from "../../application/useCases/user/userProfile";
-import { DecodedUser } from "../../middleware/auth";
+import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
+import { updateUserProfile } from "../../application/useCases/user/updateUserProfile";
+import { uploadProfilePic } from "../../utils/s3Servise";
+import { upadteAddress, userAddress } from "../../application/useCases/user/updateAddress";
 
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -28,17 +31,21 @@ export const userController = {
     login: async (req: Request, res: Response) => {
         console.log('Login request received:', req.body);
         try {
-            const { accessToken, refreshToken }= await loginUser(
-            UserRepositoryImpl,
-            req.body.email,
-            req.body.password
-          );
-          console.log('Tokens generated:', { accessToken, refreshToken });
-          res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
-          res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-          res.status(200).json({ accessToken, refreshToken });
+            const { accessToken, refreshToken } = await loginUser(
+                UserRepositoryImpl,
+                req.body.email,
+                req.body.password
+            );
+            console.log('Tokens generated:', { accessToken, refreshToken });
+    
+            // Set cookies with tokens
+            res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+            res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+    
+            // Send tokens in the response (optional)
+            res.status(200).json({ accessToken, refreshToken });
         } catch (error: any) {
-          res.status(400).json({ message: error.message });
+            res.status(400).json({ message: error.message });
         }
       },
     validateOtp: async (req: Request, res: Response) => {
@@ -150,49 +157,140 @@ export const userController = {
             res.status(500).json({ message: 'Server error' });
         }
     },
-    refreshAccessToken : async (req:Request , res: Response) => {
-        try{
-         const refreshToken = req.cookies.refresh_token;
-         if(!refreshToken) throw new Error ('Refresh Token not provided');
-
-         const decoded : any = jwt.verify(
-            refreshToken,
-            process.env.REFRESH_TOKEN_SECRET as string
-         )
-
-         const newAccessToken = jwt.sign(
-            {email: decoded.email , role: "user"},
-            process.env.ACCESS_TOKEN_SECRET as string,
-            { expiresIn :"15m"}
-         )
-         res.cookie('auth_token', newAccessToken , {httpOnly:true , maxAge:15 * 60 * 1000 })
-         res.status(200).json({ message: "Access token refreshed." });
-        }catch (error) {
-            res.status(401).json({ message: "Invalid Refresh Token" });
+    refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
+        const { refreshToken } = req.body;
+    
+        if (!refreshToken) {
+            res.status(400).json({ error: "Refresh token is required" });
+            return;
+        }
+        try {
+            const accessToken = await refreshAccessToken(refreshToken);
+            res.status(200).json({ accessToken });
+        } catch (error: any) {
+            console.error("Error refreshing access token:", error.message);
+            if (error.name === "TokenExpiredError") {
+                res.status(401).json({ error: "Refresh token expired. Please log in again." });
+            } else if (error.name === "JsonWebTokenError") {
+                res.status(401).json({ error: "Invalid refresh token. Please log in again." });
+            } else {
+                res.status(500).json({ error: error.message || "Internal server error" });
+            }
         }
     },
-    getUserProfile : async (req:Request , res: Response) : Promise <void>=> {
-        console.log("body",req.body)
+    getUserProfile: async (req: Request, res: Response): Promise<void> => {
+        console.log("Request User:", req.user); 
+    
         try {
-            const user = req.user as DecodedUser; 
-            // Validate user existence
-            if (!user || !user.email) {
-                res.status(400).json({ message: "User information is missing" });
-                return;
-              }
           
-              const profileData = await userProfile(user.email); // This should now work
-              
-              res.status(200).json({
-                message: "Profile fetched successfully",
-                data: profileData,
-              });
-          } catch (error: any) {
-            console.error("Error in getUserProfile:", error); // Log error for debugging
-            res.status(500).json({
-              message: error.message || "Internal server error",
+            const userEmail = (req.user as { email?: string })?.email; 
+    
+           
+            if (!userEmail) {
+                res.status(404).json({ error: 'User email not found in request' });
+                return; 
+            }
+    
+          
+            const user = await userProfile(userEmail);
+            const addressResponse = await userAddress(user._id); 
+            console.log("address.............", addressResponse, "user", user);
+    
+         
+            if (!addressResponse.address) {
+          
+                res.status(200).json({
+                    user: {
+                        _id: user._id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        email: user.email,
+                        mobileNumber: user.mobileNumber,
+                        profilePic: user.profilePic,
+                    },
+                    address: null,
+                });
+                return; 
+            }
+            const {
+                _id: userId,
+                firstName,
+                lastName,
+                email,
+                mobileNumber,
+                profilePic
+            } = user;
+            const {
+                id: addressId,
+                userId: addressUserId, 
+                address: useraddress,
+                area
+            } = addressResponse.address; 
+    
+         
+            res.status(200).json({
+                user: {
+                    _id: userId,
+                    firstName,
+                    lastName,
+                    email,
+                    mobileNumber,
+                    profilePic
+                },
+                address: {
+                    id: addressId,
+                    userId: addressUserId,
+                    address: useraddress,
+                    area
+                }
             });
+        } catch (error) {
+            console.error('Error retrieving user profile:', error); 
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    editProfile: async (req: Request, res: Response) => {
+        console.log("edit Request User:", req.user); 
+     try{
+        const userEmail = (req.user as { email?: string })?.email;
+        if (!userEmail) {
+            res.status(404).json({ error: 'User email not found in request' });
+            return;
+        }
+        const user = await userProfile(userEmail)
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+        const { firstName, lastName, address, area } = req.body;
+        let profilePicUrl: string | undefined;
+
+     
+        if (req.file) {
+            profilePicUrl = await uploadProfilePic(req.file,user.profilePic);
+        }
+
+       
+        const updates: Partial<any> = {};
+        if (firstName) updates.firstName = firstName;
+        if (lastName) updates.lastName = lastName;
+        if (profilePicUrl) updates.profilePic = profilePicUrl; 
+
+       
+        const updatedUser = await updateUserProfile(user.email, updates);
+
+
+        const userAddress = await upadteAddress(user._id.toString(), address,area);
+
+        
+        res.status(200).json({ user: updatedUser ,address: userAddress });
+     }catch (error:any) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ error: 'Internal server error' });
+     }
+        
+    }
 }
-}
-}
+
 

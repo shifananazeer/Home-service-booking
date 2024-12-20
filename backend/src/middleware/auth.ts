@@ -1,31 +1,35 @@
-import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-export interface DecodedUser {
-  email: string;
-  role: string;
-}
+export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+    // Extract the token from the Authorization header
+    const authHeader = req.headers['authorization'];
+    console.log('Authorization Header:', authHeader); // Debugging line
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
-export const authenticateUser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const accessToken = req.cookies?.auth_token; // Use optional chaining for safety
-  if (!accessToken) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
+    if (!token) {
+        console.error('No token provided'); // Debugging line
+        res.status(401).json({ error: 'Access token is required' });
+        return; // End the function here
+    }
 
-  try {
-    const decoded = jwt.verify(
-      accessToken,
-      process.env.ACCESS_TOKEN_SECRET as string
-    ) as DecodedUser;
+    // Verify the token using ACCESS_TOKEN_SECRET
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, user) => {
+        if (err) {
+            console.error('Token verification failed:', err); // Debugging line
+            res.status(403).json({ error: 'Invalid or expired token' });
+            return; // End the function here
+        }
 
-    req.user = decoded; // Attach decoded user to req
-    next();
-  } catch (error) {
-    res.status(403).json({ message: "Access token is invalid or expired" });
-  }
+        // Attach the user to the request object
+        req.user = user; // user contains the payload from the token
+        console.log("requser",req.user)
+        next(); // Proceed to the next middleware or route handler
+    });
 };
+
+export default authenticateUser;
+
+
+
+

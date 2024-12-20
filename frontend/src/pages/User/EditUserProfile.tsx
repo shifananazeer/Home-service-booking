@@ -1,0 +1,173 @@
+import React, { useState, useEffect } from 'react';
+import { updateUserProfile } from '../../services/userService';
+import toast from 'react-hot-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Address } from '../../interfaces/addressInterface';
+
+export interface User {
+    firstName: string;
+    lastName: string;
+    profilePic?: string;
+}
+
+const EditUserProfile: React.FC = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const user = location.state?.user as User; 
+    const useraddress = location.state?.address as Address;
+
+    const [profileData, setProfileData] = useState({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: useraddress?.address || '',
+        area: useraddress?.area || '',
+        profilePic: null as File | null,
+        profilePicPreview: user.profilePic || '',
+    });
+    const [message, setMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        
+        if (user) {
+            setProfileData((prev) => ({
+                ...prev,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePicPreview: user.profilePic || '',
+            }));
+        }
+    }, [user]);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setProfileData((prev) => ({
+                ...prev,
+                profilePic: file,
+                profilePicPreview: URL.createObjectURL(file),
+            }));
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setProfileData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setLoading(true);
+        setMessage(null);
+
+        const formData = new FormData();
+        formData.append('firstName', profileData.firstName);
+        formData.append('lastName', profileData.lastName);
+        formData.append('address', profileData.address);
+        formData.append('area', profileData.area);
+        if (profileData.profilePic) {
+            formData.append('profilePic', profileData.profilePic);
+        }
+
+        try {
+            const { success, message } = await updateUserProfile(formData);
+            if (success) {
+                toast.success(message);
+                navigate('/user/profile'); 
+            } else {
+                toast.error(message);
+                setMessage(message);
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+            toast.error(errorMessage);
+            setMessage('Error updating profile. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <form
+                onSubmit={handleSubmit}
+                className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4"
+            >
+                <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
+                {message && <div className="mb-4 text-red-500">{message}</div>}
+                <div className="flex flex-col items-center mb-4">
+                    <img
+                        src={profileData.profilePicPreview || '/path/to/default/profile/pic.png'}
+                        alt="Profile Preview"
+                        className="w-24 h-24 rounded-full border border-gray-300 mb-4"
+                    />
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                        className="mb-4"
+                    />
+                </div>
+                <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium">First Name:</label>
+                    <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        value={profileData.firstName}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium">Last Name:</label>
+                    <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={profileData.lastName}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="address" className="block text-sm font-medium">Address:</label>
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value={profileData.address}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="area" className="block text-sm font-medium">Area:</label>
+                    <input
+                        type="text"
+                        id="area"
+                        name="area"
+                        value={profileData.area}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md w-full"
+                    disabled={loading}
+                >
+                    {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+            </form>
+        </div>
+    );
+};
+
+export default EditUserProfile;

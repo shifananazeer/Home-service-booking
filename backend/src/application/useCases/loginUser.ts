@@ -17,7 +17,7 @@ export const loginUser=async (
 
        // Generate Access Token
   const accessToken = jwt.sign(
-    { email: user.email, role: "user" },
+    { email: user.email, role: user.role },
     process.env.ACCESS_TOKEN_SECRET as string,
     { expiresIn: "15m" } 
   );

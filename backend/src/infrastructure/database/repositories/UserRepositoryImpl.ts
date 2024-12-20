@@ -1,7 +1,7 @@
 
 import { User } from "../../../domain/entities/User";
 import { UserRepository } from "../../../domain/repositories/userRepository";
-import UserModel from "../models/userModels"; 
+import UserModel, { UserDocument } from "../models/userModels"; 
 
 export const UserRepositoryImpl: UserRepository = {
     async createUser(user: User): Promise<User> {
@@ -21,9 +21,9 @@ export const UserRepositoryImpl: UserRepository = {
     },
     async updateUser(user: User): Promise<User | null> {
         const updatedUser = await UserModel.findOneAndUpdate(
-            { email: user.email }, 
-            { isVerified: user.isVerified }, 
-            { new: true } 
+            { email: user.email },
+            { isVerified: user.isVerified },
+            { new: true }
         );
         return updatedUser ? updatedUser.toObject() : null;
     },
@@ -33,6 +33,12 @@ export const UserRepositoryImpl: UserRepository = {
     async updateBlockStatus(userId: string, isBlocked: boolean): Promise<User | null> {
         const updatedUser = await UserModel.findByIdAndUpdate(userId, { isBlocked }, { new: true });
         return updatedUser ? updatedUser.toObject() : null;
-    }
-    
+    },
+    async updateUserProfile(email: string, updates: Partial<User>): Promise<User | null> {
+        return await UserModel.findOneAndUpdate(
+            { email },
+            { $set: updates },
+            { new: true } // Return the updated document
+        );
+    },
 };

@@ -10,7 +10,7 @@ export const userProfile = async (email:string ) => {
         if (!user) {
           throw new Error("User not found");
         }
-    
+      console.log("user",user)
         return user; // Return user data
       } catch (error: any) {
         console.error("Error in userProfile use case:", error); // Log error for debugging

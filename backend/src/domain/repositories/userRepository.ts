@@ -8,4 +8,5 @@ export interface UserRepository {
     updateUser(user: User): Promise<User | null>;
     setVerifiedFalse(email: string): Promise<void>;
     updateBlockStatus(userId: string, isBlocked: boolean): Promise<User | null>; 
+    updateUserProfile(userEmail: string, updates: Partial<User>): Promise<User | null>;
 }
