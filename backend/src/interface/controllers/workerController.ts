@@ -7,6 +7,10 @@ import { validateOtp } from '../../application/useCases/validateOTP';
 import { loginWorker } from '../../application/useCases/loginWorker';
 import { resetPassword, sendResetLink } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
+import { upadteAddress, userAddress } from '../../application/useCases/user/updateAddress';
+import { workerProfile } from '../../application/useCases/worker/workerProfil';
+import { uploadProfilePic } from '../../utils/s3Servise';
+import { updateWorkerProfile } from '../../application/useCases/worker/updateWorkerProfile';
 
 
 
@@ -53,7 +57,7 @@ export const workerController  = {
             const { accessToken, refreshToken } = await loginWorker(WorkerRepositoryImpl, req.body.email, req.body.password);
             
            
-            res.cookie('access_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
+            res.cookie('auth_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
     
           
             res.cookie('refresh_token', refreshToken, { httpOnly: true, maxAge: 604800000 }); // 7 days
@@ -128,5 +132,75 @@ export const workerController  = {
                     res.status(500).json({ message: error.message });
                 }
             },
-           
+
+            getWorkerProfile : async (req:Request , res:Response) => {
+                console.log("Request User:", req.user); 
+                try {
+                   const workerEmail = (req.user as {email?:string})?.email;
+                   if(!workerEmail){
+                    res.status(404).json({ error: 'Worker email not found in request' });
+                    return;
+                   }
+
+                   const worker = await workerProfile(workerEmail);
+                   const addressResponse = await userAddress(worker._id)
+                   console.log("address worker .", addressResponse, "worker", worker);
+                   if (!addressResponse.address) {
+          
+                    res.status(200).json({
+                        worker: {
+                            _id: worker._id,
+                            name: worker.name,
+                            email: worker.email,
+                            phone: worker.phone,
+                            profilePic: worker.profilePic,
+                            skills: worker.skills,
+                            status:worker.status,
+                            expirience: worker.expirience,
+                        },
+                        address: null,
+                    });
+                    return; 
+                }
+                const { _id:workerId, name,email,phone,profilePic, expirience, status, skills} = worker
+                const { id : addressId , userId: addressUserId,   address: useraddress,  area} = addressResponse.address;
+                res.status(200).json({
+                    worker: {_id: workerId , name , email , phone , expirience , skills ,profilePic , status},
+                    address: {id: addressId , userId :addressId , address: useraddress , area}
+                })
+                }catch (error){
+                    console.error('Error retrieving user profile:', error); 
+                    res.status(500).json({ error: 'Internal server error' })
+                }
+            },
+           updateWorkerProfile : async (req:Request , res: Response) => {
+            console.log("edit Request User:", req.user); 
+            try{
+            const workerEmail = (req.user as { email? : string})?.email;
+            if(!workerEmail) {
+                res.status(404).json({error: 'Worker email not found in request'});
+                return 
+            }
+            const worker = await workerProfile(workerEmail)
+            if(!worker) {
+                res.status(404).json({ error : "Worker not found"})
+            }
+            const {name , skills , expirience , status , address , area } = req.body;
+            let profilePicUrl : string |undefined;
+            if(req.file) {
+                profilePicUrl = await uploadProfilePic(req.file,worker.profilePic)
+            }
+            const updates : Partial<any> ={};
+            if(name) updates.name = name ;
+            if(skills) updates.skills = skills;
+            if(expirience) updates.expiration = expirience;
+            if(status) updates.status = status;
+
+            const updatedWorker = await updateWorkerProfile(worker.email , updates)
+            const workerAddress = await upadteAddress(worker._id.toString(),address , area)
+            res.status(200).json({worker:updatedWorker , address: workerAddress})
+            }catch(error) {
+
+            }
+           }
 }

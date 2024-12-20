@@ -1,10 +1,14 @@
 export interface Worker {
+    _id:string;
     name: string; 
     email: string; 
     phone: string; 
     skills: string[]; 
     password: string; 
     role: string; 
+    expirience?: number;
+    profilePic?:string;
+    status:string;
     isVerified?: boolean; 
     isBlocked?: boolean; 
     latitude?: number; 

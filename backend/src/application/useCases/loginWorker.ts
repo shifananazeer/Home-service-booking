@@ -11,8 +11,8 @@ export const loginWorker = async (workerRepository:WorkerRepository, email:strin
         const isPasswordValid = await bcrypt.compare(password , user.password)
     if(!isPasswordValid) throw new Error ('Invalied Password')
         const accessToken = jwt.sign(
-            { email: user.email, role: 'worker' },
-            process.env.JWT_SECRET_KEY as string,
+            { email: user.email, role: user.role },
+            process.env.ACCESS_TOKEN_SECRET as string,
             { expiresIn: '15m' } // Short lifespan for access token
         );
     

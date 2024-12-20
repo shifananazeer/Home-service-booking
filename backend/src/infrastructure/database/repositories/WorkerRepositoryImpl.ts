@@ -23,6 +23,12 @@ export const WorkerRepositoryImpl: WorkerRepository = {
             throw new Error('Password update failed, user not found or password unchanged.');
         }
     },
-
+   async updateWorkerProfile(email:string , updates: Partial <Worker>): Promise<Worker| null> {
+        return await WorkerModel.findOneAndUpdate (
+            {email},
+            {$set: updates},
+            {new:true}
+        )
+   }
     
 };
