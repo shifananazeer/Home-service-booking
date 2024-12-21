@@ -58,7 +58,7 @@ export const workerController  = {
      login : async (req: Request, res: Response) => {
         try {
           
-            const { accessToken, refreshToken } = await loginWorker(WorkerRepositoryImpl, req.body.email, req.body.password);
+            const { accessToken, refreshToken , workerId} = await loginWorker(WorkerRepositoryImpl, req.body.email, req.body.password);
             
            
             res.cookie('auth_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
@@ -70,6 +70,7 @@ export const workerController  = {
                 message: "You can now log in",
                 accessToken,
                 refreshToken,
+                workerId
             });
         }catch(error:any) {
             res.status(400).json({message:error.message})

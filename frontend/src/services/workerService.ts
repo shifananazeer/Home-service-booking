@@ -3,7 +3,7 @@ import axios from "axios";
 import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
-import { AvailabilityWithSlots } from "../components/worker/AvailabilityManagement";
+
 
 
 
@@ -43,6 +43,7 @@ export const LoginWorker = async (credentials: { email: string; password: string
         
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
+        console.log("workerId" , workerId)
         localStorage.setItem('workerId', workerId); 
         
         return response;
@@ -129,13 +130,27 @@ export const  updateWorkerProfile = async (formData : FormData): Promise <{ succ
         throw error;
     }
 }
-export interface AddAvailability {
-    day: string;
+export interface AvailabilitySlot {
+    slotId: string;
     startTime: string;
     endTime: string;
-    slot: string; // Represents the time range, e.g., "9:00-11:00"
-    date: string;
-}
+    isAvailable: boolean;
+  }
+  
+  // Define the interface for the availability with slots
+  export interface AvailabilityWithSlots {
+   
+    date: string; // or Date
+    slots: AvailabilitySlot[];
+    
+  }
+  
+  // Define the interface for adding availability
+  export interface AddAvailability {
+    date: string; // Date for which availability is being added
+    slots: AvailabilitySlot[]; // Slots for that date
+  }
+  
 
 export const addAvailability = async (
     availabilityData: AvailabilityWithSlots
@@ -151,3 +166,8 @@ export const addAvailability = async (
         throw error;
     }
 };
+
+export const fetchAvailabilitySlots = async(workerId:string)=> {
+    const response = await axiosInstance.get(`/workers/availability/${workerId}`)
+    return response.data
+}
