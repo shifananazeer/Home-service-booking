@@ -3,6 +3,7 @@ import axios from "axios";
 import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
+import { AvailabilityWithSlots } from "../components/worker/AvailabilityManagement";
 
 
 
@@ -37,11 +38,12 @@ export const LoginWorker = async (credentials: { email: string; password: string
                 'Content-Type': 'application/json', 
             },
         });
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, refreshToken , workerId } = response.data;
       
         
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
+        localStorage.setItem('workerId', workerId); 
         
         return response;
     } catch (error: any) {
@@ -111,3 +113,41 @@ export const getWorkerProfile = async () : Promise <any> => {
         throw new Error(error.response?.data?.message || 'Error fetching user profile');
     }
 }
+
+export const  updateWorkerProfile = async (formData : FormData): Promise <{ success: boolean; message: string }> => {
+    const token = localStorage.getItem('worker_access_token');
+    try{
+       const response = await axiosInstance.put('/workers/profile/edit',formData,{
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`, 
+        },
+       })
+       return { success: true, message: 'Profile updated successfully!' };
+    }catch (error) {
+        errorHandler(error);
+        throw error;
+    }
+}
+export interface AddAvailability {
+    day: string;
+    startTime: string;
+    endTime: string;
+    slot: string; // Represents the time range, e.g., "9:00-11:00"
+    date: string;
+}
+
+export const addAvailability = async (
+    availabilityData: AvailabilityWithSlots
+): Promise<AddAvailability> => {
+    try {
+        const response = await axiosInstance.post('/workers/availability', availabilityData);
+
+        // Assuming the backend returns the created slot data
+        return response.data;
+    } catch (error: any) {
+        // Log and re-throw for higher-level handling
+        console.error('Error adding availability:', error);
+        throw error;
+    }
+};

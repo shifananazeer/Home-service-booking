@@ -24,6 +24,7 @@ const WorkerLogin: React.FC = () => {
         dispatch(loginStart()); 
         try {
             const response = await LoginWorker({ email, password });
+          
             if (!response || !response.data) {
                 throw new Error('Invalid response from server');
             }

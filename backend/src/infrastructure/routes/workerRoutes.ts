@@ -1,7 +1,9 @@
 import express from 'express'
 import { workerController } from '../../interface/controllers/workerController';
-import authenticateUser from '../../middleware/auth';
+import  { authenticateUser } from '../../middleware/auth';
+import multer from 'multer';
 
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router()
 
 router.post('/signup', workerController.signupWorker);
@@ -12,7 +14,8 @@ router.post('/forgot-password', workerController.forgotPassword);
 router.get('/reset-password/:token', workerController.validateResetToken);
 router.post('/reset-password', workerController.resetPassword);
 router.get('/profile',authenticateUser, workerController.getWorkerProfile); // Get worker profile by ID
-router.put('/profile/edit',authenticateUser, workerController.updateWorkerProfile);
-
+router.put('/profile/edit', authenticateUser ,upload.single('profilePic'), workerController.updateWorkerProfile);
+router.post('/availability',authenticateUser,workerController.handleCreateAvailability)
+router.get('/availability/:workerId', authenticateUser, workerController.fetchAvailabilitySlotForWorker);
 
 export default router;

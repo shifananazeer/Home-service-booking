@@ -53,7 +53,8 @@ const WorkerSidebar: React.FC<WorkerSidebarProps> = ({ setCurrentComponent }) =>
                     </li>
                     <li>
                       
-                            <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button 
+                             onClick={() => setCurrentComponent("availabilityManagement")}className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Slot Management
                             </button>
                        

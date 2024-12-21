@@ -1,5 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+interface UserPayload {
+    email: string;
+    role: string;
+    _id: string; // Define the _id type to match what you include in the token
+}
 
 export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
     // Extract the token from the Authorization header
@@ -20,7 +25,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
             res.status(403).json({ error: 'Invalid or expired token' });
             return; // End the function here
         }
-
+        const userPayload = user as UserPayload;
         // Attach the user to the request object
         req.user = user; // user contains the payload from the token
         console.log("requser",req.user)

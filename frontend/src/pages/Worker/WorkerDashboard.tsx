@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../app/store'
 import { Navigate, useNavigate } from 'react-router-dom'
 import WorkerProfile from '../../components/worker/WorkerProfile'
+import AvailabilityManagement from '../../components/worker/AvailabilityManagement'
 
 const WorkerDashboard = () => {
  
@@ -18,6 +19,8 @@ const WorkerDashboard = () => {
     switch (currentComponent) {
         case "profile":
             return <WorkerProfile />;
+        case 'availabilityManagement': 
+            return <AvailabilityManagement/>
         case "dashboard":
             return (
                 <>

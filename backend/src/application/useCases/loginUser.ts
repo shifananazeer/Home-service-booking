@@ -24,7 +24,7 @@ export const loginUser=async (
 
   // Generate Refresh Token
   const refreshToken = jwt.sign(
-    { email: user.email },
+    { email: user.email , role :user.role },
     process.env.REFRESH_TOKEN_SECRET as string,
     { expiresIn: "7d" } 
   );

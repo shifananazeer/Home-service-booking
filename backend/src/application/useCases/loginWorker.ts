@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 
-export const loginWorker = async (workerRepository:WorkerRepository, email:string , password:string): Promise <{ accessToken: string; refreshToken: string }> => {
+export const loginWorker = async (workerRepository:WorkerRepository, email:string , password:string): Promise <{ accessToken: string; refreshToken: string; workerId: string }> => {
     console.log("password", password)
     console.log("email", email)
     const user = await workerRepository.findByEmail(email)
@@ -11,18 +11,18 @@ export const loginWorker = async (workerRepository:WorkerRepository, email:strin
         const isPasswordValid = await bcrypt.compare(password , user.password)
     if(!isPasswordValid) throw new Error ('Invalied Password')
         const accessToken = jwt.sign(
-            { email: user.email, role: user.role },
+            { email: user.email, role: user.role  },
             process.env.ACCESS_TOKEN_SECRET as string,
             { expiresIn: '15m' } // Short lifespan for access token
         );
     
         const refreshToken = jwt.sign(
-            { email: user.email, role: user.role },
+            { email: user.email, role: user.role  },
             process.env.REFRESH_TOKEN_SECRET as string, // Use a different secret for refresh tokens
             { expiresIn: '7d' } // Longer lifespan for refresh token
         );
     
         // Store refreshToken in your database or secure storage if needed
     
-        return { accessToken, refreshToken };
+        return { accessToken, refreshToken ,workerId: user._id.toString() };
 }

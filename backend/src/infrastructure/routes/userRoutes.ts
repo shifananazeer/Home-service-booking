@@ -2,9 +2,9 @@ import express from 'express'
 import { userController } from '../../interface/controllers/userController'
 import { authenticateUser } from '../../middleware/auth'
 import multer from 'multer'
-const router = express.Router()
+export const router = express.Router()
 
-const upload = multer({storage: multer.memoryStorage()});
+export const upload = multer({storage: multer.memoryStorage()});
 router.post("/register",userController.register)
 router.post("/login",userController.login)
 router.post("/verify-otp",userController.validateOtp)

@@ -3,7 +3,7 @@ export interface Worker {
     name: string; 
     email: string; 
     phone: string; 
-    skills: string[]; 
+    skills: [String],
     password: string; 
     role: string; 
     expirience?: number;
@@ -14,4 +14,13 @@ export interface Worker {
     latitude?: number; 
     longitude?: number; 
     locationName?: string; 
+}
+
+
+export interface WorkerUpdates {
+    name?: string;
+    skills?: string[];
+    experience?: string;
+    status?: string;
+    profilePic?: string;
 }

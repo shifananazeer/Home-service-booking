@@ -20,6 +20,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserManagement from "./components/admin/UserManagement";
 import UserProfile from "./pages/User/UserProfile";
 import EditUserProfile from "./pages/User/EditUserProfile";
+import WorkerEditProfile from "./pages/Worker/WorkerEditProfile";
+import AvailabilityManagement from "./components/worker/AvailabilityManagement";
 
 
 
@@ -58,6 +60,8 @@ const App = () => {
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
+    <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
+    {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
     <Route path="/admin/login" element={ <AdminLogin/>}/>
     <Route
                     path="/admin/dashboard"

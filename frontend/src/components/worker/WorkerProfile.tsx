@@ -51,21 +51,22 @@ const WorkerProfile = () => {
             <p className="text-gray-600">{workerProfile?.email}</p>
             <p className="text-gray-600">Experience:{workerProfile?.expirience}</p>
             <div className="text-gray-600">
-  <p>Skills:</p>
-  <div className="flex flex-wrap gap-2 mt-2">
-    {workerProfile?.skills?.length ? (
-      workerProfile.skills.map((skill, index) => (
-        <span
-          key={index}
-          className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
-        >
-          {skill}
-        </span>
-      ))
-    ) : (
-      <span className="text-gray-500">Not specified</span>
-    )}
-  </div>
+            <p>Skills:</p>
+<div className="flex flex-wrap gap-2 mt-2">
+  {workerProfile?.skills?.length ? (
+    workerProfile.skills.map((skill, index) => (
+      <span
+        key={index}
+        className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+      >
+        {skill}
+        {index < workerProfile.skills.length - 1 && ', '} {/* Add a comma except for the last skill */}
+      </span>
+    ))
+  ) : (
+    <span className="text-gray-500">No skills added</span>
+  )}
+</div>
 </div>
         </div>
     </div>
@@ -87,7 +88,7 @@ const WorkerProfile = () => {
     </div>
     <div className="mt-6 flex space-x-4">
         <button
-            // onClick={() => navigate('/user/edit-profile', { state: { user: userProfile , address: userAddress} })}
+            onClick={() => navigate('/worker/edit-profile', { state: { worker: workerProfile , address: workerAddress} })}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
         >
             Edit Profile
