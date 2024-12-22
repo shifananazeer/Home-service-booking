@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import {loginAdmin}  from '../../application/useCases/loginAdmin'
 import { AdminRepositoryImpl } from "../../infrastructure/database/repositories/AdminRepositoryIml";
 import { getUsers } from '../../application/useCases/admin/getUsers'
+import { getWorkers } from "../../application/useCases/admin/getWorkers";
 
 
 export const adminController =  {
@@ -26,6 +27,15 @@ export const adminController =  {
         res.status(200).json({users})
     } catch (error: any) {
         res.status(400).json({message : error.message})
+    }
+ },
+ getWorker: async (req:Request , res:Response) => {
+    try{
+        const workers = await getWorkers(AdminRepositoryImpl)
+        console.log(workers);
+        res.status(200).json({workers})
+    }catch (error :any) {
+        res.status(400).json({message:error.message})
     }
  }
 } 

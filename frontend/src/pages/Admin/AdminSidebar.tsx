@@ -33,7 +33,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     </li>
                     <li>
                        
-                            <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button 
+                              onClick={() => setCurrentComponent("workerManagement")}
+                            className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Worker Management
                             </button>
                        

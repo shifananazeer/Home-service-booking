@@ -6,7 +6,7 @@ const router = express.Router()
 router.post ('/login',adminController.adminLogin)
 router.get('/get-users', adminController.getUser)
 router.patch('/users/:userId/block', userController.blockUser);
-
 router.patch('/users/:userId/unblock', userController.unblockUser);
+router.get('/get-workers', adminController.getWorker)
 
 export default router;

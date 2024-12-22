@@ -55,3 +55,37 @@ export const unblockUser = async (userId:string) => {
 
     
 };
+
+export const fetchWorkers = async () => {
+    try{
+    const response = await axiosInstance.get('admin/get-workers');
+        console.log("respo", response);
+        return response.data.workers; 
+    } catch (error: any) {
+        errorHandler(error);
+        throw error;
+    }
+}
+
+export const blockWorker = async (workerId:string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/workers/${workerId}/block`);
+        console.log('Block worker response:', response.data); 
+        return response.data; 
+    } catch (error) {
+        console.error('Error blocking worker:', error);
+        throw error; 
+    } 
+}
+export const unblockWorker = async (workerId:string) => {
+    try {
+        const response = await axiosInstance.patch(`/admin/users/${workerId}/unblock`);
+        console.log('Unblock worker response:', response.data); 
+        console.log("unblock",response)
+        return response.data; 
+       
+    } catch (error) {
+        console.error('Error unblocking worker:', error);
+        throw error; 
+    } 
+}

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import toast from "react-hot-toast";
 import UserManagement from "../../components/admin/UserManagement"; 
+import WorkerManagement from "../../components/admin/WorkerManagement";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -24,6 +25,8 @@ const AdminDashboard = () => {
         switch (currentComponent) {
             case "userManagement":
                 return <UserManagement />;
+            case "workerManagement":
+                return <WorkerManagement/>
             case "dashboard":
                 return (
                     <>
