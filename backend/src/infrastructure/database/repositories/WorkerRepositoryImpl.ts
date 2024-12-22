@@ -29,6 +29,10 @@ export const WorkerRepositoryImpl: WorkerRepository = {
             {$set: updates},
             {new:true}
         )
-   }
+   },
+   async updateBlockStatus(workerId: string, isBlocked: boolean): Promise<Worker | null> {
+           const updatedWorker = await WorkerModel.findByIdAndUpdate(workerId, { isBlocked }, { new: true });
+           return updatedWorker ? updatedWorker.toObject() : null;
+       },
     
 };

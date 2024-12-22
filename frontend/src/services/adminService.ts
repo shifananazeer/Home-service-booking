@@ -18,9 +18,15 @@ export const adminLogin = async (credentials: { email: string; password: string 
     }
 };
 
-export const fetchUsers = async () => {
+export const fetchUsers = async (page = 1, limit = 10, search = '') => {
     try {
-        const response = await axiosInstance.get('admin/get-users');
+        const response = await axiosInstance.get('admin/get-users',{
+            params: {
+                page,
+                limit,
+                search,
+            },
+        });
         console.log("respo", response);
         return response.data.users; 
     } catch (error: any) {
@@ -56,9 +62,15 @@ export const unblockUser = async (userId:string) => {
     
 };
 
-export const fetchWorkers = async () => {
+export const fetchWorkers = async (page = 1, limit = 10, search = '') => {
     try{
-    const response = await axiosInstance.get('admin/get-workers');
+    const response = await axiosInstance.get('admin/get-workers',{
+        params: {
+            page,
+            limit,
+            search,
+        },
+    });
         console.log("respo", response);
         return response.data.workers; 
     } catch (error: any) {
@@ -79,7 +91,7 @@ export const blockWorker = async (workerId:string) => {
 }
 export const unblockWorker = async (workerId:string) => {
     try {
-        const response = await axiosInstance.patch(`/admin/users/${workerId}/unblock`);
+        const response = await axiosInstance.patch(`/admin/workers/${workerId}/unblock`);
         console.log('Unblock worker response:', response.data); 
         console.log("unblock",response)
         return response.data; 

@@ -5,4 +5,5 @@ export interface WorkerRepository {
     findByEmail(email: string): Promise<Worker | null>;
     updatePassword(email: string, newPassword: string): Promise<void>; 
     updateWorkerProfile(workerEmail: string , update: Partial<Worker>): Promise<Worker | null>;
+     updateBlockStatus(userId: string, isBlocked: boolean): Promise<Worker | null>; 
 }

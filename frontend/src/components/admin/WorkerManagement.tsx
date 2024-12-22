@@ -23,55 +23,67 @@ const WorkerManagement = () => {
     const [Loading ,setLoading] = useState<boolean>(true);
     const [error , setError] = useState<string |null>(null);
     const [loadingStatus , setLoadingStatus] = useState<{ [key: string]: boolean }>({});
+     const [currentPage, setCurrentPage] = useState<number>(1);
+     const [totalPages, setTotalPages] = useState<number>(1);
+     const [searchQuery, setSearchQuery] = useState<string>('');
+     const [limit] = useState<number>(10); // Number o
 
     useEffect(()=> {
        const getWorkers = async () => {
                   try {
-                      const userList = await fetchWorkers();
-                      console.log("API Response:", userList);
-                      setWorkers(userList);
+                      const workerList = await fetchWorkers(currentPage, limit, searchQuery);
+                      console.log("API Response:", workerList);
+                      setWorkers(workerList);
                   } catch (err) {
-                      console.error("Error fetching users:", err);
-                      setError('Failed to fetch users. Please try again later.');
+                      console.error("Error fetching workers:", err);
+                      setError('Failed to fetch workers. Please try again later.');
                   } finally {
                       setLoading(false);
                   }
               };
       
               getWorkers();  
-    },[])
+    },[currentPage, searchQuery, limit])
 
 
-    const handleToggleBlock = async (userId: string, isBlocked: boolean) => {
+    const handleToggleBlock = async (workerId: string, isBlocked: boolean) => {
         try {
-            setLoadingStatus((prev) => ({ ...prev, [userId]: true })); 
+            setLoadingStatus((prev) => ({ ...prev, [workerId]: true })); 
             let response;
 
             
             if (isBlocked) {
-                response = await unblockWorker(userId);
-                toast.success(`User ${response.user.name} has been unblocked.`);
+                response = await unblockWorker(workerId);
+                toast.success(`Worker ${response.worker.name} has been unblocked.`);
             } else {
-                response = await blockWorker(userId);
-                toast.success(`User ${response.user.name} has been blocked.`);
+                response = await blockWorker(workerId);
+                toast.success(`Worker ${response.worker.name} has been blocked.`);
             }
 
             
-            setWorkers((prevUsers) =>
-                prevUsers.map((user) =>
-                    user._id === response.user._id ? { ...user, isBlocked: response.user.isBlocked } : user
+            setWorkers((prevWorkers) =>
+                prevWorkers.map((worker) =>
+                    worker._id === response.worker._id ? { ...worker, isBlocked: response.worker.isBlocked } : worker
                 )
             );
         } catch (error) {
             console.error('Failed to update user status:', error);
             setError('Failed to update user status. Please try again later.');
         } finally {
-            setLoadingStatus((prev) => ({ ...prev, [userId]: false })); 
+            setLoadingStatus((prev) => ({ ...prev, [workerId]: false })); 
         }
     };
+     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchQuery(event.target.value);
+            setCurrentPage(1); // Reset to the first page on search
+        };
+    
+        const handlePageChange = (page: number) => {
+            setCurrentPage(page);
+        };
 
     if (Loading) {
-        return <div className="flex justify-center items-center h-64"><p>Loading users...</p></div>;
+        return <div className="flex justify-center items-center h-64"><p>Loading workers...</p></div>;
     }
 
     if (error) {
@@ -80,6 +92,23 @@ const WorkerManagement = () => {
    return (
     <div className="p-4">
             <h2 className="text-xl font-bold mb-4">Worker Management</h2>
+            <div className="flex items-center mb-4">
+    <input
+        type="text"
+        placeholder="Search users..."
+        value={searchQuery}
+        onChange={handleSearch}
+        className="w-full py-2 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition duration-150 ease-in-out"
+    />
+    {searchQuery && (
+        <button
+            onClick={() => setSearchQuery('')} // Clears the search input
+            className="ml-2 py-2 px-3 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none transition duration-150 ease-in-out"
+        >
+            &times; {/* Clear button with a cross icon */}
+        </button>
+    )}
+</div>
             <table className="min-w-full bg-white border border-gray-300">
                 <thead>
                     <tr>
@@ -112,6 +141,23 @@ const WorkerManagement = () => {
                     ))}
                 </tbody>
             </table>
+            <div className="mt-4 flex justify-between">
+                <button 
+                    onClick={() => handlePageChange(currentPage - 1)} 
+                    disabled={currentPage === 1}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                >
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button 
+                    onClick={() => handlePageChange(currentPage + 1)} 
+                    disabled={currentPage === totalPages}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                >
+                    Next
+                </button>
+            </div>
         </div>
   )
 }

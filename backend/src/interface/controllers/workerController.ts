@@ -16,6 +16,7 @@ import { availableSlots, createAvailability, deleteSlot, updateSlot } from '../.
 import { AvailabilityRepositoryImpl } from '../../infrastructure/database/repositories/AvailabilityRepositoryIml';
 import AvailabilityModel from '../../infrastructure/database/models/availabilityModel';
 import moment from 'moment';
+import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
 
 
 export const workerController  = {
@@ -330,6 +331,37 @@ export const workerController  = {
             res.status(500).json({ error: 'Failed to delete slot' });
             return
         }
+    },
+    blockWorker : async (req:Request , res:Response): Promise<void> => {
+        const { workerId } = req.params;
+        try{
+            const updateWorker = await blockWorker(workerId);
+            if (!updateWorker) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+            res.json({ message: 'User blocked successfully', worker: updateWorker });
+        } catch (error) {
+            console.error('Error blocking user:', error);
+            res.status(500).json({ message: 'Server error' });
+        }
+        },
+         unblockWorker : async (req: Request, res: Response): Promise<void> => {
+                const { workerId } = req.params;
+            
+                try {
+                    const updatedWorker = await unblockWorker(workerId);
+                    if (!updatedWorker) {
+                        res.status(404).json({ message: 'User not found' });
+                        return;
+                    }
+                    res.json({ message: 'User unblocked successfully', worker: updatedWorker });
+                } catch (error) {
+                    console.error('Error unblocking user:', error);
+                    res.status(500).json({ message: 'Server error' });
+                }
+            },
     }
 
-}
+
+
