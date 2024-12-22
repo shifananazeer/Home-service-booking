@@ -15,3 +15,10 @@ export interface Availability {
     createdAt?: Date; // Optional because Mongoose handles this
     updatedAt?: Date; // Optional because Mongoose handles this
 }
+
+export interface AvailabilitySlot {
+    slotId: string;        // Unique identifier for the slot
+    startTime: string;     // Start time of the slot (ISO 8601 format)
+    endTime: string;       // End time of the slot (ISO 8601 format)
+    isAvailable: boolean;   // Availability status of the slot
+}

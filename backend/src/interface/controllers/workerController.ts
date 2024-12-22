@@ -12,7 +12,7 @@ import { workerProfile } from '../../application/useCases/worker/workerProfil';
 import { uploadProfilePic } from '../../utils/s3Servise';
 import { updateWorkerProfile } from '../../application/useCases/worker/updateWorkerProfile';
 import { Availability } from '../../domain/entities/Availability';
-import { availableSlots, createAvailability } from '../../application/useCases/worker/availability';
+import { availableSlots, createAvailability, deleteSlot, updateSlot } from '../../application/useCases/worker/availability';
 import { AvailabilityRepositoryImpl } from '../../infrastructure/database/repositories/AvailabilityRepositoryIml';
 import AvailabilityModel from '../../infrastructure/database/models/availabilityModel';
 import moment from 'moment';
@@ -152,7 +152,7 @@ export const workerController  = {
                     console.log("Address worker:", addressResponse, "Worker:", worker);
             
                     const { _id: workerId, name, email, phone, profilePic, expirience, status, skills } = worker;
-                    // const parsedSkills = Array.isArray(skills) ? skills : JSON.parse(skills || '[]');
+                  
                     if (!addressResponse.address) {
                         res.status(200).json({
                             worker: {
@@ -181,7 +181,6 @@ export const workerController  = {
                 }
             },
 
-        
             updateWorkerProfile: async (req: Request, res: Response): Promise<void> => {
                 console.log("Edit Request User:", req.user);
             
@@ -229,6 +228,7 @@ export const workerController  = {
                     res.status(500).json({ error: 'Failed to update worker profile' });
                 }
             },
+
              handleCreateAvailability : async (req: Request, res: Response): Promise<void> => {
                 console.log("availability", req.body)
                 const { date, slots } = req.body;
@@ -239,11 +239,11 @@ export const workerController  = {
                     return;
                 }
             
-                // Extract workerId from req.user
-                const workerEmail = (req.user as { email?: string })?.email; // Assuming req.user has been set up correctly in your middleware
+              
+                const workerEmail = (req.user as { email?: string })?.email; 
                 if (!workerEmail) {
                     res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
-                    return; // Early return if workerId is not found
+                    return; 
                 }
                 const worker = await workerProfile(workerEmail);
 
@@ -251,46 +251,85 @@ export const workerController  = {
                 console.log("workerId" , workerId)
                 if (!workerId) {
                     res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
-                    return; // Early return if workerId is not found
+                    return; 
                 }
             
                 try {
-                    // Call the use case to create the availability
                     const availability = await createAvailability(AvailabilityRepositoryImpl, workerId, new Date(date), slots);
-            
-                    // Send the created availability in the response
                     res.status(201).json(availability);
                 } catch (error: any) {
                     console.error("Error creating availability:", error.message);
-            
-                    // Send an error response
                     res.status(500).json({ message: error.message });
                 }
             },
-            
-            
-            
-
 
             fetchAvailabilitySlotForWorker : async(req:Request , res :Response): Promise<void> => {
-             const workerId = req.params.workerId
+             const workerId = req.params.workerId;
+
+             const page = parseInt(req.query.page as string) || 1; // Default to page 1
+             const limit = parseInt(req.query.limit as string) || 5; // Default limit to 5
+             console.log("page" , page)
+             console.log("limit" , limit)
              try {
-                // Call the use case function to fetch available slots for the worker
-                const availabilities = await availableSlots(AvailabilityRepositoryImpl, workerId);
+                
+                if (page <= 0 || limit <= 0) {
+                    res.status(400).json({ message: "Invalid pagination parameters." });
+                    return;
+                }
+
+                const availabilities = await availableSlots(AvailabilityRepositoryImpl, workerId, page, limit);
         
-                // If no availabilities are found, respond with a message
                 if (!availabilities || availabilities.length === 0) {
                     res.status(200).json({ message: "No slots available." });
                     return;
                 }
+
+                const totalCount = await AvailabilityRepositoryImpl.countAvailableSlots(workerId);
         
-                // If availabilities are found, respond with the data
-                res.status(200).json(availabilities);
+                res.status(200).json({
+                    data: availabilities,
+                    pagination: {
+                        currentPage: page,
+                        totalPages: Math.ceil(totalCount / limit),
+                        totalCount,
+                    },
+                });
             } catch (error: any) {
                 console.error("Error fetching available slots:", error);
-                // Respond with an error message
                 res.status(500).json({ message: "An error occurred while fetching available slots.", error: error.message });
             }
+    },
+
+    editAvailabilitySlot: async (req:Request , res:Response):Promise<void> => {
+        const slotId = req.params.slotId;
+        const { startTime, endTime, isAvailable } = req.body; 
+        try {
+            const updatedSlot = await updateSlot(slotId, { startTime, endTime, isAvailable }, AvailabilityRepositoryImpl);
+             res.status(200).json({
+                message: 'Slot updated successfully',
+                slot: updatedSlot,
+            });
+            return;
+        } catch (error:any) {
+             res.status(404).json({ message: error.message });
+             return;
+        }
+    },
+
+    deleteAvailabilitySlot : async (req:Request , res:Response) : Promise<void> => {
+        const { slotId } = req.params; 
+        try {
+            const result = await deleteSlot(slotId);
+    
+         
+                res.status(200).json({ message: 'Slot deleted successfully' });
+                return
+          
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Failed to delete slot' });
+            return
+        }
     }
 
 }

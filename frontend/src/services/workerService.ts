@@ -155,8 +155,14 @@ export interface AvailabilitySlot {
 export const addAvailability = async (
     availabilityData: AvailabilityWithSlots
 ): Promise<AddAvailability> => {
+    const token = localStorage.getItem('worker_access_token');
     try {
-        const response = await axiosInstance.post('/workers/availability', availabilityData);
+        const response = await axiosInstance.post('/workers/availability', availabilityData, {
+            headers : {
+                'Authorization':`Bearer ${token}`,
+            } 
+        });
+        
 
         // Assuming the backend returns the created slot data
         return response.data;
@@ -167,7 +173,28 @@ export const addAvailability = async (
     }
 };
 
-export const fetchAvailabilitySlots = async(workerId:string)=> {
-    const response = await axiosInstance.get(`/workers/availability/${workerId}`)
+export const fetchAvailabilitySlots = async(workerId: string, page: number, limit: number)=> {
+    const token = localStorage.getItem('worker_access_token');
+    const response = await axiosInstance.get(`/workers/availability/${workerId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        },
+        params: { page, limit }, 
+    })
     return response.data
 }
+
+export const updateSlotData = async (updateSlot:AvailabilitySlot , slotId : string) => {
+    const token = localStorage.getItem('worker_access_token');
+    const response = await axiosInstance.put(`/workers/availability/edit/${slotId}`,updateSlot ,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        } 
+    })
+    return response;
+}
+
+export const  deleteAvailability  =  async (slotId:string)=> {
+    const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`);
+    return response.data; // Assuming your API returns some data
+};

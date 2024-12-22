@@ -17,5 +17,6 @@ router.get('/profile',authenticateUser, workerController.getWorkerProfile); // G
 router.put('/profile/edit', authenticateUser ,upload.single('profilePic'), workerController.updateWorkerProfile);
 router.post('/availability',authenticateUser,workerController.handleCreateAvailability)
 router.get('/availability/:workerId', authenticateUser, workerController.fetchAvailabilitySlotForWorker);
-
+router.put('/availability/edit/:slotId', authenticateUser, workerController.editAvailabilitySlot);
+router.delete('/availability/delete/:slotId', authenticateUser,workerController.deleteAvailabilitySlot);
 export default router;
