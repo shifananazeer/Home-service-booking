@@ -20,6 +20,7 @@ import { blockWorker, unblockWorker } from '../../application/useCases/worker/bl
 import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
 import { workerService } from '../../application/useCases/worker/workerService';
+import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
 
 
 export const workerController  = {
@@ -415,7 +416,24 @@ export const workerController  = {
                     }
                 }
             },
-            
+          updateLocation:async (req:Request , res:Response) : Promise<void> => {
+            const { latitude, longitude ,workerId } = req.body;
+           try{
+            const response = await AddressRepositoryImpl.updateLocation(latitude , longitude ,workerId)
+            if (!response) {
+                res.status(404).json({ message: "Address not found for the given workerId." });
+                return;
+            }
+    
+            // Respond with the updated address
+            res.status(200).json({ message: "Coordinates updated successfully.", data: response });
+            return
+           }catch (error:any) {
+            console.error("Error updating coordinates:", error);
+            res.status(500).json({ message: "Failed to update coordinates in the database.", error: error.message });
+            return
+           }
+          }  
     }
 
 

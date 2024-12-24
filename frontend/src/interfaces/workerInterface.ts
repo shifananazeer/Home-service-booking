@@ -9,6 +9,7 @@ export interface SignupWorker {
 }
 
 export interface WorkerProfileInterface {
+    _id?:string;
     name:string;
     email:string;
     phone: string;
@@ -16,6 +17,8 @@ export interface WorkerProfileInterface {
     expirience?: string ;
     status: string;
     profilePic?:string;
+    latitude?: number; // Add latitude
+    longitude?: number; 
 
 }
 

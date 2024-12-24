@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { WorkerProfileInterface } from '../../interfaces/workerInterface';
 import { Address } from '../../interfaces/addressInterface';
 import toast from 'react-hot-toast';
-import { fetchService, updateWorkerProfile } from '../../services/workerService';
+import { fetchService, updateCoordinates, updateWorkerProfile } from '../../services/workerService';
+import axios from 'axios';
 
 interface ProfileData {
     name: string;
@@ -13,6 +14,8 @@ interface ProfileData {
     status: string;
     address: string;
     area: string;
+    latitude?: number; // Add latitude
+    longitude?: number; // Add longitude
 }
 
 interface Service {
@@ -35,6 +38,8 @@ const EditWorkerProfile = () => {
         status: worker?.status || 'Unavailable',
         address: address?.address || '',
         area: address?.area || '',
+        latitude: worker?.latitude || undefined, // Initialize latitude
+        longitude: worker?.longitude || undefined, // Initialize longitude
     });
 
     const [profilePicPreview, setProfilePicPreview] = useState<string>(
@@ -64,16 +69,15 @@ const EditWorkerProfile = () => {
                 const fetchedServicesResponse = await fetchService();
                 console.log('Fetched services:', fetchedServicesResponse); // Log the fetched response
 
-                // Check if the response contains services
                 if (fetchedServicesResponse.success && Array.isArray(fetchedServicesResponse.services)) {
-                    setServices(fetchedServicesResponse.services); // Set services to the extracted array
+                    setServices(fetchedServicesResponse.services);
                 } else {
                     console.warn('No valid services found:', fetchedServicesResponse);
-                    setServices([]); // Fallback to an empty array
+                    setServices([]);
                 }
             } catch (err) {
                 console.error('Error fetching services:', err);
-                setServices([]); // Optionally reset to empty on error
+                setServices([]);
             } finally {
                 setIsLoadingServices(false);
             }
@@ -84,7 +88,69 @@ const EditWorkerProfile = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
+
+        // If the changed input is 'area', fetch latitude and longitude
+        if (name === 'area') {
+            fetchCoordinates(value);
+        }
     };
+
+    const fetchCoordinates = async (area: string) => {
+        try {
+            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+                params: {
+                    address: area,
+                    key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, // Replace with your Google Maps API key
+                },
+            });
+    
+            console.log('API Response:', response.data); // Log the full response
+
+        // Check if results exist
+        if (response.data.results && response.data.results.length > 0) {
+            const { lat, lng } = response.data.results[0].geometry.location; // Extracting latitude and longitude
+            
+            // Update profileData state
+            setProfileData((prev) => ({
+                ...prev,
+                latitude: lat,
+                longitude: lng,
+            }));
+
+            // Call the function to update latitude and longitude in the database
+            updateCoordinatesInDatabase(lat, lng);
+        } else {
+            console.warn('No results found for the area:', area);
+            toast.error('No results found for the area.');
+        }
+        } catch (error:any) {
+            console.error('Error fetching coordinates:', error); // Log the error
+            const errorMessage = error.response?.data?.error_message || error.message || 'Failed to fetch coordinates.';
+            toast.error(errorMessage); // Show the error message
+        }
+    };
+
+
+    const updateCoordinatesInDatabase = async (lat: number, lng: number) => {
+        const workerId = localStorage.getItem('workerId');
+    
+        // Check if workerId exists
+        if (!workerId) {
+            toast.error('Worker ID is not available.');
+            return;
+        }
+    
+        try {
+            // Assuming updateCoordinates is a function that makes the API call
+            const response = await updateCoordinates(lat, lng, workerId);
+            console.log('Coordinates updated successfully:', response.data);
+            toast.success('Coordinates updated successfully!');
+        } catch (error) {
+            console.error('Error updating coordinates in the database:', error);
+            toast.error('Failed to update coordinates in the database.');
+        }
+    };
+    
 
     const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const skill = e.target.value;
@@ -110,11 +176,13 @@ const EditWorkerProfile = () => {
 
         const formData = new FormData();
         formData.append('name', profileData.name);
-        formData.append('skills', JSON.stringify(profileData.skills)); // Convert skills array to JSON
-        formData.append('expirience', profileData.expirience); // Use corrected property name
+        formData.append('skills', JSON.stringify(profileData.skills));
+        formData.append('expirience', profileData.expirience);
         formData.append('address', profileData.address);
         formData.append('area', profileData.area);
         formData.append('status', profileData.status);
+        formData.append('latitude', String(profileData.latitude)); // Include latitude
+        formData.append('longitude', String(profileData.longitude)); // Include longitude
         if (profileData.profilePic && typeof profileData.profilePic !== 'string') {
             formData.append('profilePic', profileData.profilePic);
         }
@@ -178,7 +246,7 @@ const EditWorkerProfile = () => {
                                     type="checkbox"
                                     value={service.name}
                                     id={`skill-${service.id}`}
-                                    checked={profileData.skills.includes(service.name)} // Check if skill is selected
+                                    checked={profileData.skills.includes(service.name)}
                                     onChange={handleSkillsChange}
                                     className="mr-2"
                                 />
@@ -226,13 +294,13 @@ const EditWorkerProfile = () => {
                         required
                     />
                 </div>
-                <div className="flex items-center mt-4">
-                    <span>Status: </span>
+                <div>
+                    <label className="block text-sm font-medium">Status:</label>
                     <button
                         type="button"
                         onClick={toggleStatus}
-                        className={`ml-2 px-4 py-2 rounded-md text-white ${
-                            profileData.status === 'Available' ? 'bg-green-500' : 'bg-red-500'
+                        className={`mt-1 block w-full border rounded-md p-2 ${
+                            profileData.status === 'Available' ? 'bg-green-200' : 'bg-red-200'
                         }`}
                     >
                         {profileData.status}
@@ -240,10 +308,10 @@ const EditWorkerProfile = () => {
                 </div>
                 <button
                     type="submit"
-                    className={`w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 ${loading ? 'opacity-50' : ''}`}
+                    className="w-full bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700 transition"
                     disabled={loading}
                 >
-                    {loading ? 'Updating...' : 'Update Profile'}
+                    {loading ? 'Saving...' : 'Save Profile'}
                 </button>
             </form>
         </div>

@@ -207,3 +207,12 @@ if (!response) {
 }
 return  response.data; // Ensure this returns an array
 }
+
+export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
+  const response = await axiosInstance.put('/workers/updateLocation',{
+    workerId,
+    latitude: lat,
+    longitude: lng,
+  })  
+  return response;
+}

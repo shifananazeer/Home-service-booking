@@ -20,4 +20,5 @@ router.get('/availability/:workerId', authenticateUser, workerController.fetchAv
 router.put('/availability/edit/:slotId', authenticateUser, workerController.editAvailabilitySlot);
 router.delete('/availability/delete/:slotId', authenticateUser,workerController.deleteAvailabilitySlot);
 router.get('/services',workerController.getServices)
+router.put('/updateLocation',authenticateUser,workerController.updateLocation)
 export default router;
