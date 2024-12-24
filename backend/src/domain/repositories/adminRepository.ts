@@ -5,4 +5,5 @@ export interface AdminRepository {
   findUsers(skip: number, limit: number, search: string): Promise<User[] | null>;
     findWorkers(skip: number, limit: number, search: string):Promise<Worker[]|null>
     findServices(skip: number , limit:number , search:string):Promise<Service[]|null>
+    countServices(search: string): Promise<number>
 }

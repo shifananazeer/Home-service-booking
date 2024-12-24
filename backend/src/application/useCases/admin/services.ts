@@ -14,8 +14,10 @@ export const createdServices = async (
     return await serviceRepository.createService(serviceData);
 };
 
-export const allServices = async (adminRepository:AdminRepository, page:number,limit: number , search:string):Promise<Service[]| null> => {
+export const allServices = async (adminRepository:AdminRepository, page:number,limit: number , search:string):Promise<{ services: Service[] | null; totalServices: number }> => {
     const skip = (page - 1) * limit;
+    const totalServices = await adminRepository.countServices(search);
     const services = await adminRepository.findServices(skip , limit , search);  
-    return services;
+    
+    return { services, totalServices };
 }

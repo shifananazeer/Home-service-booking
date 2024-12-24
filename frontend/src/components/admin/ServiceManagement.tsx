@@ -27,8 +27,11 @@ export default function ServiceManagement() {
             try {
                 setLoading(true);
                 const data = await fetchServices(currentPage, limit, searchQuery);
+                console.log("page................",currentPage , limit)
                 setServices(data.services || []);
-                setTotalPages(data.totalPages || 1);
+              
+            setTotalPages(data.totalServices || 1);
+            console.log("totalpage", totalPages)
             } catch (error) {
                 console.error("Error fetching services:", error);
                 setError("Failed to fetch services. Please try again later.");
@@ -46,9 +49,10 @@ export default function ServiceManagement() {
     };
 
     const handlePageChange = (page: number) => {
+        console.log("Navigating to page:", page); // Debugging line
+        if (page < 1 || page > totalPages) return;
         setCurrentPage(page);
     };
-
     const handleOpenModal = (service?: Service) => {
         setSelectedService(service || null);
         setIsModalOpen(true);
@@ -75,7 +79,7 @@ export default function ServiceManagement() {
           // Reload services after successful create/update
           const data = await fetchServices(currentPage, limit, searchQuery);
           setServices(data.services || []);
-          setTotalPages(data.totalPages || 1);
+          setTotalPages(data.totalServices || 1);
       } catch (error) {
           console.error("Error saving service:", error);
           setError("Failed to save service. Please try again.");
@@ -102,7 +106,7 @@ const handleDelete = async (serviceId: string) => {
             // Reload services after delete
             const data = await fetchServices(currentPage, limit, searchQuery);
             setServices(data.services || []);
-            setTotalPages(data.totalPages || 1);
+            setTotalPages(data.totalServices || 1);
 
             Swal.fire(
                 'Deleted!',
@@ -202,22 +206,22 @@ const handleDelete = async (serviceId: string) => {
                         </div>
                     ))}
                 </div>
-
-                <div className="mt-8 flex justify-center">
-                    <nav>
-                        <ul className="flex">
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <li key={index} className="mx-1">
-                                    <button
-                                        onClick={() => handlePageChange(index + 1)}
-                                        className={`py-2 px-4 rounded-lg ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
+                <div className="mt-4 flex justify-between">
+                <button 
+                    onClick={() => handlePageChange(currentPage - 1)} 
+                    disabled={currentPage === 1}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                >
+                    Previous
+                </button>
+                <span>Page {currentPage} of {Math.ceil(totalPages / limit)}</span>
+                <button 
+                    onClick={() => handlePageChange(currentPage + 1)} 
+                    disabled={currentPage === totalPages}
+                    className="bg-gray-300 px-4 py-2 rounded"
+                >
+                    Next
+                </button>
                 </div>
             </div>
 

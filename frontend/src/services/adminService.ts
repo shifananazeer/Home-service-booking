@@ -104,16 +104,18 @@ export const unblockWorker = async (workerId:string) => {
 }
 
 export const fetchServices = async (page = 1, limit = 5, search = '') => {
-    console.log("1")
     try {
-      const response = await axiosInstance.get('/admin/services',{
+      const response = await axiosInstance.get('/admin/services', {
         params: {
-            page,
-            limit,
-            search,
+          page,
+          limit,
+          search,
         },
-      }); // Adjust the URL based on your API endpoint
-      return response.data; // Return the fetched data
+      });
+  
+      // Return both services and totalServices
+      const { services, totalServices } = response.data;
+      return { services, totalServices };
     } catch (error:any) {
       throw new Error('Failed to fetch services: ' + error.message);
     }

@@ -90,9 +90,18 @@ getAllServices: async(req:Request , res:Response) => {
     console.log(2)
     const { page = 1, limit = 10, search = '' } = req.query;
     try {
-        const services = await allServices(AdminRepositoryImpl, parseInt(page as string), parseInt(limit as string), search as string);
-        console.log(services);
-        res.status(200).json({ services });
+        const { services, totalServices } = await allServices(
+            AdminRepositoryImpl, 
+            parseInt(page as string), 
+            parseInt(limit as string), 
+            search as string
+        );
+
+        // Send response with services and total count
+        res.status(200).json({ 
+            services, 
+            totalServices 
+        });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }

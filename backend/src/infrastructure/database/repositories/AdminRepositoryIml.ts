@@ -20,5 +20,10 @@ async findServices(skip: number, limit:number,search:string):Promise<Service[]|n
     const query = search ? { name: { $regex: search, $options: 'i' } } : {};
     const services = await ServiceModel.find(query).skip(skip) .limit(limit);
     return services;
+},
+async countServices(search: string): Promise<number> {
+    return await ServiceModel.countDocuments({
+        name: { $regex: search, $options: "i" }, // Count matching services by name, case-insensitive
+    });
 }
 }

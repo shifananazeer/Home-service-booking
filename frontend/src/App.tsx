@@ -23,6 +23,7 @@ import EditUserProfile from "./pages/User/EditUserProfile";
 import WorkerEditProfile from "./pages/Worker/WorkerEditProfile";
 import AvailabilityManagement from "./components/worker/AvailabilityManagement";
 import HomePage from "./components/HomePage";
+import ServicesPage from "./components/ServicePage";
 
 
 
@@ -41,6 +42,7 @@ const App = () => {
       {/* <Toaster position="top-right" reverseOrder={false} />  */}
     <Routes>
       <Route path="/" element={<HomePage/>}/>
+      <Route path="/services" element={<ServicesPage/>}/>
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
