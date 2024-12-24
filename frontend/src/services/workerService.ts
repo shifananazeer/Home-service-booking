@@ -3,6 +3,7 @@ import axios from "axios";
 import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
+import { fetchServices } from "./adminService";
 
 
 
@@ -198,3 +199,11 @@ export const  deleteAvailability  =  async (slotId:string)=> {
     const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`);
     return response.data; // Assuming your API returns some data
 };
+
+export const fetchService = async () => {
+const response = await axiosInstance.get('/workers/services');
+if (!response) {
+    throw new Error('Failed to fetch services');
+}
+return  response.data; // Ensure this returns an array
+}

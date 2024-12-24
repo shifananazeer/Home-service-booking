@@ -1,3 +1,4 @@
+
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
 
@@ -20,7 +21,7 @@ export const adminLogin = async (credentials: { email: string; password: string 
 
 export const fetchUsers = async (page = 1, limit = 10, search = '') => {
     try {
-        const response = await axiosInstance.get('admin/get-users',{
+        const response = await axiosInstance.get('/admin/get-users',{
             params: {
                 page,
                 limit,
@@ -64,7 +65,7 @@ export const unblockUser = async (userId:string) => {
 
 export const fetchWorkers = async (page = 1, limit = 10, search = '') => {
     try{
-    const response = await axiosInstance.get('admin/get-workers',{
+    const response = await axiosInstance.get('/admin/get-workers',{
         params: {
             page,
             limit,
@@ -101,3 +102,56 @@ export const unblockWorker = async (workerId:string) => {
         throw error; 
     } 
 }
+
+export const fetchServices = async (page = 1, limit = 5, search = '') => {
+    console.log("1")
+    try {
+      const response = await axiosInstance.get('/admin/services',{
+        params: {
+            page,
+            limit,
+            search,
+        },
+      }); // Adjust the URL based on your API endpoint
+      return response.data; // Return the fetched data
+    } catch (error:any) {
+      throw new Error('Failed to fetch services: ' + error.message);
+    }
+  };
+
+  interface  Service  {
+    _id?: string;
+    name: string;
+    description: string;
+    image: string;
+};
+
+
+  export const createService = async (formData:FormData) => {
+    const response = await axiosInstance.post('/admin/services', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+  });
+    return response.data;
+};
+
+// Update an existing service
+export const updateService = async (serviceId: string, formData:FormData) => {
+    const response = await axiosInstance.put(`/admin/service/edit/${serviceId}`, formData,{
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        } 
+    });
+    return response.data;
+};
+  
+  // Function to delete a service by its ID
+  export const deleteService = async (serviceId:string) => {
+    try {
+      const response = await axiosInstance.delete(`/admin/service/delete/${serviceId}`);
+      return response.data; // Return the response data confirming deletion
+    } catch (error) {
+      throw error; // Rethrow the error for handling in the calling component
+    }
+  };

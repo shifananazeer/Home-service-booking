@@ -1,13 +1,22 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { RootState } from '../../app/store';
 import { signupStart, signupSuccess, signupFail } from '../../features/worker/workerSlice';
-import { registerWorker } from '../../services/workerService';
+import { fetchService, registerWorker } from '../../services/workerService';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { SignupWorker } from '../../interfaces/workerInterface';
 import toast from 'react-hot-toast';
 
+
+interface Service {
+    id: string; // or number, depending on your API
+    name: string;
+}
+
+
 const WorkerSignup: React.FC = () => {
+    const [services, setServices] = useState<Service[]>([]);
+    const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true);
     const [formData, setFormData] = useState<SignupWorker>({
         name: '',
         email: '',
@@ -20,18 +29,44 @@ const WorkerSignup: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+    useEffect(() => {
+        // Fetch services on component mount
+        const getServices = async () => {
+            try {
+                const fetchedServicesResponse = await fetchService();
+                console.log('Fetched services:', fetchedServicesResponse); // Log the fetched response
+        
+                // Check if the response contains services
+                if (fetchedServicesResponse.success && Array.isArray(fetchedServicesResponse.services)) {
+                    setServices(fetchedServicesResponse.services); // Set services to the extracted array
+                } else {
+                    console.warn('No valid services found:', fetchedServicesResponse);
+                    setServices([]); // Fallback to an empty array
+                }
+            } catch (err) {
+                console.error('Error fetching services:', err);
+                setServices([]); // Optionally reset to empty on error
+            } finally {
+                setIsLoadingServices(false);
+            }
+          };
+          getServices();
+    }, []);
+
+    const handleChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+    
         if (name === 'skills') {
-            setFormData({
-                ...formData,
-                skills: value.split(',').map(skill => skill.trim()), 
-            });
+            setFormData((prev) => ({
+                ...prev,
+                skills: [value], // Single selection for now
+            }));
         } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
         }
     };
 
@@ -94,18 +129,28 @@ const WorkerSignup: React.FC = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block mb-2" htmlFor="skills">Skills (comma-separated)</label>
-                    <input
-                        type="text"
-                        id="skills"
-                        name="skills"
-                        value={formData.skills.join(', ')} 
-                        onChange={handleChange}
-                        required
-                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Plumbing, Cleaning, Repair"
-                    />
+                    <label className="block mb-2" htmlFor="service">Select Service</label>
+                    {isLoadingServices ? (
+                        <p>Loading services...</p>
+                    ) : (
+                        <select
+                            id="service"
+                            name="skills"
+                            value={formData.skills.join(',')}
+                            onChange={handleChange}
+                            required
+                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Select a service</option>
+                            {services.map((service) => (
+                                <option key={service.id} value={service.name}>
+                                    {service.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                 </div>
+
                 <div className="mb-4">
                     <label className="block mb-2" htmlFor="password">Password</label>
                     <input

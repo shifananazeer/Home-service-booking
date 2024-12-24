@@ -19,4 +19,5 @@ router.post('/availability',authenticateUser,workerController.handleCreateAvaila
 router.get('/availability/:workerId', authenticateUser, workerController.fetchAvailabilitySlotForWorker);
 router.put('/availability/edit/:slotId', authenticateUser, workerController.editAvailabilitySlot);
 router.delete('/availability/delete/:slotId', authenticateUser,workerController.deleteAvailabilitySlot);
+router.get('/services',workerController.getServices)
 export default router;

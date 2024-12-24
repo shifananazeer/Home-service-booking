@@ -17,6 +17,8 @@ import { AvailabilityRepositoryImpl } from '../../infrastructure/database/reposi
 import AvailabilityModel from '../../infrastructure/database/models/availabilityModel';
 import moment from 'moment';
 import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
+import { getServers } from 'dns';
+import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
 
 
 export const workerController  = {
@@ -361,6 +363,40 @@ export const workerController  = {
                     res.status(500).json({ message: 'Server error' });
                 }
             },
+
+            getServices: async (req: Request, res: Response):Promise<void> => {
+                console.log("Fetching all services...");
+                try {
+                    const services = await ServiceRepositoryImpl.getAllServices();
+                    if (!services) { // Check for null
+                         res.status(200).json({
+                            success: true,
+                            services: [],
+                            message: 'No services found',
+                        });
+                        return
+                    }
+            
+                    if (services.length === 0) { // Check for empty array
+                         res.status(200).json({
+                            success: true,
+                            services: [],
+                            message: 'No services available',
+                            
+                        });
+                        return
+                    }
+                    res.status(200).json({ success: true, services });
+                } catch (error: any) {
+                    console.error('Error fetching services:', error.message);
+                    res.status(500).json({
+                        success: false,
+                        message: 'Failed to fetch services',
+                        error: error.message,
+                    });
+                }
+            }
+            
     }
 
 

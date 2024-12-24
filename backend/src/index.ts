@@ -16,8 +16,8 @@ dotenv.config();
 const app = express();
 
 app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Increase this limit based on your needs
+app.use(express.urlencoded());
 app.use(cookieParser());
 
 //cors middleware to connect frontend

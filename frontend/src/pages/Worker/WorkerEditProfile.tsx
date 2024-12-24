@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { WorkerProfileInterface } from '../../interfaces/workerInterface';
 import { Address } from '../../interfaces/addressInterface';
 import toast from 'react-hot-toast';
-import { updateWorkerProfile } from '../../services/workerService';
+import { fetchService, updateWorkerProfile } from '../../services/workerService';
 
 interface ProfileData {
     name: string;
@@ -15,7 +15,14 @@ interface ProfileData {
     area: string;
 }
 
+interface Service {
+    id: string; // or number, depending on your API
+    name: string;
+}
+
 const EditWorkerProfile = () => {
+    const [services, setServices] = useState<Service[]>([]);
+    const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true);
     const navigate = useNavigate();
     const location = useLocation();
     const { worker, address }: { worker: WorkerProfileInterface; address: Address } = location.state || {};
@@ -50,19 +57,45 @@ const EditWorkerProfile = () => {
         }
     };
 
+    useEffect(() => {
+        // Fetch services on component mount
+        const getServices = async () => {
+            try {
+                const fetchedServicesResponse = await fetchService();
+                console.log('Fetched services:', fetchedServicesResponse); // Log the fetched response
+
+                // Check if the response contains services
+                if (fetchedServicesResponse.success && Array.isArray(fetchedServicesResponse.services)) {
+                    setServices(fetchedServicesResponse.services); // Set services to the extracted array
+                } else {
+                    console.warn('No valid services found:', fetchedServicesResponse);
+                    setServices([]); // Fallback to an empty array
+                }
+            } catch (err) {
+                console.error('Error fetching services:', err);
+                setServices([]); // Optionally reset to empty on error
+            } finally {
+                setIsLoadingServices(false);
+            }
+        };
+        getServices();
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setProfileData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const skillsArray = value.split(',').map(skill => skill.trim()).filter(skill => skill); // Filter out empty skills
-        setProfileData((prev) => ({
-            ...prev,
-            skills: skillsArray, 
-        }));
+        const skill = e.target.value;
+        setProfileData((prev) => {
+            const skills = prev.skills.includes(skill)
+                ? prev.skills.filter((s) => s !== skill) // Remove skill if already selected
+                : [...prev.skills, skill]; // Add skill if not selected
+            return { ...prev, skills };
+        });
     };
+
     const toggleStatus = () => {
         setProfileData((prev) => ({
             ...prev,
@@ -132,24 +165,37 @@ const EditWorkerProfile = () => {
                         required
                     />
                 </div>
+
+                {/* Skills Checkbox Section */}
                 <div>
-                    <label htmlFor="skills" className="block text-sm font-medium">Skills (comma-separated):</label>
-                    <input
-                        type="text"
-                        id="skills"
-                        name="skills"
-                        value={profileData.skills.join(', ')} // Convert array to comma-separated string for input
-                        onChange={handleSkillsChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        required
-                    />
+                    <label className="block text-sm font-medium">Skills:</label>
+                    {isLoadingServices ? (
+                        <p>Loading services...</p>
+                    ) : (
+                        services.map((service) => (
+                            <div key={service.id} className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    value={service.name}
+                                    id={`skill-${service.id}`}
+                                    checked={profileData.skills.includes(service.name)} // Check if skill is selected
+                                    onChange={handleSkillsChange}
+                                    className="mr-2"
+                                />
+                                <label htmlFor={`skill-${service.id}`} className="text-sm">
+                                    {service.name}
+                                </label>
+                            </div>
+                        ))
+                    )}
                 </div>
+
                 <div>
                     <label htmlFor="expirience" className="block text-sm font-medium">Experience:</label>
                     <input
                         type="text"
                         id="expirience"
-                        name="exprience"
+                        name="expirience"
                         value={profileData.expirience}
                         onChange={handleChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md p-2"
@@ -194,10 +240,10 @@ const EditWorkerProfile = () => {
                 </div>
                 <button
                     type="submit"
-                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md w-full"
+                    className={`w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 ${loading ? 'opacity-50' : ''}`}
                     disabled={loading}
                 >
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {loading ? 'Updating...' : 'Update Profile'}
                 </button>
             </form>
         </div>
