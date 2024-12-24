@@ -21,13 +21,14 @@ const Login = () => {
         try {
             // Call the login service
             const response = await loginUser({ email, password });
-    
+          console.log("ressssssssss",response)
             // Access the tokens and user details from response
-            const { accessToken, refreshToken, name, email: userEmail } = response;
-    
+            const { accessToken, refreshToken, name, email: userEmail ,userId } = response;
+              console.log("user....." , userId)
             // Store tokens in local storage
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('user_Id' , userId)
     
             // User data to save in Redux
             const userData = {

@@ -24,6 +24,7 @@ import WorkerEditProfile from "./pages/Worker/WorkerEditProfile";
 import AvailabilityManagement from "./components/worker/AvailabilityManagement";
 import HomePage from "./components/HomePage";
 import ServicesPage from "./components/ServicePage";
+import BookingPage from "./pages/User/BookingPage";
 
 
 
@@ -43,6 +44,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<HomePage/>}/>
       <Route path="/services" element={<ServicesPage/>}/>
+      <Route path="/book/:serviceId" element={<BookingPage />} />
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />

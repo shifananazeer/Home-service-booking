@@ -2,6 +2,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { SignupInterface, UserProfileInterface } from "../interfaces/userInterface";
 import errorHandler from "../utils/errorHandler";
 import axios from "axios";
+import { Address } from "../interfaces/addressInterface";
 
 
 
@@ -53,9 +54,9 @@ export const loginUser = async (credentials: { email: string; password: string }
             },
         });
         console.log('Login Response:', response.data);
-        const { accessToken, refreshToken, name, email } = response.data;
+        const { accessToken, refreshToken, name, email  , userId} = response.data;
 
-        return { accessToken, refreshToken, name, email }; 
+        return { accessToken, refreshToken, name, email  , userId}; 
     } catch (error: any) {
         errorHandler(error);
         throw error;
@@ -116,5 +117,39 @@ try{
     throw error;
 }
 }
+
+export const fetchAddress = async (userId: string): Promise<Address> => {
+    const token = localStorage.getItem('accessToken');
+    try {
+      const response = await axiosInstance.get(`/auth/address/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      console.log("Backend response:", response.data); // Debugging response
+  
+      // Ensure you extract the `userAddress` field
+      return response.data.userAddress;
+    } catch (error) {
+      errorHandler(error);
+      throw error;  
+    }
+  };
+  
+
+  export const fetchWorkersByService = async (serviceName: string) => {
+    const token = localStorage.getItem('accessToken'); // Use the token for authorization
+    try {
+      const response = await axiosInstance.get(`/auth/workers?skill=${encodeURIComponent(serviceName)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      return response.data.workers; // Adjust based on your API response structure
+    } catch (error) {
+      throw new Error('Failed to fetch workers');
+    }
+  };
 
 

@@ -15,6 +15,7 @@ import { refreshAccessToken } from "../../application/useCases/refreshAccessToke
 import { updateUserProfile } from "../../application/useCases/user/updateUserProfile";
 import { uploadProfilePic } from "../../utils/s3Servise";
 import { upadteAddress, userAddress } from "../../application/useCases/user/updateAddress";
+import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
 
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -31,7 +32,7 @@ export const userController = {
     login: async (req: Request, res: Response) => {
         console.log('Login request received:', req.body);
         try {
-            const { accessToken, refreshToken } = await loginUser(
+            const { accessToken, refreshToken ,userId } = await loginUser(
                 UserRepositoryImpl,
                 req.body.email,
                 req.body.password
@@ -43,7 +44,12 @@ export const userController = {
             res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
     
             // Send tokens in the response (optional)
-            res.status(200).json({ accessToken, refreshToken });
+            res.status(200).json({
+                message: "You can now log in",
+                accessToken,
+                refreshToken,
+                userId
+            });
         } catch (error: any) {
             res.status(400).json({ message: error.message });
         }
@@ -290,6 +296,18 @@ export const userController = {
         res.status(500).json({ error: 'Internal server error' });
      }
         
+    },
+    getAddress : async (req:Request , res:Response):Promise<void> => {
+    const userId =  req.params.userId
+    console.log("id.",userId)
+    if (!/^[a-fA-F0-9]{24}$/.test(userId)) {
+        throw new Error('Invalid user ID format');
+      }
+    
+     
+    const userAddress = await AddressRepositoryImpl.findAddressByUserId(userId)
+    console.log("aaaaaaaaa",userAddress)
+    res.status(200).json({  userAddress })
     }
 }
 

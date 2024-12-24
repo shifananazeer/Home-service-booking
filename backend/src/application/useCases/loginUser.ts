@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 export const loginUser=async (
     userRepository: UserRepository,
      email:string, password:string
-    ) : Promise<{ accessToken: string; refreshToken: string }> => {
+    ) : Promise<{ accessToken: string; refreshToken: string  , userId : string}> => {
 
     const user = await userRepository.findByEmail(email)
 
@@ -29,5 +29,7 @@ export const loginUser=async (
     { expiresIn: "7d" } 
   );
 
-  return { accessToken, refreshToken };
+  console.log("userId.................." , user._id)
+
+  return { accessToken, refreshToken ,userId: user._id.toString()  };
 }

@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import { fetchService } from '../services/workerService'
 import { fetchServices } from '../services/adminService'
+import { useNavigate } from 'react-router-dom'
 
 interface Service {
-  id: number
+  _id: string
   name: string
   description: string
   image: string
 }
 
 export default function ServicesPage() {
+  const navigate = useNavigate()
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,6 +25,7 @@ export default function ServicesPage() {
         const  data = await fetchServices(currentPage , limit , searchQuery);// Replace with your API endpoint
     
         console.log("page................",currentPage , limit)
+        console.log("ssssssssss",data.services)
                 setServices(data.services || []);
                 setTotalPages(data.totalServices || 1);
                 console.log("totalpage", totalPages)
@@ -77,7 +80,7 @@ const handlePageChange = (page: number) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {services.map((service) => (
-          <div key={service.id} className="bg-black text-white p-4 rounded-lg">
+          <div key={service._id} className="bg-black text-white p-4 rounded-lg">
             <div className="relative h-48 mb-4">
               <img
                 src={service.image}
@@ -89,7 +92,7 @@ const handlePageChange = (page: number) => {
             <p className="text-gray-300 text-center text-sm mb-4">{service.description}</p>
             <button 
               className="w-full bg-gray-300 hover:bg-gray-500 text-black py-2 px-4 rounded-lg transition-colors"
-              onClick={() => window.location.href = `/book/${service.id}`}
+              onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name } })}
             >
               Book Now
             </button>

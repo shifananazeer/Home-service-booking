@@ -154,5 +154,6 @@ deleteService : async (req:Request , res:Response) : Promise<void> => {
     
         return 
     }
-}
+},
+
 }

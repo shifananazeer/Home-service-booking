@@ -84,7 +84,8 @@ const workerSlice = createSlice({
             state.success = false; // Reset success status
             state.isVerified = false; // Reset verification status
             localStorage.removeItem('worker_access_token'); // Remove access token from storage
-            localStorage.removeItem('worker_refresh_token'); // Remove refresh token from storage
+            localStorage.removeItem('worker_refresh_token'); 
+            localStorage.removeItem('workerId')// Remove refresh token from storage
         },
     },
 });

@@ -19,6 +19,7 @@ import moment from 'moment';
 import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
 import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
+import { workerService } from '../../application/useCases/worker/workerService';
 
 
 export const workerController  = {
@@ -395,7 +396,25 @@ export const workerController  = {
                         error: error.message,
                     });
                 }
-            }
+            },
+            findWorkerBySkills: async (req: Request, res: Response): Promise<void> => {
+                const skill = req.query.skill as string; // Type assertion to string
+            
+                try {
+                    // Correct the call to the workerService
+                    const workers = await workerService(skill);
+                    res.status(200).json({ workers });
+                } catch (error: any) {
+                    console.error(error);
+                    if (error.message === 'Skill is required') {
+                        res.status(400).json({ error: error.message });
+                    } else if (error.message === 'No workers found with this skill') {
+                        res.status(404).json({ message: error.message });
+                    } else {
+                        res.status(500).json({ error: 'Failed to fetch workers' });
+                    }
+                }
+            },
             
     }
 
