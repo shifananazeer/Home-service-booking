@@ -7,6 +7,7 @@ import { logout } from '../features/user/userSlice.'
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const userData = useAppSelector((state) => state.user.userData)
+  const token = localStorage.getItem('accessToken')
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -74,7 +75,7 @@ const Navbar: React.FC = () => {
             Register as a Worker
           </button>
 
-          {!userData?.accessToken ? (
+          {!token ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLoginClick}

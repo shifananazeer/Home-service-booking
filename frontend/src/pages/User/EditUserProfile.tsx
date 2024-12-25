@@ -95,11 +95,11 @@ const EditUserProfile: React.FC = () => {
                 updateCoordinatesInDatabase(lat, lng);
             } else {
                 console.warn('No results found for the area:', area);
-                toast.error('No results found for the area.');
+               
             }
         } catch (error) {
             console.error('Error fetching coordinates:', error);
-            toast.error('Failed to fetch coordinates for the address.');
+           
             return null;
         }
     };

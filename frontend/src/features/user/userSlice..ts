@@ -49,7 +49,6 @@ const userSlice = createSlice({
             state.error = null; 
             try {
                 localStorage.setItem('userData', JSON.stringify(action.payload));
-            
             } catch (error) {
                 console.error('Error saving userData to localStorage:', error);
             }
@@ -68,10 +67,10 @@ const userSlice = createSlice({
             state.loading = false;
 
             try {
-                localStorage.removeItem('userData');
-                localStorage.removeItem('accessToken'); // Clear access token
-                localStorage.removeItem('refreshToken'); // Clear refresh token
+             localStorage.removeItem('userData');
                 localStorage.removeItem('user_Id')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
             } catch (error) {
                 console.error('Error removing data from localStorage during logout:', error);
             }
@@ -81,9 +80,9 @@ const userSlice = createSlice({
         clearUserData: (state) => {
             state.userData = null;
             state.error = null;
-
             try {
                 localStorage.removeItem('userData');
+                localStorage.removeItem('user_Id')
             } catch (error) {
                 console.error('Error removing userData from localStorage:', error);
             }

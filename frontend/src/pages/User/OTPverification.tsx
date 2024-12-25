@@ -51,6 +51,7 @@ const OTPverification = () => {
            console.log("response", response)
             toast.success('OTP Verified Successfully');
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            console.log("signupUserdata", userData)
             dispatch(setUserData(userData));
 
             if (response.role === 'worker') {

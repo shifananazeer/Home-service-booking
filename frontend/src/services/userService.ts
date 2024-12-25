@@ -23,6 +23,7 @@ export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
         console.log('Verification Success:', response.data);
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('user_Id',response.data.userId)
         return response;
     }catch(error: any) {
         errorHandler(error);
@@ -146,7 +147,9 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      return response.data.workers; // Adjust based on your API response structure
+      console.log("fetched workers" , response.data.workers)
+      return response.data.workers; 
+      // Adjust based on your API response structure
     } catch (error) {
       throw new Error('Failed to fetch workers');
     }

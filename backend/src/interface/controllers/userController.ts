@@ -56,7 +56,7 @@ export const userController = {
       },
     validateOtp: async (req: Request, res: Response) => {
         try {
-            const { accessToken, refreshToken, role, valid } = await validateOtp(req.body.email, req.body.otp, 1);
+            const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(req.body.email, req.body.otp, 1);
 
         // Set tokens in cookies
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
@@ -66,7 +66,8 @@ export const userController = {
             valid,
             role,
             accessToken,
-            refreshToken
+            refreshToken,
+            userId,
         });
         } catch (error: any) {
             console.error("Error verifying OTP:", error.message);

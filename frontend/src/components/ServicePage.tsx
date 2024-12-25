@@ -92,7 +92,7 @@ const handlePageChange = (page: number) => {
             <p className="text-gray-300 text-center text-sm mb-4">{service.description}</p>
             <button 
               className="w-full bg-gray-300 hover:bg-gray-500 text-black py-2 px-4 rounded-lg transition-colors"
-              onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name } })}
+              onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name , serviceImage : service.image , serviceDescription: service.description} })}
             >
               Book Now
             </button>

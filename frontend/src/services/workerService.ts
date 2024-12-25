@@ -23,8 +23,10 @@ export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
         const response = await axiosInstance.post('/workers/verify-otp', {otp , email });
         console.log("res",response)
         
-        localStorage.setItem('worker_token', response.data.token);
-        console.log("workerToken",response.data.token)
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('workerId',response.data.userId)
+
         return response;
     }catch(error: any) {
         errorHandler(error);

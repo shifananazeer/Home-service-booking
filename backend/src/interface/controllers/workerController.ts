@@ -40,7 +40,7 @@ export const workerController  = {
         console.log("otp body",req.body)
         try{
           console.log(req.body.email)
-          const { accessToken, refreshToken, role, valid } = await validateOtp(req.body.email, req.body.otp, 0);
+          const { accessToken, refreshToken, role, valid , userId} = await validateOtp(req.body.email, req.body.otp, 0);
 
         // Set tokens in cookies
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
@@ -52,7 +52,8 @@ export const workerController  = {
             valid,
             role,
             accessToken,
-            refreshToken
+            refreshToken, 
+            userId
     
         });
         }catch (error:any) {
@@ -404,6 +405,7 @@ export const workerController  = {
                 try {
                     // Correct the call to the workerService
                     const workers = await workerService(skill);
+                    console.log("fetchWorkers",workers)
                     res.status(200).json({ workers });
                 } catch (error: any) {
                     console.error(error);
