@@ -15,6 +15,7 @@ export interface WorkerProfileInterface {
     phone: string;
     skills:string[];
     expirience?: string ;
+    hourlyRate?:number;
     status: string;
     profilePic?:string;
     latitude?: number; // Add latitude

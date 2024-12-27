@@ -14,6 +14,7 @@ interface ProfileData {
     status: string;
     address: string;
     area: string;
+    hourlyRate:number;
     latitude?: number; // Add latitude
     longitude?: number; // Add longitude
 }
@@ -36,6 +37,7 @@ const EditWorkerProfile = () => {
         expirience: worker?.expirience || '', // Corrected property name
         profilePic: worker?.profilePic || '',
         status: worker?.status || 'Unavailable',
+        hourlyRate:worker?.hourlyRate||0,
         address: address?.address || '',
         area: address?.area || '',
         latitude: worker?.latitude || undefined, // Initialize latitude
@@ -87,7 +89,8 @@ const EditWorkerProfile = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setProfileData((prev) => ({ ...prev, [name]: value }));
+        const updatedValue = name === 'hourlyRate' ? parseFloat(value) : value; 
+        setProfileData((prev) => ({ ...prev, [name]: updatedValue }));
 
         // If the changed input is 'area', fetch latitude and longitude
         if (name === 'area') {
@@ -178,6 +181,7 @@ const EditWorkerProfile = () => {
         formData.append('name', profileData.name);
         formData.append('skills', JSON.stringify(profileData.skills));
         formData.append('expirience', profileData.expirience);
+        formData.append('hourlyRate', String(profileData.hourlyRate)); 
         formData.append('address', profileData.address);
         formData.append('area', profileData.area);
         formData.append('status', profileData.status);
@@ -270,6 +274,20 @@ const EditWorkerProfile = () => {
                         required
                     />
                 </div>
+                <div>
+    <label htmlFor="hourlyRate" className="block text-sm font-medium">Hourly Rate:</label>
+    <input
+        type="number"
+        id="hourlyRate"
+        name="hourlyRate"
+        value={profileData.hourlyRate}
+        onChange={handleChange}
+        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+        required
+        min="0" // Optionally set a minimum value for the hourly rate
+        step="0.01" // Allow decimal input
+    />
+</div>
                 <div>
                     <label htmlFor="address" className="block text-sm font-medium">Address:</label>
                     <input

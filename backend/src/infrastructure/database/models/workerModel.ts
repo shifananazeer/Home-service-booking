@@ -11,6 +11,7 @@ const workerSchema = new Schema<WorkerDocument>({
     password: { type: String, required: true },
     role: { type: String, required: true },
     expirience:{type:Number},
+    hourlyRate:{type: Number},
     status: {
         type: String,
         enum: ['available', 'not available'],

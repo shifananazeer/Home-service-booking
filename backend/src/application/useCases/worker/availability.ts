@@ -68,3 +68,16 @@ if (result === null) {
 return result; // Return true if deletion was successful
 
 }
+
+
+export const fetchAvailableSlots = async (workerId: string, date: Date): Promise<any[]> => {
+  try {
+      const availability = await AvailabilityRepositoryImpl.getAvailableSlots(workerId, date);
+
+      // Extract and return the slots array
+      return availability ? availability.slots : [];
+  } catch (err) {
+      console.error("Error in fetchAvailableSlots:", err);
+      throw new Error("Error fetching available slots");
+  }
+};

@@ -7,4 +7,5 @@ export interface WorkerRepository {
     updateWorkerProfile(workerEmail: string , update: Partial<Worker>): Promise<Worker | null>;
      updateBlockStatus(userId: string, isBlocked: boolean): Promise<Worker | null>; 
      findWorkersBySkill (skill : string):Promise<Worker []|[]>;
+     getWorkerById(workerId:string) :Promise<Worker | null>;
 }

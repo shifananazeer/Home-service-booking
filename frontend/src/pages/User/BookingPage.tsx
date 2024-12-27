@@ -7,9 +7,11 @@ interface Worker {
   _id: string;
   name: string;
   profilePic?:string;
+  hourlyRate?:number;
+
 }
 
-interface WorkerAddress extends Worker {
+export interface WorkerAddress extends Worker {
   address: string;
   distance?: number;
   location?: { lat: number; lng: number };
@@ -64,7 +66,9 @@ const BookingPage: React.FC = () => {
       setLoading(true);
       try {
         const data = await fetchWorkersByService(serviceName);
+      
         setWorkers(data);
+        console.log("workers..", workers)
       } catch (err: any) {
         console.error('Error fetching workers:', err);
         toast.error('Failed to fetch workers. Please try again.');
@@ -128,6 +132,7 @@ const BookingPage: React.FC = () => {
           mapInstance.current = new google.maps.Map(mapRef.current!, {
             center: userLocation,
             zoom: 14,
+            
           });
 
           new google.maps.Marker({
@@ -196,73 +201,83 @@ const BookingPage: React.FC = () => {
     }
   }, [userLocation, workers, apiKey]);
 
-  const handleSelectWorker = (workerId: string) => {
-    console.log(`Selected worker: ${workerId}`);
-    toast.success(`Worker ${workerId} selected. Implement booking logic here.`);
-    // Implement your booking logic here
-  };
+  
 
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-    <div className="bg-white shadow-md rounded-lg overflow-hidden mb-8">
-      <div className="p-4">
-        <div className="flex items-center mb-4">
-          {serviceImage && (
-            <div className="mr-4">
-              <img 
-                src={serviceImage} 
-                alt={serviceName} 
-                className="w-24 h-24 object-cover rounded-md"
-              />
+    <div className="min-h-screen  text-gray-300">
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-gray-900 shadow-lg rounded-xl overflow-hidden mb-8">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row items-center mb-6">
+              {serviceImage && (
+                <div className="mb-4 md:mb-0 md:mr-6">
+                  <img 
+                    src={serviceImage} 
+                    alt={serviceName} 
+                    className="w-32 h-32 object-cover rounded-lg shadow-md"
+                  />
+                </div>
+              )}
+              <div className="text-center md:text-left">
+                <h1 className="text-3xl font-bold text-gray-100">{serviceName}</h1>
+                <p className="text-gray-400 mt-2 max-w-2xl">{serviceDescription || 'Service description not available'}</p>
+              </div>
             </div>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold">{serviceName}</h1>
-            <p className="text-gray-600 mt-1">{serviceDescription || 'Service description not available'}</p>
+            <div ref={mapRef} className="w-full h-80 rounded-lg shadow-inner mb-4" />
+            {!mapLoaded && <div className="text-center text-gray-400">Loading map...</div>}
           </div>
         </div>
-        <div ref={mapRef} className="w-full h-64 rounded-md mb-4" />
-        {!mapLoaded && <div className="text-center">Loading map...</div>}
+      
+        <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
+        {workers.length === 0 ? (
+          <div className="text-center text-gray-400 bg-gray-900 p-8 rounded-xl shadow-md">No workers available for this service in your area.</div>
+        ) : (
+          <div className="space-y-6">
+            {sortedWorkers.map((worker) => (
+              <div key={worker._id} className="bg-gray-900 shadow-lg rounded-xl overflow-hidden transition duration-300 hover:bg-gray-800">
+                <div className="p-6 flex flex-col md:flex-row items-center justify-between">
+                  <div className="flex items-center mb-4 md:mb-0">
+                    <img
+                      src={worker.profilePic || '/avathar.jpeg'}
+                      alt="Profile"
+                      className="h-24 w-24 object-cover rounded-full border-4 border-gray-700 shadow-lg mr-6"
+                    />
+                    <div>
+                      <h3 className="text-2xl font-semibold mb-2 text-gray-100">{worker.name}</h3>
+                      <p className="text-gray-400 mb-2">Distance: <span className='text-gray-200 font-bold'> {worker.distance?.toFixed(2)} km</span></p>
+                      <p className="text-gray-400">Rate Per Hour: <span className='text-gray-200 font-bold'>{worker.hourlyRate || "Not Specified"}</span></p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/confirm-booking/${worker._id}`, {
+                      state: {
+                        workerName: worker.name,
+                        workerLocation: worker.location,
+                        workerRate: worker.hourlyRate,
+                        workerDistance: worker.distance,
+                        workerPic: worker.profilePic,
+                        workerId: worker._id,
+                        serviceName: serviceName,
+                        serviceImage: serviceImage,
+                      }
+                    })}
+                    className="bg-gray-200 hover:bg-gray-600 text-black font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+                  >
+                    Select Worker
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
-  
-    <h2 className="text-2xl font-bold mb-4">Available Workers</h2>
-    {workers.length === 0 ? (
-      <div className="text-center text-gray-600">No workers available for this service in your area.</div>
-    ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sortedWorkers.map((worker) => (
-          <div key={worker._id} className="bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="flex items-center p-6">
-              <div className="flex-grow">
-                <h3 className="text-xl font-semibold mb-2">{worker.name}</h3>
-                <p className="text-gray-600 mb-4">Distance: {worker.distance?.toFixed(2)} km</p>
-              </div>
-              <img
-                src={worker.profilePic || '/avathar.jpeg'}
-                alt="Profile"
-                className="h-20 w-20 object-cover rounded-full border-4 border-gray-300 shadow-md"
-              />
-            </div>
-            <div className="p-6">
-              <button 
-                onClick={() => handleSelectWorker(worker._id)}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-              >
-                Select Worker
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-  
   );
 };
+
 
 export default BookingPage;
 

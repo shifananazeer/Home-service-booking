@@ -64,9 +64,15 @@ const WorkerProfile = () => {
       </span>
     ))
   ) : (
+
     <span className="text-gray-500">No skills added</span>
+
   )}
+ 
 </div>
+
+<h2>Rate Per Hour:  <span className='text-red-700 font-extrabold'> {workerProfile?.hourlyRate !== undefined ? workerProfile.hourlyRate : 'Not specified'}</span></h2>
+
 </div>
         </div>
     </div>

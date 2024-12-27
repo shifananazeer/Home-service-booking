@@ -8,6 +8,7 @@ import AvailabilityModel from "../models/availabilityModel";
 export const AvailabilityRepositoryImpl: AvailabilityRepository = {
     async createAvailability(workerId: string, date: Date, slots: any[]): Promise<Availability> {
         const availability = await AvailabilityModel.create({ workerId, date, slots });
+        console.log("availability", availability)
         return availability.toObject();
     },
 
@@ -16,6 +17,7 @@ export const AvailabilityRepositoryImpl: AvailabilityRepository = {
             workerId: new mongoose.Types.ObjectId(workerId),
             date: { $eq: date }, // Use strict equality check
           });
+          console.log("availability", availability)
         return availability ? availability.toObject() : null;
       },
     async updateAvailability(id: string, slots: any[]): Promise<Availability> {
@@ -86,6 +88,23 @@ export const AvailabilityRepositoryImpl: AvailabilityRepository = {
         await availability.save();
 
         return true; // Return true if deletion was successful
-    }
+    },
+    async getAvailableSlots(workerId: string, date: Date): Promise<{ slots: any[] } | null> {
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+
+        const availability = await AvailabilityModel.findOne(
+            {
+                workerId: new mongoose.Types.ObjectId(workerId),
+                date: { $gte: startOfDay, $lt: endOfDay },
+            },
+            { slots: 1 } // Return only the slots field
+        );
+
+        return availability ? { slots: availability.slots } : null;
+    },
 
 };

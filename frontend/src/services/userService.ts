@@ -3,6 +3,7 @@ import { SignupInterface, UserProfileInterface } from "../interfaces/userInterfa
 import errorHandler from "../utils/errorHandler";
 import axios from "axios";
 import { Address } from "../interfaces/addressInterface";
+import { Booking } from "../interfaces/bookingInterface";
 
 
 
@@ -93,6 +94,7 @@ export const getUserProfile = async () : Promise<any> => {
              
                 'Authorization': `Bearer ${token}`, 
             },
+
         }); 
         console.log("response" , response)
         return response.data 
@@ -156,3 +158,55 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
   };
 
 
+  export const fetchingSlots =async (date:Date , workerId:string) => {
+    const token = localStorage.getItem('accessToken');
+    const formattedDate = date.toISOString().split('T')[0]; 
+    try{
+        const response = await axiosInstance.get(`/auth/available-slots?workerId=${workerId}&date=${formattedDate}`);
+       
+      
+     console.log("fetched workers" , response)
+      return response
+    }catch (error) {
+        throw new Error('Failed to fetch slots');
+    }
+  }
+
+
+
+export const createBooking = async(bookingDetails:Booking) => {
+    const token = localStorage.getItem('accessToken');
+
+    const response = await axiosInstance.post('/auth/create-booking', bookingDetails , {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+          }, 
+    });
+    return response;
+}
+export const fetchBookigs = async (userId: string) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Authentication token is missing');
+    }
+  
+    const response = await axiosInstance.get(`/auth/booking/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Send the token in headers
+      },
+    });
+    return response.data; // Ensure only the data is returned
+  };
+
+  export const fetchWorkerById = async (workerId:string) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('Authentication token is missing');
+    }
+    const response = await axiosInstance.get(`/auth/worker/${workerId}`,{
+        headers: {
+            Authorization: `Bearer ${token}`, // Send the token in headers
+          },
+    })
+    return response.data;
+  }

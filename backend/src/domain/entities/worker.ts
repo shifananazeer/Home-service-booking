@@ -7,6 +7,7 @@ export interface Worker {
     password: string; 
     role: string; 
     expirience?: number;
+    hourlyRate?:number;
     profilePic?:string;
     status:string;
     isVerified?: boolean; 
@@ -23,4 +24,5 @@ export interface WorkerUpdates {
     experience?: string;
     status?: string;
     profilePic?: string;
+    hourlyRate?:number;
 }

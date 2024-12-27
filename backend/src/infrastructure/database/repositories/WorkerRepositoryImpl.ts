@@ -1,3 +1,4 @@
+
 import { Worker } from "../../../domain/entities/worker";
 import { WorkerRepository } from "../../../domain/repositories/workerRepository";
 import WorkerModel from "../models/workerModel";
@@ -36,5 +37,10 @@ export const WorkerRepositoryImpl: WorkerRepository = {
        },
        async findWorkersBySkill(skill: string): Promise<Worker[]> { // Update return type
         return await WorkerModel.find({ skills: skill }).exec();
-    }
+    },
+    async getWorkerById(workerId: string): Promise<Worker | null> {
+        const worker = await WorkerModel.findOne({ workerId }); // Use findOne instead of find
+        return worker; // This will return a single Worker document or null
+      }
+      
 }

@@ -11,4 +11,5 @@ export interface AvailabilityRepository {
     updateSlot(slotId: string, updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot>;
     countAvailableSlots(workerId: string): Promise<number>;
     deleteSlot(slotId: string): Promise<boolean | null>;
+    getAvailableSlots(workerId: string, date: Date): Promise <{ slots: any[] } | null>;
 }

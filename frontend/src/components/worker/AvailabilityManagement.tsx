@@ -22,11 +22,25 @@ const [totalPages, setTotalPages] = useState(1);
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+
+
+  const calculateDate = (selectedDay: string): string => {
+    const today = moment();
+    const dayIndex = days.indexOf(selectedDay); // Index of the selected day (0-6)
+    const todayIndex = today.isoWeekday() - 1; // Current day index (0-6)
+  
+    // Calculate the difference in days to the next occurrence
+    const daysUntilSelectedDay = (dayIndex - todayIndex + 7) % 7 || 7;
+
+    // Add the difference to the current date to get the future date
+    return today.add(daysUntilSelectedDay, 'days').startOf('day').toISOString();
+  };
+
   const handleAddSlot = async () => {
     if (selectedDay && startTime && endTime) {
       const slotId = `${selectedDay}-${startTime}-${endTime}`;
-      const date = moment().day(days.indexOf(selectedDay) + 1).startOf('day').toISOString(); // Calculate the date for the selected day
-
+      const date = calculateDate(selectedDay);
+   console.log("date",date)
       const newSlot: AvailabilitySlot = {
         slotId,
         startTime,

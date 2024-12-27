@@ -112,7 +112,9 @@ export const getWorkerProfile = async () : Promise <any> => {
             'Authorization':`Bearer ${token}`,
         }
       })
+      console.log("rrrrrrrrr",response.data)
       return response.data
+
     }catch (error: any) {
         throw new Error(error.response?.data?.message || 'Error fetching user profile');
     }

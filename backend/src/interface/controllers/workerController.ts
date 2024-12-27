@@ -157,7 +157,7 @@ export const workerController  = {
                     const addressResponse = await userAddress(worker._id)
                     console.log("Address worker:", addressResponse, "Worker:", worker);
             
-                    const { _id: workerId, name, email, phone, profilePic, expirience, status, skills } = worker;
+                    const { _id: workerId, name, email, phone, profilePic, expirience, status, skills , hourlyRate } = worker;
                   
                     if (!addressResponse.address) {
                         res.status(200).json({
@@ -170,6 +170,7 @@ export const workerController  = {
                                 skills:skills,
                                 status,
                                 expirience,
+                                hourlyRate,
                             },
                             address: null,
                         });
@@ -178,7 +179,7 @@ export const workerController  = {
             
                     const { id: addressId, userId: addressuserId, address: useraddress, area } = addressResponse.address;
                     res.status(200).json({
-                        worker: { _id: workerId, name, email, phone, expirience, skills, profilePic, status },
+                        worker: { _id: workerId, name, email, phone, expirience, skills, profilePic, hourlyRate ,status },
                         address: { id: addressId, userId: addressuserId, address: useraddress, area }
                     });
                 } catch (error) {
@@ -203,7 +204,7 @@ export const workerController  = {
                         return;
                     }
             
-                    const { name, skills, expirience, status, address, area } = req.body;
+                    const { name, skills, expirience, status,hourlyRate , address, area } = req.body;
             
             //         const skillArray = Array.isArray(skills) 
             // ? skills 
@@ -222,6 +223,7 @@ export const workerController  = {
                         skills:JSON.parse(skills), // Store as an array
                         expirience,
                         status,
+                        hourlyRate,
                         ...(profilePicUrl && { profilePic: profilePicUrl }),
                     };
             
@@ -245,7 +247,11 @@ export const workerController  = {
                     return;
                 }
             
-              
+
+                const parsedDate = new Date(date);
+                const utcDate = new Date(parsedDate.toUTCString());
+
+
                 const workerEmail = (req.user as { email?: string })?.email; 
                 if (!workerEmail) {
                     res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
@@ -261,7 +267,7 @@ export const workerController  = {
                 }
             
                 try {
-                    const availability = await createAvailability(AvailabilityRepositoryImpl, workerId, new Date(date), slots);
+                    const availability = await createAvailability(AvailabilityRepositoryImpl, workerId,utcDate, slots);
                     res.status(201).json(availability);
                 } catch (error: any) {
                     console.error("Error creating availability:", error.message);

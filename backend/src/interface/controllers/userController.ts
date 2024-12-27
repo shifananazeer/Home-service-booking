@@ -8,7 +8,7 @@ import { sendResetLink } from "../../application/useCases/passwordResent";
 import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
 import { blockUser,unblockUser } from "../../application/useCases/user/blockUser";
-
+import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken'
 import { userProfile } from "../../application/useCases/user/userProfile";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
@@ -16,6 +16,11 @@ import { updateUserProfile } from "../../application/useCases/user/updateUserPro
 import { uploadProfilePic } from "../../utils/s3Servise";
 import { upadteAddress, userAddress } from "../../application/useCases/user/updateAddress";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
+import { availableSlots, fetchAvailableSlots } from "../../application/useCases/worker/availability";
+import { Booking } from "../../domain/entities/Booking";
+import { createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
+import { getWorkers } from "../../application/useCases/admin/getWorkers";
+import { getWorker } from "../../application/useCases/user/getWorkerDetails";
 
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -309,7 +314,71 @@ export const userController = {
     const userAddress = await AddressRepositoryImpl.findAddressByUserId(userId)
     console.log("aaaaaaaaa",userAddress)
     res.status(200).json({  userAddress })
+    },
+    availableSlots : async (req:Request , res:Response) : Promise <void> => {
+        const { workerId, date } = req.query;
+        console.log("dd",date)
+
+        try {
+            const slots = await fetchAvailableSlots(workerId as string, new Date(date as string));
+            console.log("slots", slots);
+
+            if (!slots ) {
+                res.status(404).json({ message: "No available slots for the given worker and date" });
+                return;
+            }
+
+            res.status(200).json({ slots });
+        } catch (error) {
+            console.error("Error fetching slots:", error);
+            res.status(500).json({ message: "Failed to fetch available slots" });
+        }
+    },
+    createBooking : async (req:Request , res:Response):Promise <void>=> {
+        try{
+         const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus} = req.body ;
+         const bookingDetails: Booking = {
+             date, // Ensure date is a Date object
+             slotId,
+             workLocation,
+             workDescription,
+             workerId,
+             workerName ,
+             serviceImage,
+             serviceName,
+             userId,
+             paymentStatus: paymentStatus || 'Pending',
+             bookingId: uuidv4(),
+         };
+        const createdBooking = await createBookings (bookingDetails);
+        res.status(201).json(createdBooking);
+        }catch (error) {
+            console.error('Error creating booking:', error);
+            res.status(500).json({ message: 'Failed to create booking.' });
+        }
+ },
+ getBookings : async (req:Request , res:Response) :Promise <void> => {
+    const {userId} = req.params;
+    try{
+     const bookings = await getBookingsByUserId(userId)
+     res.status(200).json({bookings})
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ message: 'Failed to fetch bookings' });
     }
+ },
+ fetchWorkerDetails: async (req:Request , res:Response) : Promise<void> => {
+   const { workerId } = req.params;
+   try{
+    const workerDetails = await getWorker(workerId)
+    res.status(200).json({workerDetails})
+   }catch(error) {
+    console.error("failed to fetch worker " , error);
+    res.status(500).json({ message: 'Failed to fetch workerDetails' });
+   }
+ }
 }
+
+
 
 

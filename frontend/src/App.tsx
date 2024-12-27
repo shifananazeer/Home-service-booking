@@ -25,6 +25,9 @@ import AvailabilityManagement from "./components/worker/AvailabilityManagement";
 import HomePage from "./components/HomePage";
 import ServicesPage from "./components/ServicePage";
 import BookingPage from "./pages/User/BookingPage";
+import BookingConfirm from "./pages/User/BookingConfirm";
+import PaymentPage from "./pages/User/PaymentPage";
+import BookingList from "./pages/User/bookingList";
 
 
 
@@ -45,6 +48,8 @@ const App = () => {
       <Route path="/" element={<HomePage/>}/>
       <Route path="/services" element={<ServicesPage/>}/>
       <Route path="/book/:serviceId" element={<BookingPage />} />
+      <Route path="/payment" element={<PaymentPage/>}/>
+      <Route path="/booking-list" element={<BookingList/>}/>
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
@@ -53,6 +58,7 @@ const App = () => {
     <Route path="/register-worker" element={<WorkerSignup />} />
     <Route path="/user/profile" element={<UserProfile/>}/>
     <Route path="/user/edit-profile" element={<EditUserProfile />} />
+    <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
     {/* Protected Route */}
     <Route
         path="/worker/dashboard"

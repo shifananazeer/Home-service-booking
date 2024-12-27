@@ -19,5 +19,8 @@ router.get("/profile", authenticateUser, userController.getUserProfile);
 router.put('/profile/edit', authenticateUser ,upload.single('profilePic'),userController.editProfile)
 router.get('/address/:userId',authenticateUser , userController.getAddress)
 router.get('/workers',authenticateUser,workerController.findWorkerBySkills)
-
+router.get('/available-slots',authenticateUser,userController.availableSlots)
+router.post('/create-booking',authenticateUser , userController.createBooking)
+router.get('/booking/:userId' ,userController.getBookings)
+router.get('/worker/:workerId' , userController.fetchWorkerDetails)
 export default router;
