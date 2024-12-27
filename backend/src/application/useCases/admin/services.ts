@@ -6,11 +6,7 @@ interface CreateServiceInput {
     description: string;
     image: string;
 }
-export const createdServices = async (
-    serviceRepository: ServiceRepository,
-    serviceData: CreateServiceInput
-): Promise<Service> => {
-    // Additional business logic or validations can be added here
+export const createdServices = async (serviceRepository: ServiceRepository,serviceData: CreateServiceInput): Promise<Service> => {  
     return await serviceRepository.createService(serviceData);
 };
 

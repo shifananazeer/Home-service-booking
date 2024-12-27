@@ -22,6 +22,6 @@ const UserSchema = new Schema<UserDocument>({
     googleId: { type: String },
 });
 
-// Mongoose will automatically add the `_id` field
+
 export const UserModel = mongoose.model<UserDocument>('User', UserSchema);
 export default UserModel;

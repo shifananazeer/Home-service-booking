@@ -1,4 +1,4 @@
-// Address Model (addressModel.ts)
+
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface Address extends Document {

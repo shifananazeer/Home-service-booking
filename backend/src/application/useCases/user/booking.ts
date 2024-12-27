@@ -4,10 +4,10 @@ import { BookingRepositoryImpl } from "../../../infrastructure/database/reposito
 export const createBookings = async (bookingDetails: Booking): Promise<Booking |null> => {
     try {
         const createdBooking = await BookingRepositoryImpl.bookingDetailsUpdate(bookingDetails);
-        return createdBooking; // Return the created booking
+        return createdBooking; 
     } catch (error) {
         console.error('Error creating booking:', error);
-        throw new Error('Failed to create booking'); // Handle the error appropriately
+        throw new Error('Failed to create booking'); 
     }
 }
 

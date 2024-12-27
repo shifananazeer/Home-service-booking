@@ -52,33 +52,20 @@ export const adminController =  {
     const imagePath = req.file ? req.file.path : '';
         console.log('Received body:', req.body);
         console.log('Received file:', req.file);
-
-        // Validate required fields
         if (!name || !description) {
             res.status(400).json({ message: 'Name and description are required' });
             return;
         }
-
-        let serviceImageUrl: string = ""; // Set a default empty string
-
-        // Check for uploaded file
+        let serviceImageUrl: string = ""; 
         if (req.file) {
-            // Upload the image and get the URL
             serviceImageUrl = await uploadProfilePic(req.file);
         }
-
-        // Log received data for debugging
         console.log('Received data:', { name, description, image: serviceImageUrl });
-
-        // Create the service using the repository
         const createdService = await createdServices(ServiceRepositoryImpl, {
             name,
             description,
-            image: serviceImageUrl, // This is now guaranteed to be a string
+            image: serviceImageUrl, 
         });
-
-
-        // Return the success response
         res.status(201).json({ message: "Service created successfully", service: createdService });
     } catch (error) {
         console.error("Error creating service:", error);
@@ -96,8 +83,6 @@ getAllServices: async(req:Request , res:Response) => {
             parseInt(limit as string), 
             search as string
         );
-
-        // Send response with services and total count
         res.status(200).json({ 
             services, 
             totalServices 
@@ -106,28 +91,22 @@ getAllServices: async(req:Request , res:Response) => {
         res.status(400).json({ message: error.message });
     }
 },
+
 updateService: async(req:Request , res:Response) :Promise<void>=> {
     const serviceId = req.params.serviceId;
     const { name, description } = req.body;
     let imageUrl: string | undefined;
 
     try {
-        // Handle image upload if a new file is provided
         if (req.file) {
-            // Assuming req.file is defined when using multer
             imageUrl = await uploadServiceImage(req.file, req.body.currentImageUrl);
         }
-
-        // Prepare the data to update
         const updateData: Partial<Service> = {
             name,
             description,
-            ...(imageUrl && { image: imageUrl }), // Only add imageUrl if it's defined
+            ...(imageUrl && { image: imageUrl }),
         };
-
-        // Update the service using the repository
         const updatedService = await ServiceRepositoryImpl.updateService(serviceId, updateData);
-
         if (!updatedService) {
             res.status(404).json({ message: "Service not found" });
             return 
@@ -141,6 +120,7 @@ updateService: async(req:Request , res:Response) :Promise<void>=> {
          return
     }
 },
+
 deleteService : async (req:Request , res:Response) : Promise<void> => {
     const {serviceId} = req.params;
     try {

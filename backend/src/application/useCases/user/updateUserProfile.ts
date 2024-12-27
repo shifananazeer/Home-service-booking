@@ -8,7 +8,7 @@ export const updateUserProfile = async (userEmail: string , updates : Partial<Us
 
         return updatedUser;
     }catch (error) {
-        console.error('Error updating user profile:', error); // Log the error for debugging
-        throw new Error('Database error'); // Throw an error to handle it in the controller
+        console.error('Error updating user profile:', error); 
+        throw new Error('Database error'); 
     }
 }

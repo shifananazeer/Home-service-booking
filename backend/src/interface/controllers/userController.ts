@@ -334,11 +334,12 @@ export const userController = {
             res.status(500).json({ message: "Failed to fetch available slots" });
         }
     },
+    
     createBooking : async (req:Request , res:Response):Promise <void>=> {
         try{
          const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus} = req.body ;
          const bookingDetails: Booking = {
-             date, // Ensure date is a Date object
+             date, 
              slotId,
              workLocation,
              workDescription,
@@ -357,6 +358,7 @@ export const userController = {
             res.status(500).json({ message: 'Failed to create booking.' });
         }
  },
+
  getBookings : async (req:Request , res:Response) :Promise <void> => {
     const {userId} = req.params;
     try{
@@ -367,6 +369,7 @@ export const userController = {
         res.status(500).json({ message: 'Failed to fetch bookings' });
     }
  },
+
  fetchWorkerDetails: async (req:Request , res:Response) : Promise<void> => {
    const { workerId } = req.params;
    try{

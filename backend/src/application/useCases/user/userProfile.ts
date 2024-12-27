@@ -3,17 +3,14 @@ import { UserRepositoryImpl } from "../../../infrastructure/database/repositorie
 
 export const userProfile = async (email:string ) => {
     try {
-        // Fetch user from repository
         const user = await UserRepositoryImpl.findByEmail(email);
-    
-        // Handle case where user is not found
         if (!user) {
           throw new Error("User not found");
         }
       console.log("user",user)
-        return user; // Return user data
+        return user; 
       } catch (error: any) {
-        console.error("Error in userProfile use case:", error); // Log error for debugging
+        console.error("Error in userProfile use case:", error); 
         throw new Error(error.message || "Error fetching user profile");
       }
 }

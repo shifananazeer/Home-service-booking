@@ -9,7 +9,7 @@ export const BookingRepositoryImpl : BookingRepository = {
             return createdBooking;
         } catch (error) {
             console.error('Error updating booking details:', error);
-            throw new Error('Failed to update booking details'); // Handle the error appropriately
+            throw new Error('Failed to update booking details'); 
         }
     },
     async getBookingsForUser(userId: string): Promise<Booking[] | []> {

@@ -1,7 +1,7 @@
 import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl";
 import { Worker } from "../../../domain/entities/worker";
 
-export const workerService = async (skill: string | undefined): Promise<Worker[]> => { // Update return type
+export const workerService = async (skill: string | undefined): Promise<Worker[]> => { 
     if (!skill) {
         throw new Error('Skill is required');
     }
@@ -12,5 +12,5 @@ export const workerService = async (skill: string | undefined): Promise<Worker[]
         throw new Error('No workers found with this skill');
     }
 
-    return workers; // This should now correctly return ServiceWorker[]
+    return workers; 
 };

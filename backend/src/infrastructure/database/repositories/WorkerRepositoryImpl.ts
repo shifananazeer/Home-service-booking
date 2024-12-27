@@ -14,16 +14,17 @@ export const WorkerRepositoryImpl: WorkerRepository = {
         const worker = await WorkerModel.findOne({ email });
         return worker ? (worker.toObject() as Worker) : null; 
     },
+
     async updatePassword(email: string, hashedPassword: string) {
         const result = await WorkerModel.updateOne(
             { email },
             { $set: { password: hashedPassword } }
         );
-
         if (result.modifiedCount === 0) {
             throw new Error('Password update failed, user not found or password unchanged.');
         }
     },
+
    async updateWorkerProfile(email:string , updates: Partial <Worker>) {
         return await WorkerModel.findOneAndUpdate (
             {email},
@@ -31,16 +32,19 @@ export const WorkerRepositoryImpl: WorkerRepository = {
             {new:true}
         )
    },
+
    async updateBlockStatus(workerId: string, isBlocked: boolean) {
            const updatedWorker = await WorkerModel.findByIdAndUpdate(workerId, { isBlocked }, { new: true });
            return updatedWorker ? updatedWorker.toObject() : null;
        },
-       async findWorkersBySkill(skill: string): Promise<Worker[]> { // Update return type
+       
+       async findWorkersBySkill(skill: string): Promise<Worker[]> {
         return await WorkerModel.find({ skills: skill }).exec();
     },
+
     async getWorkerById(workerId: string): Promise<Worker | null> {
-        const worker = await WorkerModel.findOne({ workerId }); // Use findOne instead of find
-        return worker; // This will return a single Worker document or null
+        const worker = await WorkerModel.findOne({ workerId }); 
+        return worker; 
       }
       
 }

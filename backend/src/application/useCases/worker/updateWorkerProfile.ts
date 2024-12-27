@@ -9,7 +9,7 @@ try {
     console.log("updated worker" , updatedWorker)
     return updatedWorker ;
 }catch (error) {
-    console.error('Error updating user profile:', error); // Log the error for debugging
+    console.error('Error updating user profile:', error); 
         throw new Error('Database error'); 
 }
 }

@@ -23,7 +23,7 @@ async findServices(skip: number, limit:number,search:string):Promise<Service[]|n
 },
 async countServices(search: string): Promise<number> {
     return await ServiceModel.countDocuments({
-        name: { $regex: search, $options: "i" }, // Count matching services by name, case-insensitive
+        name: { $regex: search, $options: "i" }, 
     });
 }
 }

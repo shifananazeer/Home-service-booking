@@ -11,7 +11,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<string> 
       const accessToken = jwt.sign(
         { email: decoded.email, role: "user" },
         process.env.ACCESS_TOKEN_SECRET as string,
-        { expiresIn: "15m" } // Set the expiration time for the new access token
+        { expiresIn: "15m" }
       );
   
       return accessToken;

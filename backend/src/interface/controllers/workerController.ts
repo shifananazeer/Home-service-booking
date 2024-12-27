@@ -206,12 +206,7 @@ export const workerController  = {
             
                     const { name, skills, expirience, status,hourlyRate , address, area } = req.body;
             
-            //         const skillArray = Array.isArray(skills) 
-            // ? skills 
-            // : typeof skills === 'string' 
-            // ? skills.split(',').map(skill => skill.trim()) // Split string and trim spaces
-            // : []; // Default to an empty array if not a string or array
-
+            
                     let profilePicUrl: string | undefined;
                     if (req.file) {
                         profilePicUrl = await uploadProfilePic(req.file, worker.profilePic);
@@ -220,7 +215,7 @@ export const workerController  = {
             
                     const updates: Partial<any> = {
                         name,
-                        skills:JSON.parse(skills), // Store as an array
+                        skills:JSON.parse(skills), 
                         expirience,
                         status,
                         hourlyRate,
@@ -240,32 +235,24 @@ export const workerController  = {
              handleCreateAvailability : async (req: Request, res: Response): Promise<void> => {
                 console.log("availability", req.body)
                 const { date, slots } = req.body;
-            
-                // Ensure date and slots are provided and valid
                 if (!date || !Array.isArray(slots) || slots.length === 0) {
                     res.status(400).json({ message: 'Date and slots are required' });
                     return;
                 }
-            
-
                 const parsedDate = new Date(date);
                 const utcDate = new Date(parsedDate.toUTCString());
-
-
                 const workerEmail = (req.user as { email?: string })?.email; 
                 if (!workerEmail) {
                     res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
                     return; 
                 }
                 const worker = await workerProfile(workerEmail);
-
                 const workerId = worker._id
                 console.log("workerId" , workerId)
                 if (!workerId) {
                     res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
                     return; 
                 }
-            
                 try {
                     const availability = await createAvailability(AvailabilityRepositoryImpl, workerId,utcDate, slots);
                     res.status(201).json(availability);
@@ -277,9 +264,8 @@ export const workerController  = {
 
             fetchAvailabilitySlotForWorker : async(req:Request , res :Response): Promise<void> => {
              const workerId = req.params.workerId;
-
-             const page = parseInt(req.query.page as string) || 1; // Default to page 1
-             const limit = parseInt(req.query.limit as string) || 5; // Default limit to 5
+             const page = parseInt(req.query.page as string) || 1;
+             const limit = parseInt(req.query.limit as string) || 5; 
              console.log("page" , page)
              console.log("limit" , limit)
              try {
@@ -288,16 +274,12 @@ export const workerController  = {
                     res.status(400).json({ message: "Invalid pagination parameters." });
                     return;
                 }
-
                 const availabilities = await availableSlots(AvailabilityRepositoryImpl, workerId, page, limit);
-        
                 if (!availabilities || availabilities.length === 0) {
                     res.status(200).json({ message: "No slots available." });
                     return;
                 }
-
                 const totalCount = await AvailabilityRepositoryImpl.countAvailableSlots(workerId);
-        
                 res.status(200).json({
                     data: availabilities,
                     pagination: {
@@ -343,6 +325,7 @@ export const workerController  = {
             return
         }
     },
+
     blockWorker : async (req:Request , res:Response): Promise<void> => {
         const { workerId } = req.params;
         try{
@@ -357,6 +340,7 @@ export const workerController  = {
             res.status(500).json({ message: 'Server error' });
         }
         },
+
          unblockWorker : async (req: Request, res: Response): Promise<void> => {
                 const { workerId } = req.params;
             
@@ -405,11 +389,11 @@ export const workerController  = {
                     });
                 }
             },
+
             findWorkerBySkills: async (req: Request, res: Response): Promise<void> => {
-                const skill = req.query.skill as string; // Type assertion to string
+                const skill = req.query.skill as string; 
             
                 try {
-                    // Correct the call to the workerService
                     const workers = await workerService(skill);
                     console.log("fetchWorkers",workers)
                     res.status(200).json({ workers });
@@ -424,6 +408,7 @@ export const workerController  = {
                     }
                 }
             },
+
           updateLocation:async (req:Request , res:Response) : Promise<void> => {
             const { latitude, longitude ,workerId } = req.body;
            try{
@@ -432,8 +417,6 @@ export const workerController  = {
                 res.status(404).json({ message: "Address not found for the given workerId." });
                 return;
             }
-    
-            // Respond with the updated address
             res.status(200).json({ message: "Coordinates updated successfully.", data: response });
             return
            }catch (error:any) {

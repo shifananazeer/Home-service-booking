@@ -13,16 +13,14 @@ export const loginWorker = async (workerRepository:WorkerRepository, email:strin
         const accessToken = jwt.sign(
             { email: user.email, role: user.role  },
             process.env.ACCESS_TOKEN_SECRET as string,
-            { expiresIn: '15m' } // Short lifespan for access token
+            { expiresIn: '15m' } 
         );
     
         const refreshToken = jwt.sign(
             { email: user.email, role: user.role  },
-            process.env.REFRESH_TOKEN_SECRET as string, // Use a different secret for refresh tokens
-            { expiresIn: '7d' } // Longer lifespan for refresh token
+            process.env.REFRESH_TOKEN_SECRET as string, 
+            { expiresIn: '7d' }
         );
-    
-        // Store refreshToken in your database or secure storage if needed
     
         return { accessToken, refreshToken ,workerId: user._id.toString() };
 }

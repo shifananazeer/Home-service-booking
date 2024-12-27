@@ -38,7 +38,7 @@ const BookingConfirm: React.FC = () => {
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [workLocation, setWorkLocation] = useState<string>('');
     const [workDescription, setWorkDescription] = useState<string>('');
-
+      const [isLoading, setIsLoading] = useState(true);
     const userId = localStorage.getItem('user_Id');
 
     useEffect(() => {
@@ -55,6 +55,7 @@ const BookingConfirm: React.FC = () => {
             return nextDate;
         });
         setAvailableDates(dates);
+        setIsLoading(false);
     }, [userId, navigate]);
 
     const fetchSlots = async (date: Date, workerId: string) => {
@@ -149,6 +150,13 @@ const BookingConfirm: React.FC = () => {
             alert('An error occurred. Please try again.');
         }
     };
+    if (isLoading) {
+        return (
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        );
+      }
  
 
     return (

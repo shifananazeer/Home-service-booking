@@ -4,10 +4,7 @@ import { AddressRepositoryImpl } from "../../../infrastructure/database/reposito
 import { Address } from "../../../domain/entities/Address";
 
 export const upadteAddress = async(userId : string , address: string, area: string) => {
-   
-
     try {
-        // Call repository method to update address
         const updatedAddress = await AddressRepositoryImpl.updateAddress(userId,{ address, area });
 
         if (!updatedAddress) {
@@ -16,7 +13,6 @@ export const upadteAddress = async(userId : string , address: string, area: stri
                 message: 'Address not found or could not be updated',
             };
         }
-
         return {
             success: true,
             updatedAddress,
@@ -29,42 +25,26 @@ export const upadteAddress = async(userId : string , address: string, area: stri
             message: 'Failed to update the address due to a server error',
         };
     }
-
-
 }
 
-// interface Address {
-//     _id: string;       // ID of the address
-//     userId: string;    // ID of the user that the address belongs to
-//     address: string;    // The actual address
-//     area: string;       // Area of the address
-//     __v: number;       // Version key, usually present in MongoDB documents
-// }
-
-// Define the AddressResponse interface
 interface AddressResponse {
-    message: string;    // Message indicating the result of the operation
-    address?: Address;  // Optional address object of type Address
+    message: string;    
+    address?: Address; 
 }
 
 export const userAddress = async (userId: string): Promise<AddressResponse> => {
     try {
-        // Retrieve the address based on userId
         const address: Address | null = await AddressRepositoryImpl.findAddressByUserId(userId);
-
-        // Check if the address was found
         if (!address) {
             return {
                 message: "User doesn't have an address",
             };
         }
-
-        // Return the retrieved address along with a success message
         return {
             message: "Address retrieved successfully",
             address: {
-                id: address.id?.toString(),   // Convert ObjectId to string for type safety
-                userId: address.userId.toString(), // Convert ObjectId to string if necessary
+                id: address.id?.toString(),   
+                userId: address.userId.toString(), 
                 address: address.address,
                 area: address.area,
                 __v: address.__v,

@@ -13,7 +13,7 @@ router.post('/login',workerController.login)
 router.post('/forgot-password', workerController.forgotPassword);
 router.get('/reset-password/:token', workerController.validateResetToken);
 router.post('/reset-password', workerController.resetPassword);
-router.get('/profile',authenticateUser, workerController.getWorkerProfile); // Get worker profile by ID
+router.get('/profile',authenticateUser, workerController.getWorkerProfile); 
 router.put('/profile/edit', authenticateUser ,upload.single('profilePic'), workerController.updateWorkerProfile);
 router.post('/availability',authenticateUser,workerController.handleCreateAvailability)
 router.get('/availability/:workerId', authenticateUser, workerController.fetchAvailabilitySlotForWorker);
