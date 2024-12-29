@@ -4,10 +4,10 @@ export interface Booking {
     id?: string;
     bookingId?: string;
     workerId:string;
-    workerName: string;  // Use Types.ObjectId
+    workerName: string;  
     serviceImage:string;
     serviceName:string;
-    userId: string   // Use Types.ObjectId
+    userId: string  
     date: Date;
     workLocation: {
         address: string;

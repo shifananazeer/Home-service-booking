@@ -71,3 +71,7 @@ export const fetchAvailableSlots = async (workerId: string, date: Date): Promise
       throw new Error("Error fetching available slots");
   }
 };
+
+export const updateStatusOfSlot = async (slotId:string) => {
+     await AvailabilityRepositoryImpl.updateSlotStatus(slotId)
+}

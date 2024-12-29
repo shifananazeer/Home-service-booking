@@ -138,7 +138,6 @@ export const fetchServices = async (page = 1, limit = 5, search = '') => {
     return response.data;
 };
 
-// Update an existing service
 export const updateService = async (serviceId: string, formData:FormData) => {
     const response = await axiosInstance.put(`/admin/service/edit/${serviceId}`, formData,{
         headers: {
@@ -148,12 +147,12 @@ export const updateService = async (serviceId: string, formData:FormData) => {
     return response.data;
 };
   
-  // Function to delete a service by its ID
+ 
   export const deleteService = async (serviceId:string) => {
     try {
       const response = await axiosInstance.delete(`/admin/service/delete/${serviceId}`);
-      return response.data; // Return the response data confirming deletion
+      return response.data; 
     } catch (error) {
-      throw error; // Rethrow the error for handling in the calling component
+      throw error; 
     }
   };

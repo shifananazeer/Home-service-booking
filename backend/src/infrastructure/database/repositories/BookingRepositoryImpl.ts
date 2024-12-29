@@ -20,5 +20,16 @@ export const BookingRepositoryImpl : BookingRepository = {
             console.error('Error fetching bookings for user:', error);
             return [];
         }
+    },
+    async findBookingsByWorkerId(workerId: string, page: number, limit: number): Promise<Booking[]> {
+        const skip = (page - 1) * limit; // Calculate how many records to skip
+        return await BookingModel.find({ workerId })
+            .skip(skip)
+            .limit(limit)
+            .exec(); // Execute the query
+    },
+    
+    async countBookingsByWorkerId(workerId: string): Promise<number> {
+        return await BookingModel.countDocuments({ workerId }).exec(); // Get total count of bookings
     }
 }

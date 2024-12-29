@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,12 @@ const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
+    const token = localStorage.getItem('user_Id')
+    useEffect(()=> {
+        if(token) {
+      navigate('/')
+        }
+    })
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -19,13 +24,13 @@ const Login = () => {
         console.log('Dispatching loginStart');
     
         try {
-            // Call the login service
+         
             const response = await loginUser({ email, password });
           console.log("ressssssssss",response)
-            // Access the tokens and user details from response
+          
             const { accessToken, refreshToken, name, email: userEmail ,userId } = response;
               console.log("user....." , userId)
-            // Store tokens in local storage
+          
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user_Id' , userId)

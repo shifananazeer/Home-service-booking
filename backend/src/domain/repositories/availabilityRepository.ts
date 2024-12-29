@@ -12,4 +12,5 @@ export interface AvailabilityRepository {
     countAvailableSlots(workerId: string): Promise<number>;
     deleteSlot(slotId: string): Promise<boolean | null>;
     getAvailableSlots(workerId: string, date: Date): Promise <{ slots: any[] } | null>;
+    updateSlotStatus(slotId:string) :Promise<void>;
 }

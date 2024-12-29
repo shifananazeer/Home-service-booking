@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { fetchBookigs } from '../../services/userService';
+import { cancelBooking, fetchBookigs } from '../../services/userService';
 
 interface Booking {
   id: string;
@@ -52,7 +52,7 @@ const BookingList: React.FC = () => {
 
   const handleCancelBooking = async (bookingId: string) => {
     try {
-      await axios.patch(`/api/bookings/cancel/${bookingId}`); // Update with your API endpoint
+    await cancelBooking(bookingId)// Update with your API endpoint
       setBookings(
         bookings.map((booking) =>
           booking.id === bookingId
@@ -101,7 +101,7 @@ const BookingList: React.FC = () => {
             <div
               key={booking.id}
               className="flex bg-gray-900 rounded-lg shadow-md overflow-hidden mb-3"
-              style={{ height: "150px" }} // Adjusted height
+              style={{ height: "150px" }} 
             >
               {/* Left Section: Details */}
               <div className="flex-1 p-2 overflow-hidden ">
@@ -137,9 +137,9 @@ const BookingList: React.FC = () => {
             {/* Third Section: Service Image */}
             <div className="w-1/3 flex items-center justify-center p-2">
               <img
-                src={booking.serviceImage} // Ensure booking includes a `serviceImage` field
+                src={booking.serviceImage} 
                 alt={booking.serviceName}
-                className="object-cover w-20 h-20 rounded-lg" // Adjust size as needed
+                className="object-cover w-20 h-20 rounded-lg" 
               />
             </div>
 

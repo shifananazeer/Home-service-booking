@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AddAvailability, addAvailability, AvailabilitySlot, AvailabilityWithSlots, deleteAvailability, fetchAvailabilitySlots } from '../../services/workerService';
 import moment from 'moment';
-import Modal from './editModel'; // Import your modal component
+import Modal from './editModel';
 import { Slot } from './editModel';
 
 const formatDate = (dateString: string): string => {
-  return moment(dateString).format('YYYY-MM-DD dddd'); // Formats as 'YYYY-MM-DD Day'
+  return moment(dateString).format('YYYY-MM-DD dddd'); 
 };
 
 const AvailabilityManagement = () => {
@@ -26,13 +26,11 @@ const [totalPages, setTotalPages] = useState(1);
 
   const calculateDate = (selectedDay: string): string => {
     const today = moment();
-    const dayIndex = days.indexOf(selectedDay); // Index of the selected day (0-6)
-    const todayIndex = today.isoWeekday() - 1; // Current day index (0-6)
+    const dayIndex = days.indexOf(selectedDay); 
+    const todayIndex = today.isoWeekday() - 1; 
   
-    // Calculate the difference in days to the next occurrence
+    
     const daysUntilSelectedDay = (dayIndex - todayIndex + 7) % 7 || 7;
-
-    // Add the difference to the current date to get the future date
     return today.add(daysUntilSelectedDay, 'days').startOf('day').toISOString();
   };
 
@@ -47,7 +45,6 @@ const [totalPages, setTotalPages] = useState(1);
         endTime,
         isAvailable: true,
       };
-
       const payload: AddAvailability = {
         date,
         slots: [newSlot],
@@ -91,9 +88,13 @@ const [totalPages, setTotalPages] = useState(1);
             setError('Worker ID not found in localStorage.');
             return;
         }
-        const { data, pagination }  = await fetchAvailabilitySlots(workerId, page, 5); // Assuming a limit of 5 per page
+        const { data, pagination }  = await fetchAvailabilitySlots(workerId, page, 5); 
         if (data && pagination) {
-          setSlots(data);
+          const now = moment();
+          const validSlots = data.filter((availability: AvailabilityWithSlots) =>
+            moment(availability.date).isSameOrAfter(now, 'day')
+          );
+          setSlots(validSlots);
           setTotalPages(pagination.totalPages);
           setCurrentPage(pagination.currentPage);
       } else {
@@ -117,22 +118,17 @@ const [totalPages, setTotalPages] = useState(1);
     setError(null);
     
     try {
-        // Assuming you have a deleteAvailability function in your workerService
         const workerId = localStorage.getItem('workerId');
         if (!workerId) {
             setError('Worker ID not found in localStorage.');
             return;
         }
-
-        // Call the delete API
-        await deleteAvailability( slotId); // Make sure this function exists
-
-        // Update state by removing the deleted slot
+        await deleteAvailability( slotId); 
         setSlots((prevSlots) =>
             prevSlots.map((availability) => ({
                 ...availability,
                 slots: availability.slots.filter((slot) => slot.slotId !== slotId),
-            })).filter((availability) => availability.slots.length > 0) // Remove empty availability entries
+            })).filter((availability) => availability.slots.length > 0) 
         );
     } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to delete slot');
@@ -140,6 +136,7 @@ const [totalPages, setTotalPages] = useState(1);
         setLoading(false);
     }
 };
+
   const handlePageChange = (page: number) => {
     fetchSlots(page);
 };
@@ -152,7 +149,7 @@ const [totalPages, setTotalPages] = useState(1);
     if (slotToEdit) {
       setEditingSlot({
         ...slotToEdit,
-        isAvailable: slotToEdit.isAvailable, // Ensure this is included
+        isAvailable: slotToEdit.isAvailable, 
       });
       setIsModalOpen(true);
     }
@@ -160,7 +157,7 @@ const [totalPages, setTotalPages] = useState(1);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setEditingSlot(null); // Clear editing slot on close
+    setEditingSlot(null); 
   };
 
   const handleModalSubmit = (updatedSlot: Slot) => {
@@ -175,7 +172,6 @@ const [totalPages, setTotalPages] = useState(1);
     );
 
     console.log('Updated Slot:', updatedSlot);
-    // Implement the logic to update the slot in your backend
     handleModalClose();
   };
 
@@ -229,7 +225,7 @@ const [totalPages, setTotalPages] = useState(1);
           </button>
         </div>
 
-        {/* Display added slots */}
+      
         <div className="mt-6">
           <h2 className="text-xl font-bold mb-4">Your Slots</h2>
           {slots.length > 0 ? (
@@ -272,7 +268,7 @@ const [totalPages, setTotalPages] = useState(1);
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSubmit={handleModalSubmit}
-        initialData={editingSlot} // Pass the editing slot here
+        initialData={editingSlot} 
       />
       <div className="flex justify-between items-center mt-6">
     <button

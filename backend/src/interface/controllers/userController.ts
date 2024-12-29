@@ -16,7 +16,7 @@ import { updateUserProfile } from "../../application/useCases/user/updateUserPro
 import { uploadProfilePic } from "../../utils/s3Servise";
 import { upadteAddress, userAddress } from "../../application/useCases/user/updateAddress";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
-import { availableSlots, fetchAvailableSlots } from "../../application/useCases/worker/availability";
+import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
 import { Booking } from "../../domain/entities/Booking";
 import { createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
 import { getWorkers } from "../../application/useCases/admin/getWorkers";
@@ -338,6 +338,8 @@ export const userController = {
     createBooking : async (req:Request , res:Response):Promise <void>=> {
         try{
          const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus} = req.body ;
+
+         const updateSlotStatus = await updateStatusOfSlot(slotId)
          const bookingDetails: Booking = {
              date, 
              slotId,

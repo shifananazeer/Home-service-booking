@@ -1,4 +1,5 @@
 export interface Worker {
+    toObject(): Worker | PromiseLike<Worker | null> | null;
     _id:string;
     name: string; 
     email: string; 

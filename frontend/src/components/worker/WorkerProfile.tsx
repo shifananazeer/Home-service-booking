@@ -60,7 +60,7 @@ const WorkerProfile = () => {
         className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
       >
         {skill}
-        {index < workerProfile.skills.length - 1 && ', '} {/* Add a comma except for the last skill */}
+        {index < workerProfile.skills.length - 1 && ', '} 
       </span>
     ))
   ) : (
@@ -76,7 +76,7 @@ const WorkerProfile = () => {
 </div>
         </div>
     </div>
-   {/* Display Address */}
+
    <div className="mt-4">
         <h2 className="text-xl font-semibold">Address</h2>
        {workerAddress? (

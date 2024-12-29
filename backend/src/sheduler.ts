@@ -4,7 +4,7 @@ import cron from 'node-cron';
 import { deleteExpiredSlots } from './infrastructure/services/availabilityService';
 import { AvailabilityRepositoryImpl } from './infrastructure/database/repositories/AvailabilityRepositoryIml'; // Adjust this import according to your project structure
 
-// Schedule a task to run every day at midnight
+
 cron.schedule('0 0 * * *', async () => {
     console.log('Deleting expired slots...');
     try {

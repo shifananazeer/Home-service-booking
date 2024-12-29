@@ -74,7 +74,7 @@ const UserProfile = () => {
                         </li>
                         <li>
                             <button
-                                onClick={() => navigate('/user/booking-list')}
+                                onClick={() => navigate('/booking-list')}
                                 className="w-full text-left px-4 py-2 hover:bg-gray-200 rounded transition"
                             >
                                 Booking List

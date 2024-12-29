@@ -10,16 +10,13 @@ const HomePage = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Hero Section */}
       <div 
         className="relative h-[900px] w-full bg-cover bg-center bg-no-repeat"
         style={{
-          // Replace this URL with your actual image URL
           backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("home-renovation-insurance.jpg")',
         }}
       >
        
-{/* Content Container */}
 <div className="absolute inset-0 flex flex-col justify-center px-4 sm:px-6 lg:px-8 -ml-2"> {/* Added negative margin here */}
   <div className="max-w-xl mx-auto text-center sm:text-left">
     <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">

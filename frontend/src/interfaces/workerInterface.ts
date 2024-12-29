@@ -18,7 +18,7 @@ export interface WorkerProfileInterface {
     hourlyRate?:number;
     status: string;
     profilePic?:string;
-    latitude?: number; // Add latitude
+    latitude?: number; 
     longitude?: number; 
 
 }

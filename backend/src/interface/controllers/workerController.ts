@@ -19,7 +19,7 @@ import moment from 'moment';
 import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
 import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
-import { workerService } from '../../application/useCases/worker/workerService';
+import { getBookingsByWorkerId, singleWorker, workerService } from '../../application/useCases/worker/workerService';
 import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
 
 
@@ -424,7 +424,53 @@ export const workerController  = {
             res.status(500).json({ message: "Failed to update coordinates in the database.", error: error.message });
             return
            }
-          }  
+          }  ,
+          allBookingsByworkerId: async (req:Request , res:Response) :Promise<void> =>{
+            const { page, limit } = req.query;
+              const workerId = req.params.workerId;
+
+            console.log("Page:", page, "Limit:", limit, "Worker ID:", workerId);
+            try {
+
+                const parsedPage = parseInt(page as string, 10)||1;
+                const parsedLimit = parseInt(limit as string, 10)||1;
+            
+                // Fetch bookings using the workerId and parsed page and limit
+                const result = await getBookingsByWorkerId(workerId, parsedPage, parsedLimit);
+        
+                // Check if bookings exist
+                if (!result.bookings || result.bookings.length === 0) {
+                    res.status(404).json({ message: 'No bookings found for this worker' });
+                    return;
+                }
+              console.log("result" , result)
+                // Return bookings along with total count, current page, and limit
+                res.status(200).json(result);
+            } catch (error) {
+                console.error('Error in getWorkerBookingsController:', error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+          },
+
+           getWorkerLocation : async (req: Request, res: Response): Promise<void> => {
+            const { workerId } = req.params;
+        
+            try {
+                const response = await singleWorker(workerId);
+        
+                // If the worker does not have an address
+                if (!response.address) {
+                    res.status(404).json({ message: response.message });
+                    return;
+                }
+        
+                // Successful retrieval of address
+                res.status(200).json(response);
+            } catch (error) {
+                console.error('Error in getWorkerLocation:', error);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        }
     }
 
 

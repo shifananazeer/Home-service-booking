@@ -45,6 +45,8 @@ export const WorkerRepositoryImpl: WorkerRepository = {
     async getWorkerById(workerId: string): Promise<Worker | null> {
         const worker = await WorkerModel.findOne({ workerId }); 
         return worker; 
-      }
+      },
+  
+    
       
 }

@@ -84,5 +84,19 @@ export const AddressRepositoryImpl: AddressRepository = {
         }
     },
 
- 
+    findAddressByWorkerId: async (userId: string): Promise<Address | null> => {
+        const address = await AddressModel.findOne({ userId: new ObjectId(userId) }).exec(); 
+
+        if (!address) {
+            return null;
+        }
+        return {
+            id: address.id.toString(),
+            userId: address.userId.toString(),
+            address: address.address,
+            area: address.area,
+            location: address.location,
+            __v: address.__v,
+        };
+    },
 };

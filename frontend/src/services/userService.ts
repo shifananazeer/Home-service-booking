@@ -130,9 +130,7 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
         },
       });
   
-      console.log("Backend response:", response.data); // Debugging response
-  
-      // Ensure you extract the `userAddress` field
+      console.log("Backend response:", response.data); 
       return response.data.userAddress;
     } catch (error) {
       errorHandler(error);
@@ -208,5 +206,14 @@ export const fetchBookigs = async (userId: string) => {
             Authorization: `Bearer ${token}`, // Send the token in headers
           },
     })
+    return response.data;
+  }
+
+  export const cancelBooking = async(bookingId:string) => {
+    const token = localStorage.getItem('accessToken');
+    if(!token) {
+      throw new Error('Authentication token is missing');
+    }
+    const response = await axiosInstance.post(`/auth/cancelBooking/${bookingId}`)
     return response.data;
   }

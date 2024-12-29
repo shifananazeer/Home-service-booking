@@ -47,7 +47,7 @@ export const LoginWorker = async (credentials: { email: string; password: string
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
         console.log("workerId" , workerId)
-        localStorage.setItem('workerId', workerId); 
+        // localStorage.setItem('workerId', workerId); 
         
         return response;
     } catch (error: any) {
@@ -142,7 +142,7 @@ export interface AvailabilitySlot {
     isAvailable: boolean;
   }
   
-  // Define the interface for the availability with slots
+  
   export interface AvailabilityWithSlots {
    
     date: string; // or Date
@@ -150,10 +150,10 @@ export interface AvailabilitySlot {
     
   }
   
-  // Define the interface for adding availability
+ 
   export interface AddAvailability {
-    date: string; // Date for which availability is being added
-    slots: AvailabilitySlot[]; // Slots for that date
+    date: string; 
+    slots: AvailabilitySlot[]; 
   }
   
 
@@ -167,12 +167,8 @@ export const addAvailability = async (
                 'Authorization':`Bearer ${token}`,
             } 
         });
-        
-
-        // Assuming the backend returns the created slot data
         return response.data;
     } catch (error: any) {
-        // Log and re-throw for higher-level handling
         console.error('Error adding availability:', error);
         throw error;
     }
@@ -201,7 +197,7 @@ export const updateSlotData = async (updateSlot:AvailabilitySlot , slotId : stri
 
 export const  deleteAvailability  =  async (slotId:string)=> {
     const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`);
-    return response.data; // Assuming your API returns some data
+    return response.data; 
 };
 
 export const fetchService = async () => {
@@ -209,7 +205,7 @@ const response = await axiosInstance.get('/workers/services');
 if (!response) {
     throw new Error('Failed to fetch services');
 }
-return  response.data; // Ensure this returns an array
+return  response.data; 
 }
 
 export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
@@ -220,3 +216,20 @@ export const updateCoordinates  = async(lat: number , lng:number, workerId:strin
   })  
   return response;
 }
+
+export const getBookings = async(workerId:string , currentPage:number , limit: number) => {
+    const response = await axiosInstance.get(`/workers/bookings/${workerId}`,{
+        params: {
+            page: currentPage, 
+            limit,
+
+        },
+    })
+    return response ;
+}
+
+export const getWorkerLocation = async (workerId :string) => {
+    const response = await axiosInstance.get(`/workers/${workerId}`); // Adjust the URL as necessary
+    console.log("response.......",response)
+    return response.data;
+  };

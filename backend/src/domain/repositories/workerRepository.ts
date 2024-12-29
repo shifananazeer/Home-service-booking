@@ -8,4 +8,5 @@ export interface WorkerRepository {
      updateBlockStatus(userId: string, isBlocked: boolean): Promise<Worker | null>; 
      findWorkersBySkill (skill : string):Promise<Worker []|[]>;
      getWorkerById(workerId:string) :Promise<Worker | null>;
+    
 }

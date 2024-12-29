@@ -65,18 +65,14 @@ export default function ServiceManagement() {
 
     const handleSubmit = async (formData: FormData) => {
       try {
-          // Append the image if it exists
           if (selectedService && selectedService.image) {
               formData.append("image", selectedService.image);
           }
-          
           if (selectedService) {
               await updateService(selectedService._id!, formData);
           } else {
               await createService(formData);
           }
-  
-          // Reload services after successful create/update
           const data = await fetchServices(currentPage, limit, searchQuery);
           setServices(data.services || []);
           setTotalPages(data.totalServices || 1);
@@ -84,7 +80,7 @@ export default function ServiceManagement() {
           console.error("Error saving service:", error);
           setError("Failed to save service. Please try again.");
       } finally {
-          handleCloseModal(); // Close the modal after saving
+          handleCloseModal(); 
       }
   };
 
@@ -103,7 +99,6 @@ const handleDelete = async (serviceId: string) => {
     if (result.isConfirmed) {
         try {
             await deleteService(serviceId);
-            // Reload services after delete
             const data = await fetchServices(currentPage, limit, searchQuery);
             setServices(data.services || []);
             setTotalPages(data.totalServices || 1);
@@ -121,27 +116,31 @@ const handleDelete = async (serviceId: string) => {
                 'Failed to delete the service. Please try again later.',
                 'error'
             );
-
             setError("Failed to delete service. Please try again.");
         }
     }
 };
 
-
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <p>Loading Services...</p>
+            <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
             </div>
-        );
+          );
     }
 
     if (error) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <p className="text-red-500">{error}</p>
+            <div className="flex justify-center items-center h-screen">
+              <div
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                role="alert"
+              >
+                <strong className="font-bold">Error!</strong>
+                <span className="block sm:inline"> {error}</span>
+              </div>
             </div>
-        );
+          );
     }
 
     return (

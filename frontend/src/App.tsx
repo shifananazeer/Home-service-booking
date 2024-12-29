@@ -28,6 +28,7 @@ import BookingPage from "./pages/User/BookingPage";
 import BookingConfirm from "./pages/User/BookingConfirm";
 import PaymentPage from "./pages/User/PaymentPage";
 import BookingList from "./pages/User/bookingList";
+import WorkerBookings from "./components/worker/bookings";
 
 
 
@@ -73,8 +74,9 @@ const App = () => {
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
+    <Route path="/worker/bookings" element= {<WorkerBookings/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
-    <Route path="/admin/login" element={ <AdminLogin/>}/>
+  
     <Route
                     path="/admin/dashboard"
                     element={

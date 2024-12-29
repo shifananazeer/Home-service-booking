@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dialog } from "@headlessui/react"; // Ensure you have headlessui/react installed
+import { Dialog } from "@headlessui/react"; 
 
 interface Service {
     _id?: string;
@@ -33,9 +33,8 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
             setDescription(initialData.description);
             setImage(initialData.image);
             setImagePreview(initialData.image);
-            setImageFile(null); // Reset image file when loading initial data
+            setImageFile(null); 
         } else {
-            // Reset the fields if adding a new service
             resetForm();
         }
     }, [initialData, isOpen]);
@@ -45,7 +44,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
         setDescription("");
         setImage("");
         setImagePreview(null);
-        setImageFile(null); // Reset the image file
+        setImageFile(null);
     };
 
     const handleSubmit = (event: React.FormEvent) => {
@@ -58,17 +57,14 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
         if (imageFile) {
             formData.append("image", imageFile);
         } else if (image && typeof image === 'string') {
-            // If editing and no new image is selected, send the existing image URL
             formData.append("image", image);
         }
-
-        // Log FormData contents
         for (let pair of formData.entries()) {
             console.log(`${pair[0]}: ${pair[1] instanceof File ? pair[1].name : pair[1]}`);
         }
-
         onSubmit(formData);
     };
+    
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];

@@ -6,6 +6,7 @@ import { RootState } from '../../app/store'
 import { Navigate, useNavigate } from 'react-router-dom'
 import WorkerProfile from '../../components/worker/WorkerProfile'
 import AvailabilityManagement from '../../components/worker/AvailabilityManagement'
+import WorkerBookings from '../../components/worker/bookings'
 
 const WorkerDashboard = () => {
  
@@ -14,13 +15,15 @@ const WorkerDashboard = () => {
   if(!accessToken) {
     return <Navigate to="/worker/login" replace />;
   }
-   const [currentComponent, setCurrentComponent] = useState("profile"); 
+   const [currentComponent, setCurrentComponent] = useState("dashboard"); 
    const renderComponent = () => {
     switch (currentComponent) {
         case "profile":
             return <WorkerProfile />;
         case 'availabilityManagement': 
             return <AvailabilityManagement/>
+        case 'workerBookings' :
+            return <WorkerBookings/>    
         case "dashboard":
             return (
                 <>

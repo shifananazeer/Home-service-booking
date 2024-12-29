@@ -5,27 +5,27 @@ export interface Slot {
   slotId: string;
   startTime: string;
   endTime: string;
-  isAvailable: boolean; // Ensure this property is present
+  isAvailable: boolean; 
 }
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedSlot: Slot) => void;
-  initialData: Slot | null; // This now correctly expects Slot or null
+  initialData: Slot | null; 
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
-  // Use useEffect to update state when initialData changes
+ 
   useEffect(() => {
     if (initialData) {
       setStartTime(initialData.startTime);
       setEndTime(initialData.endTime);
     }
-  }, [initialData]); // This effect runs whenever initialData changes
+  }, [initialData]); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,19 +36,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, initialData })
         endTime,
       };
 
-      const slotId = initialData.slotId; // Get the slotId from initialData
+      const slotId = initialData.slotId; 
 
       try {
-        const response = await updateSlotData(updatedSlot, slotId); // Call your service function
-        console.log('Slot updated successfully:', response.data); // Log or handle the response as needed
-
-        // Optionally, call onSubmit with the updated slot data to refresh the UI in the parent component
+        const response = await updateSlotData(updatedSlot, slotId); 
+        console.log('Slot updated successfully:', response.data); 
         onSubmit(updatedSlot);
       } catch (error) {
         console.error('Error updating slot:', error);
       }
     }
-    onClose(); // Close the modal after submission
+    onClose(); 
   };
 
   if (!isOpen) return null;

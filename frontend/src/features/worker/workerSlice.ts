@@ -57,13 +57,14 @@ const workerSlice = createSlice({
             state.error = null;
             state.success = false;
         },
-        loginSuccess: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
+        loginSuccess: (state, action: PayloadAction<{ accessToken: string; refreshToken: string, workerId:string}>) => {
             state.isLoading = false;
             state.success = true;
             state.accessToken = action.payload.accessToken; // Set access token
             state.refreshToken = action.payload.refreshToken; // Set refresh token
             localStorage.setItem('worker_access_token', action.payload.accessToken); // Store access token
             localStorage.setItem('worker_refresh_token', action.payload.refreshToken); // Store refresh token
+            localStorage.setItem('workerId',action.payload.workerId)
         },
         loginFail: (state, action) => {
             state.isLoading = false;
@@ -72,6 +73,7 @@ const workerSlice = createSlice({
             state.refreshToken = null; // Clear refresh token on login failure
             localStorage.removeItem('worker_access_token'); // Remove access token from storage
             localStorage.removeItem('worker_refresh_token'); // Remove refresh token from storage
+            localStorage.removeItem('workerId')
         },
         resetLoginState: (state) => {
             state.isLoading = false;

@@ -19,7 +19,7 @@ const UserManagement = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [limit] = useState<number>(10); // Number of users per pa
+    const [limit] = useState<number>(10);
 
     useEffect(() => {
         const getUsers = async () => {
@@ -67,18 +67,32 @@ const UserManagement = () => {
     };
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1); // Reset to the first page on search
+        setCurrentPage(1); 
     };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
     if (loading) {
-        return <div className="flex justify-center items-center h-64"><p>Loading users...</p></div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          );
     }
 
     if (error) {
-        return <div className="flex justify-center items-center h-64"><p className="text-red-500">{error}</p></div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+              <div
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                role="alert"
+              >
+                <strong className="font-bold">Error!</strong>
+                <span className="block sm:inline"> {error}</span>
+              </div>
+            </div>
+          );
     }
 
     return (
@@ -94,10 +108,10 @@ const UserManagement = () => {
     />
     {searchQuery && (
         <button
-            onClick={() => setSearchQuery('')} // Clears the search input
+            onClick={() => setSearchQuery('')} 
             className="ml-2 py-2 px-3 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none transition duration-150 ease-in-out"
         >
-            &times; {/* Clear button with a cross icon */}
+            &times;
         </button>
     )}
 </div>
