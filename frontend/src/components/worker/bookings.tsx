@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getBookings, getWorkerLocation } from '../../services/workerService';
+import { refreshAccessToken } from '../../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface WorkLocation {
   address: string;
@@ -33,37 +35,49 @@ const WorkerBookings: React.FC = () => {
   const [distance, setDistance] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(1); // Set your default limit per page
+  const [limit, setLimit] = useState<number>(5); 
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const workerId = localStorage.getItem('workerId');
-
+   const navigate = useNavigate()
   useEffect(() => {
     const fetchBookingsAndLocation = async () => {
+      const refreshToken = localStorage.getItem('worker_refresh_token')
+      if (refreshToken) {
+                      const newAccessToken = await refreshAccessToken();
+                      if (!newAccessToken) {
+                        console.log('Failed to refresh token, redirecting to login...');
+                      
+                        return navigate( '/login');
+                      }
+                    } else {
+                      console.log('No refresh token found, redirecting to login...');
+                   
+                      return navigate('/login');
+                    }
+           
       try {
         if (!workerId) {
           console.error("Worker ID is null. Cannot fetch bookings.");
           return;
         }
-
-        // Fetch bookings with pagination
         const response = await getBookings(workerId, currentPage, limit);
         console.log("Bookings response:", response);
         setBookings(response.data.bookings);
         
-        // Calculate total pages based on the total count of bookings
-        const totalBookings = response.data.total; // Total bookings from response
-        const pages = Math.ceil(totalBookings / limit); // Calculate total pages
-        setTotalPages(pages); // Update total pages
-        setCurrentPage(currentPage); // Keep current page as is
+      
+        const totalBookings = response.data.total; 
+        const pages = Math.ceil(totalBookings / limit); 
+        setTotalPages(pages); 
+        setCurrentPage(currentPage); 
 
-        // Fetch worker location
+      
         const workerLocationResponse = await getWorkerLocation(workerId);
         console.log("Worker location response:", workerLocationResponse);
         setWorkerLocation({
-          latitude: workerLocationResponse.address.latitude, // Access latitude from address
-          longitude: workerLocationResponse.address.longitude, // Access longitude from address
-        });// Assuming response contains 'address', 'latitude', and 'longitude'
+          latitude: workerLocationResponse.address.latitude, 
+          longitude: workerLocationResponse.address.longitude, 
+        });
       } catch (error) {
         console.error('Error fetching bookings or worker location:', error);
       }
@@ -73,7 +87,7 @@ const WorkerBookings: React.FC = () => {
   }, [workerId, currentPage, limit]);
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -81,7 +95,7 @@ const WorkerBookings: React.FC = () => {
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    return R * c; 
   };
 console.log("))))", workerLocation?.latitude)
   const renderMap = (booking: Booking) => {
@@ -141,24 +155,30 @@ console.log("workk",workerLocation)
         </div>
 
         {selectedBooking && workerLocation && (
-          <div className="mt-6">
-            <h2 className="text-lg font-medium text-gray-900">Map View</h2>
-            <iframe
-              title="Google Map"
-              width="100%"
-              height="400"
-              frameBorder="0"
-              style={{ border: 0 }}
-              src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${workerLocation.latitude},${workerLocation.longitude}&destination=${selectedBooking.workLocation.latitude},${selectedBooking.workLocation.longitude}&mode=driving`}
-              allowFullScreen
-            ></iframe>
-            {distance && (
-              <p className="mt-2 text-sm text-gray-600">
-                Distance between worker and work location: {distance} km
-              </p>
-            )}
-          </div>
-        )}
+  <div className="mt-6 relative">
+    <h2 className="text-lg font-medium text-gray-900">Map View</h2>
+    <iframe
+      title="Google Map"
+      width="100%"
+      height="400"
+      frameBorder="0"
+      style={{ border: 0 }}
+      src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${workerLocation.latitude},${workerLocation.longitude}&destination=${selectedBooking.workLocation.latitude},${selectedBooking.workLocation.longitude}&mode=driving`}
+      allowFullScreen
+    ></iframe>
+    {distance && (
+      <p className="mt-2 text-sm text-gray-600">
+        Distance between worker and work location: {distance} km
+      </p>
+    )}
+    <button
+      onClick={() => setSelectedBooking(null)}
+      className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full shadow hover:bg-red-600 focus:outline-none"
+    >
+      Close
+    </button>
+  </div>
+)}
 
         <div className="mt-4 flex justify-between items-center">
           <button 

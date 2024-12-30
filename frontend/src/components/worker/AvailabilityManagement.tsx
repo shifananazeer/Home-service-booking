@@ -3,6 +3,8 @@ import { AddAvailability, addAvailability, AvailabilitySlot, AvailabilityWithSlo
 import moment from 'moment';
 import Modal from './editModel';
 import { Slot } from './editModel';
+import { refreshAccessToken } from '../../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString: string): string => {
   return moment(dateString).format('YYYY-MM-DD dddd'); 
@@ -19,10 +21,27 @@ const AvailabilityManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
-
+const navigate = useNavigate()
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-
+useEffect(()=> {
+const refresh = async () => {
+  const refreshToken = localStorage.getItem('worker_refresh_token')
+   if (refreshToken) {
+                const newAccessToken = await refreshAccessToken();
+                if (!newAccessToken) {
+                  console.log('Failed to refresh token, redirecting to login...');
+                
+                  return navigate( '/login');
+                }
+              } else {
+                console.log('No refresh token found, redirecting to login...');
+             
+                return navigate('/login');
+              }
+}
+refresh();
+}, [])
 
   const calculateDate = (selectedDay: string): string => {
     const today = moment();

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
+import { FaUser } from 'react-icons/fa'; 
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -94,9 +95,12 @@ const Navbar: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleProfileClick}
-                className="px-4 py-2 text-sm font-medium text-white hover:text-white/80"
+                className="px-4 py-2 text-sm font-medium  text-white hover:text-white/80"
               >
-                Profile
+                   <div style={{ display: 'flex', alignItems: 'center' }}>
+               <FaUser style={{ fontSize: '24px', marginRight: '8px' }} />
+                  <span>My Profile</span>
+                   </div>
               </button>
               <button
                 onClick={handleLogout}

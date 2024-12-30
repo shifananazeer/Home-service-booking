@@ -8,19 +8,19 @@ import axios from 'axios';
 
 interface ProfileData {
     name: string;
-    skills: string[]; // Array of skills
-    expirience: string; // Corrected spelling from 'expirience'
+    skills: string[];
+    expirience: string;
     profilePic: string | File;
     status: string;
     address: string;
     area: string;
-    hourlyRate:number;
-    latitude?: number; // Add latitude
-    longitude?: number; // Add longitude
+    hourlyRate: number;
+    latitude?: number;
+    longitude?: number;
 }
 
 interface Service {
-    id: string; // or number, depending on your API
+    id: string;
     name: string;
 }
 
@@ -33,15 +33,15 @@ const EditWorkerProfile = () => {
 
     const [profileData, setProfileData] = useState<ProfileData>({
         name: worker?.name || '',
-        skills: worker?.skills || [], // Initialize skills as an array
-        expirience: worker?.expirience || '', // Corrected property name
+        skills: worker?.skills || [],
+        expirience: worker?.expirience || '',
         profilePic: worker?.profilePic || '',
         status: worker?.status || 'Unavailable',
-        hourlyRate:worker?.hourlyRate||0,
+        hourlyRate: worker?.hourlyRate || 0,
         address: address?.address || '',
         area: address?.area || '',
-        latitude: worker?.latitude || undefined, // Initialize latitude
-        longitude: worker?.longitude || undefined, // Initialize longitude
+        latitude: worker?.latitude || undefined,
+        longitude: worker?.longitude || undefined,
     });
 
     const [profilePicPreview, setProfilePicPreview] = useState<string>(
@@ -65,11 +65,10 @@ const EditWorkerProfile = () => {
     };
 
     useEffect(() => {
-        // Fetch services on component mount
         const getServices = async () => {
             try {
                 const fetchedServicesResponse = await fetchService();
-                console.log('Fetched services:', fetchedServicesResponse); // Log the fetched response
+                console.log('Fetched services:', fetchedServicesResponse);
 
                 if (fetchedServicesResponse.success && Array.isArray(fetchedServicesResponse.services)) {
                     setServices(fetchedServicesResponse.services);
@@ -92,7 +91,6 @@ const EditWorkerProfile = () => {
         const updatedValue = name === 'hourlyRate' ? parseFloat(value) : value; 
         setProfileData((prev) => ({ ...prev, [name]: updatedValue }));
 
-        // If the changed input is 'area', fetch latitude and longitude
         if (name === 'area') {
             fetchCoordinates(value);
         }
@@ -103,48 +101,42 @@ const EditWorkerProfile = () => {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
                 params: {
                     address: area,
-                    key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, // Replace with your Google Maps API key
+                    key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
                 },
             });
     
-            console.log('API Response:', response.data); // Log the full response
+            console.log('API Response:', response.data);
 
-        // Check if results exist
-        if (response.data.results && response.data.results.length > 0) {
-            const { lat, lng } = response.data.results[0].geometry.location; // Extracting latitude and longitude
-            
-            // Update profileData state
-            setProfileData((prev) => ({
-                ...prev,
-                latitude: lat,
-                longitude: lng,
-            }));
+            if (response.data.results && response.data.results.length > 0) {
+                const { lat, lng } = response.data.results[0].geometry.location;
+                
+                setProfileData((prev) => ({
+                    ...prev,
+                    latitude: lat,
+                    longitude: lng,
+                }));
 
-            // Call the function to update latitude and longitude in the database
-            updateCoordinatesInDatabase(lat, lng);
-        } else {
-            console.warn('No results found for the area:', area);
-            toast.error('No results found for the area.');
-        }
-        } catch (error:any) {
-            console.error('Error fetching coordinates:', error); // Log the error
+                updateCoordinatesInDatabase(lat, lng);
+            } else {
+                console.warn('No results found for the area:', area);
+                toast.error('No results found for the area.');
+            }
+        } catch (error: any) {
+            console.error('Error fetching coordinates:', error);
             const errorMessage = error.response?.data?.error_message || error.message || 'Failed to fetch coordinates.';
-            toast.error(errorMessage); // Show the error message
+            toast.error(errorMessage);
         }
     };
-
 
     const updateCoordinatesInDatabase = async (lat: number, lng: number) => {
         const workerId = localStorage.getItem('workerId');
     
-        // Check if workerId exists
         if (!workerId) {
             toast.error('Worker ID is not available.');
             return;
         }
     
         try {
-            // Assuming updateCoordinates is a function that makes the API call
             const response = await updateCoordinates(lat, lng, workerId);
             console.log('Coordinates updated successfully:', response.data);
             toast.success('Coordinates updated successfully!');
@@ -154,13 +146,12 @@ const EditWorkerProfile = () => {
         }
     };
     
-
     const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const skill = e.target.value;
         setProfileData((prev) => {
             const skills = prev.skills.includes(skill)
-                ? prev.skills.filter((s) => s !== skill) // Remove skill if already selected
-                : [...prev.skills, skill]; // Add skill if not selected
+                ? prev.skills.filter((s) => s !== skill)
+                : [...prev.skills, skill];
             return { ...prev, skills };
         });
     };
@@ -185,8 +176,8 @@ const EditWorkerProfile = () => {
         formData.append('address', profileData.address);
         formData.append('area', profileData.area);
         formData.append('status', profileData.status);
-        formData.append('latitude', String(profileData.latitude)); // Include latitude
-        formData.append('longitude', String(profileData.longitude)); // Include longitude
+        formData.append('latitude', String(profileData.latitude));
+        formData.append('longitude', String(profileData.longitude));
         if (profileData.profilePic && typeof profileData.profilePic !== 'string') {
             formData.append('profilePic', profileData.profilePic);
         }
@@ -209,124 +200,138 @@ const EditWorkerProfile = () => {
         }
     };
 
+    useEffect(() => {
+      document.querySelector('form')?.classList.add('animate-fadeIn');
+    }, []);
+
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4"
+                className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl space-y-6 animate-fadeIn"
             >
-                <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
-                {message && <div className="mb-4 text-red-500">{message}</div>}
-                <div className="flex flex-col items-center mb-4">
-                    <img
-                        src={profilePicPreview}
-                        alt="Profile Preview"
-                        className="w-24 h-24 rounded-full border border-gray-300 mb-4"
-                    />
-                    <input type="file" onChange={handleFileChange} className="mb-4" />
+                <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Edit Profile</h2>
+                {message && <div className="mb-4 text-red-500 text-center">{message}</div>}
+                <div className="flex flex-col md:flex-row md:space-x-8">
+                    <div className="md:w-1/3 flex flex-col items-center mb-6">
+                        <img
+                            src={profilePicPreview}
+                            alt="Profile Preview"
+                            className="w-40 h-40 rounded-full border-4 border-blue-200 mb-4 object-cover"
+                        />
+                        <label htmlFor="profile-pic" className="cursor-pointer bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition">
+                            Change Picture
+                        </label>
+                        <input id="profile-pic" type="file" onChange={handleFileChange} className="hidden" />
+                    </div>
+                    <div className="md:w-2/3 space-y-6">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name:</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={profileData.name}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="expirience" className="block text-sm font-medium text-gray-700">Experience:</label>
+                            <input
+                                type="text"
+                                id="expirience"
+                                name="expirience"
+                                value={profileData.expirience}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700">Hourly Rate:</label>
+                            <input
+                                type="number"
+                                id="hourlyRate"
+                                name="hourlyRate"
+                                value={profileData.hourlyRate}
+                                onChange={handleChange}
+                                className="mt-1 block w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                required
+                                min="0" 
+                                step="0.01" 
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium">Name:</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={profileData.name}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        required
-                    />
-                </div>
-
-                {/* Skills Checkbox Section */}
-                <div>
-                    <label className="block text-sm font-medium">Skills:</label>
-                    {isLoadingServices ? (
-                        <p>Loading services...</p>
-                    ) : (
-                        services.map((service) => (
-                            <div key={service.id} className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    value={service.name}
-                                    id={`skill-${service.id}`}
-                                    checked={profileData.skills.includes(service.name)}
-                                    onChange={handleSkillsChange}
-                                    className="mr-2"
-                                />
-                                <label htmlFor={`skill-${service.id}`} className="text-sm">
-                                    {service.name}
-                                </label>
+                <div className="space-y-6">
+                    <div>
+                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address:</label>
+                        <input
+                            type="text"
+                            id="address"
+                            name="address"
+                            value={profileData.address}
+                            onChange={handleChange}
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="area" className="block text-sm font-medium text-gray-700">Area:</label>
+                        <input
+                            type="text"
+                            id="area"
+                            name="area"
+                            value={profileData.area}
+                            onChange={handleChange}
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Skills:</label>
+                        {isLoadingServices ? (
+                            <p className="text-gray-500">Loading services...</p>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {services.map((service) => (
+                                    <div key={service.id} className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            value={service.name}
+                                            id={`skill-${service.id}`}
+                                            checked={profileData.skills.includes(service.name)}
+                                            onChange={handleSkillsChange}
+                                            className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label htmlFor={`skill-${service.id}`} className="text-sm text-gray-700">
+                                            {service.name}
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
-                        ))
-                    )}
-                </div>
-
-                <div>
-                    <label htmlFor="expirience" className="block text-sm font-medium">Experience:</label>
-                    <input
-                        type="text"
-                        id="expirience"
-                        name="expirience"
-                        value={profileData.expirience}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        required
-                    />
-                </div>
-                <div>
-    <label htmlFor="hourlyRate" className="block text-sm font-medium">Hourly Rate:</label>
-    <input
-        type="number"
-        id="hourlyRate"
-        name="hourlyRate"
-        value={profileData.hourlyRate}
-        onChange={handleChange}
-        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-        required
-        min="0" // Optionally set a minimum value for the hourly rate
-        step="0.01" // Allow decimal input
-    />
-</div>
-                <div>
-                    <label htmlFor="address" className="block text-sm font-medium">Address:</label>
-                    <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={profileData.address}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="area" className="block text-sm font-medium">Area:</label>
-                    <input
-                        type="text"
-                        id="area"
-                        name="area"
-                        value={profileData.area}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Status:</label>
-                    <button
-                        type="button"
-                        onClick={toggleStatus}
-                        className={`mt-1 block w-full border rounded-md p-2 ${
-                            profileData.status === 'Available' ? 'bg-green-200' : 'bg-red-200'
-                        }`}
-                    >
-                        {profileData.status}
-                    </button>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Status:</label>
+                        <button
+                            type="button"
+                            onClick={toggleStatus}
+                            className={`w-full border rounded-md p-3 font-medium transition ${
+                                profileData.status === 'Available' 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                : 'bg-red-100 text-red-800 hover:bg-red-200'
+                            }`}
+                        >
+                            {profileData.status}
+                        </button>
+                    </div>
                 </div>
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700 transition"
+                    className="w-full bg-gray-900 text-white rounded-md p-3 font-medium hover:bg-gray-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     disabled={loading}
                 >
                     {loading ? 'Saving...' : 'Save Profile'}
@@ -337,3 +342,4 @@ const EditWorkerProfile = () => {
 };
 
 export default EditWorkerProfile;
+

@@ -29,13 +29,13 @@ const WorkerLogin: React.FC = () => {
                 throw new Error('Invalid response from server');
             }
             console.log("respo", response);
-            const { accessToken, refreshToken , workerId } = response.data; // Destructure both tokens
-            dispatch(loginSuccess({ accessToken, refreshToken , workerId })); // Pass both tokens to the success action
+            const { accessToken, refreshToken , workerId } = response.data; 
+            dispatch(loginSuccess({ accessToken, refreshToken , workerId })); 
             toast.success("Login successful");
             navigate('/worker/dashboard');
             
         } catch (error: any) {
-            dispatch(loginFail(error.message)); // Handle login failure
+            dispatch(loginFail(error.message));
             toast.error("Login failed");
         }
     };

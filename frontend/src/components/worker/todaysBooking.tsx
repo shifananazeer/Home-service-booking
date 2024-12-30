@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { todaysBooking } from '../../services/workerService'
+import { refreshAccessToken } from '../../utils/auth'
+import { useNavigate } from 'react-router-dom'
 
 interface WorkLocation {
   address: string
@@ -29,13 +31,29 @@ export default function WorkerTodayBookings() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const workerId = localStorage.getItem('workerId')
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchTodayBookings = async () => {
+      const refreshToken = localStorage.getItem('worker_refresh_token')
       try {
+
+          if (refreshToken) {
+                        const newAccessToken = await refreshAccessToken();
+                        if (!newAccessToken) {
+                          console.log('Failed to refresh token, redirecting to login...');
+                        
+                          return navigate( '/login');
+                        }
+                      } else {
+                        console.log('No refresh token found, redirecting to login...');
+                     
+                        return navigate('/login');
+                      }
+                      
         if(!workerId) {
             throw new Error ('invalied workerId')
         }
-        // In a real application, you would get the workerId from authentication or context
+       
       const data = await todaysBooking(workerId)
        
         setBookings(data.bookings)
@@ -50,11 +68,25 @@ export default function WorkerTodayBookings() {
   }, [])
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center p-4">{error}</div>
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+          <div
+              className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-md"
+              role="alert"
+          >
+              <p className="font-bold">Error</p>
+              <p>{error}</p>
+          </div>
+      </div>
+  );
   }
 
   return (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createBooking, fetchingSlots } from '../../services/userService';
 import axios from 'axios';
+import { refreshAccessToken } from '../../utils/auth';
 
 interface Slot {
     slotId: string;
@@ -42,21 +43,47 @@ const BookingConfirm: React.FC = () => {
     const userId = localStorage.getItem('user_Id');
 
     useEffect(() => {
-        if (!userId) {
-            alert('You need to be logged in to book a service.');
-            navigate('/login');
-            return;
-        }
-
-        const today = new Date();
-        const dates = Array.from({ length: 8 }, (_, i) => {
-            const nextDate = new Date();
-            nextDate.setDate(today.getDate() + i);
-            return nextDate;
-        });
-        setAvailableDates(dates);
-        setIsLoading(false);
-    }, [userId, navigate]);
+        const initialize = async () => {
+          try {
+            const refreshToken = localStorage.getItem('refreshToken');
+    
+            if (refreshToken) {
+              const newAccessToken = await refreshAccessToken();
+              if (!newAccessToken) {
+                console.log('Failed to refresh token, redirecting to login...');
+                navigate('/login');
+                return;
+              }
+            } else {
+              console.log('No refresh token found, redirecting to login...');
+              navigate('/login');
+              return;
+            }
+    
+            if (!userId) {
+              alert('You need to be logged in to book a service.');
+              navigate('/login');
+              return;
+            }
+    
+            // Generate available dates
+            const today = new Date();
+            const dates = Array.from({ length: 8 }, (_, i) => {
+              const nextDate = new Date(today);
+              nextDate.setDate(today.getDate() + i);
+              return nextDate;
+            });
+    
+            setAvailableDates(dates);
+          } catch (error) {
+            console.error('Error during initialization:', error);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        initialize();
+      }, [userId, navigate]);
 
     const fetchSlots = async (date: Date, workerId: string) => {
         try {

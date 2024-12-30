@@ -160,7 +160,11 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
     const token = localStorage.getItem('accessToken');
     const formattedDate = date.toISOString().split('T')[0]; 
     try{
-        const response = await axiosInstance.get(`/auth/available-slots?workerId=${workerId}&date=${formattedDate}`);
+        const response = await axiosInstance.get(`/auth/available-slots?workerId=${workerId}&date=${formattedDate}`,{
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }, 
+        });
        
       
      console.log("fetched workers" , response)

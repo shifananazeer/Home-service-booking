@@ -21,6 +21,7 @@ export const adminLogin = async (credentials: { email: string; password: string 
 };
 
 export const fetchUsers = async (page = 1, limit = 10, search = '') => {
+    
     try {
         const response = await axiosInstance.get('/admin/get-users',{
             params: {

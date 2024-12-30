@@ -21,7 +21,7 @@ router.put('/availability/edit/:slotId', authenticateUser, workerController.edit
 router.delete('/availability/delete/:slotId', authenticateUser,workerController.deleteAvailabilitySlot);
 router.get('/services',authenticateUser , workerController.getServices)
 router.put('/updateLocation',authenticateUser,workerController.updateLocation)
-router.get('/bookings/:workerId', workerController.allBookingsByworkerId);
-router.get('/:workerId', workerController.getWorkerLocation)
-router.get('/today-booking/:workerId',workerController.todaysBooking)
+router.get('/bookings/:workerId',authenticateUser, workerController.allBookingsByworkerId);
+router.get('/:workerId',authenticateUser , workerController.getWorkerLocation)
+router.get('/today-booking/:workerId',authenticateUser,workerController.todaysBooking)
 export default router;

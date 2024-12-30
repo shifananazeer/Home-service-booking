@@ -206,7 +206,12 @@ export const  deleteAvailability  =  async (slotId:string)=> {
 };
 
 export const fetchService = async () => {
-const response = await axiosInstance.get('/workers/services');
+    const token = localStorage.getItem('worker_access_token');
+const response = await axiosInstance.get('/workers/services',{
+    headers : {
+        'Authorization':`Bearer ${token}`,
+    } 
+});
 if (!response) {
     throw new Error('Failed to fetch services');
 }
@@ -214,32 +219,50 @@ return  response.data;
 }
 
 export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
+    const token = localStorage.getItem('worker_access_token');
   const response = await axiosInstance.put('/workers/updateLocation',{
     workerId,
     latitude: lat,
     longitude: lng,
+    headers : {
+        'Authorization':`Bearer ${token}`,
+    } 
   })  
   return response;
 }
 
 export const getBookings = async(workerId:string , currentPage:number , limit: number) => {
+    const token = localStorage.getItem('worker_access_token');
     const response = await axiosInstance.get(`/workers/bookings/${workerId}`,{
         params: {
             page: currentPage, 
             limit,
 
         },
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        } 
     })
     return response ;
 }
 
 export const getWorkerLocation = async (workerId :string) => {
-    const response = await axiosInstance.get(`/workers/${workerId}`); // Adjust the URL as necessary
+    const token = localStorage.getItem('worker_access_token');
+    const response = await axiosInstance.get(`/workers/${workerId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        } 
+    }); 
     console.log("response.......",response)
     return response.data;
   };
 
   export const todaysBooking = async (workerId:string) => {
-    const response = await axiosInstance.get(`/workers/today-booking/${workerId}`);
+    const token = localStorage.getItem('worker_access_token');
+    const response = await axiosInstance.get(`/workers/today-booking/${workerId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        }   
+    });
     return response.data
   }
