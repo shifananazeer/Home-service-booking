@@ -20,3 +20,13 @@ export const   getBookingsByUserId = async (userId:string) => {
        
     }
 }
+
+export const bookingCancelUpdate = async (bookingId: string): Promise<Booking | null> => {
+    try {
+        const updateBooking = await BookingRepositoryImpl.cancelUpdate(bookingId);
+        return updateBooking;
+    } catch (error) {
+        console.error("Error updating booking status:", error);
+        throw new Error("Failed to cancel booking");
+    }
+};

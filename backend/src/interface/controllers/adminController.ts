@@ -8,6 +8,8 @@ import { ServiceRepositoryImpl } from "../../infrastructure/database/repositorie
 import { allServices, createdServices } from "../../application/useCases/admin/services";
 import { uploadServiceImage } from "../../utils/uploadServiseImage";
 import { Service } from "../../domain/entities/Service";
+import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
+import { fetchAllBookings } from "../../application/useCases/admin/getBookings";
 
 
 export const adminController =  {
@@ -15,12 +17,15 @@ export const adminController =  {
     console.log("body",req.body)
    try{
     const {email, password} = req.body
-    const token = await loginAdmin(email , password)
-    res.cookie('auth_token', token,{
-        httpOnly:true,
-        maxAge:86400000
-    })
-    res.status(200).json({message:"You can login now",token})
+    const { accessToken, refreshToken , adminId}= await loginAdmin(UserRepositoryImpl , email , password)
+    res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+    res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+    res.status(200).json({
+        message: "You can now log in",
+        accessToken,
+        refreshToken,
+        adminId,
+    });
    }catch(error:any) {
     res.status(400).json({message: error.message})
    }
@@ -135,5 +140,21 @@ deleteService : async (req:Request , res:Response) : Promise<void> => {
         return 
     }
 },
+
+getAllBookings : async (req:Request , res:Response) : Promise<void> => {
+    try {
+        const bookings = await fetchAllBookings( AdminRepositoryImpl);
+        console.log("booking",bookings)
+        res.status(200).json({
+            message: "Bookings retrieved successfully",
+            bookings,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            message: "Failed to retrieve bookings",
+            error: error.message,
+        });
+    }
+}
 
 }

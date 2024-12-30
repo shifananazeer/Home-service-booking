@@ -29,7 +29,7 @@ const adminSlice = createSlice({
             state.isLoading = false;
             state.success = true;
             state.token = action.payload; 
-            localStorage.setItem('admin_token', action.payload); 
+            
         },
         loginFail: (state, action: PayloadAction<string>) => {
             state.isLoading = false;
@@ -42,7 +42,7 @@ const adminSlice = createSlice({
             state.token = null; 
             state.success = false; 
             state.error = null; 
-            localStorage.removeItem('admin_token'); 
+          
         },
     },
 });

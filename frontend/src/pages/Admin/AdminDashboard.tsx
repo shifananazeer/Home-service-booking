@@ -8,18 +8,19 @@ import toast from "react-hot-toast";
 import UserManagement from "../../components/admin/UserManagement"; 
 import WorkerManagement from "../../components/admin/WorkerManagement";
 import ServiceManagement from "../../components/admin/ServiceManagement";
+import AdminBookings from "../../components/admin/bookings";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const current = useSelector((state: RootState) => state.admin.token);
+    const token = localStorage.getItem('admin_Id')
     const [currentComponent, setCurrentComponent] = useState("dashboard"); 
 
     useEffect(() => {
-        if (!current) {
+        if (!token) {
             navigate('/admin/login');
             // toast.error("Please log in to access the admin dashboard.");
         }
-    }, [current, navigate]);
+    }, [ navigate]);
 
    
     const renderComponent = () => {
@@ -30,6 +31,8 @@ const AdminDashboard = () => {
                 return <WorkerManagement/>;
             case "serviceManagement" :
                 return <ServiceManagement/>   
+            case "bookings" :
+                return <AdminBookings/>    
             case "dashboard":
                 return (
                     <>

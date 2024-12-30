@@ -17,4 +17,5 @@ router.post('/services',upload.single('image'),adminController.createService)
 router.get('/services',adminController.getAllServices)
 router.put('/service/edit/:serviceId',upload.single('image'),adminController.updateService)
 router.delete('/service/delete/:serviceId', adminController.deleteService)
+router.get('/bookings' , adminController.getAllBookings)
 export default router;

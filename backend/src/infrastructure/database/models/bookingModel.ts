@@ -19,13 +19,15 @@ const BookingSchema = new Schema<BookingDocument>({
     latitude: { type: Number,required: true},
      longitude: { type: Number, required: true},
 },
+rate:{type:Number},
 workerName:{type:String} ,
 serviceImage:{type:String},
 serviceName:{type:String},
 paymentStatus: {type: String,
-    enum: ['Pending', 'Paid', 'Cancelled'], 
+    enum: ['Pending', 'Completed','Confirmed', 'Cancelled'], 
     required: true,
 },
+
 
 })
 

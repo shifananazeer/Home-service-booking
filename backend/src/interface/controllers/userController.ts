@@ -18,7 +18,7 @@ import { upadteAddress, userAddress } from "../../application/useCases/user/upda
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
 import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
 import { Booking } from "../../domain/entities/Booking";
-import { createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
+import { bookingCancelUpdate, createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
 import { getWorkers } from "../../application/useCases/admin/getWorkers";
 import { getWorker } from "../../application/useCases/user/getWorkerDetails";
 
@@ -336,8 +336,9 @@ export const userController = {
     },
     
     createBooking : async (req:Request , res:Response):Promise <void>=> {
+        console.log('Request body:', req.body);
         try{
-         const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus} = req.body ;
+         const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus , rate} = req.body ;
 
          const updateSlotStatus = await updateStatusOfSlot(slotId)
          const bookingDetails: Booking = {
@@ -350,6 +351,7 @@ export const userController = {
              serviceImage,
              serviceName,
              userId,
+             rate,
              paymentStatus: paymentStatus || 'Pending',
              bookingId: uuidv4(),
          };
@@ -381,6 +383,30 @@ export const userController = {
     console.error("failed to fetch worker " , error);
     res.status(500).json({ message: 'Failed to fetch workerDetails' });
    }
+ },
+
+ cancelBooking : async (req:Request , res:Response) :Promise<void> => {
+    const { bookingId } = req.params;
+    try {
+        const updatedBooking = await bookingCancelUpdate(bookingId);
+
+        if (!updatedBooking) {
+            res.status(404).json({ success: false, message: "Booking not found" });
+            return;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Booking cancelled successfully",
+            data: updatedBooking,
+        });
+    } catch (error) {
+        console.error("Error cancelling booking:", error);
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong while cancelling the booking",
+        });
+    }
  }
 }
 

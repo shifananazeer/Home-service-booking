@@ -86,24 +86,26 @@ const BookingConfirm: React.FC = () => {
             alert('Please fill all fields and select a slot.');
             return;
         }
-
+    
         if (!userId) {
             alert('You need to be logged in to book a service.');
             navigate('/login');
             return;
         }
-
+    
         const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         const geocodingURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(workLocation)}&key=${API_KEY}`;
         try {
             const response = await axios.get(geocodingURL);
             const data = response.data;
-
+    
+            console.log('Geocoding API Response:', data);
+    
             if (data.status === 'OK') {
                 const location = data.results[0].geometry.location;
                 const latitude = location.lat;
                 const longitude = location.lng;
-
+    
                 const bookingDetails: Booking = {
                     date: selectedDate,
                     slotId: selectedSlot,
@@ -116,32 +118,29 @@ const BookingConfirm: React.FC = () => {
                     workerId,
                     userId,
                     paymentStatus: 'Pending',
-                    workerName, // Added property
-                    serviceImage, // Added property
-                    serviceName, // Added property
+                    workerName,
+                    serviceImage,
+                    serviceName,
                 };
-
-                const saveResponse = await createBooking(bookingDetails);
-
-                if (saveResponse.status === 201) {
-                    alert('Booking created successfully!');
+    
+                console.log('Booking Details:', bookingDetails);
+               console.log("lllll",workLocation)
+                // const saveResponse = await createBooking(bookingDetails);
+                // console.log('Save Response:', saveResponse);
+    
+                // if (saveResponse.status === 201) {
+                //     alert('Booking created successfully!');
                     navigate('/payment', {
                         state: {
                             bookingDetails: {
-                                selectedDate,
-                                selectedSlot,
-                                workDescription,
-                                serviceName, // include service name here
-                                serviceImage, // include service image URL here
+                                ...bookingDetails, // Spread bookingDetails to pass all its fields
                             },
-                            workerId,
-                            workerName,
-                            workerRate,
+                            workerRate
                         },
                     });
-                } else {
-                    alert('Failed to save booking. Please try again.');
-                }
+                // } else {
+                //     alert('Failed to save booking. Please try again.');
+                // }
             } else {
                 alert('Failed to fetch location details. Please check the address.');
             }

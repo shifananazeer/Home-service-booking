@@ -60,15 +60,10 @@ const App = () => {
     <Route path="/user/profile" element={<UserProfile/>}/>
     <Route path="/user/edit-profile" element={<EditUserProfile />} />
     <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
-    {/* Protected Route */}
+  
     <Route
         path="/worker/dashboard"
-        element={
-           
-                <WorkerDashboard />
-           
-        }
-    />
+        element={ <WorkerDashboard />} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
     <Route path="/worker/login" element={<WorkerLogin/>}/>
@@ -76,18 +71,10 @@ const App = () => {
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
     <Route path="/worker/bookings" element= {<WorkerBookings/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
-  
-    <Route
-                    path="/admin/dashboard"
-                    element={
-                      
-                            <AdminDashboard />
-                       
-                    }
-                />
-              
+    <Route path="/admin/login" element={<AdminLogin/>}/>
+    <Route path="/admin/dashboard" element={<AdminDashboard />}/>     
   </Routes>
-   
+  
    </Router>
   )
 }

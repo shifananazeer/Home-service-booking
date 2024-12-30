@@ -23,5 +23,5 @@ router.get('/available-slots',authenticateUser,userController.availableSlots)
 router.post('/create-booking',authenticateUser , userController.createBooking)
 router.get('/booking/:userId' ,authenticateUser , userController.getBookings)
 router.get('/worker/:workerId' ,authenticateUser , userController.fetchWorkerDetails)
-router.post('/cancelBooking/:bookingId' , authenticateUser , userController)
+router.post('/cancelBooking/:bookingId' , authenticateUser , userController.cancelBooking)
 export default router;

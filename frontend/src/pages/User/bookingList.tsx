@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { cancelBooking, fetchBookigs } from '../../services/userService';
+import Swal from 'sweetalert2';
 
 interface Booking {
-  id: string;
+  _id: string;
   workerName: string;
   serviceName: string;
   date: string;
@@ -51,17 +52,33 @@ const BookingList: React.FC = () => {
   }, []);
 
   const handleCancelBooking = async (bookingId: string) => {
-    try {
-    await cancelBooking(bookingId)// Update with your API endpoint
-      setBookings(
-        bookings.map((booking) =>
-          booking.id === bookingId
-            ? { ...booking, status: 'Cancelled' as const }
-            : booking
-        )
-      );
-    } catch (err) {
-      setError('Failed to cancel booking. Please try again.');
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to undo this action!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, cancel it!',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await cancelBooking(bookingId); // API call to cancel the booking
+  
+        // Immediately update the bookings state to reflect cancellation
+        setBookings((prevBookings) =>
+          prevBookings.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, paymentStatus: 'Cancelled' } // Update the status
+              : booking
+          )
+        );
+  
+        Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success');
+      } catch (error) {
+        Swal.fire('Error!', 'Failed to cancel booking. Please try again.', 'error');
+      }
     }
   };
 
@@ -99,7 +116,7 @@ const BookingList: React.FC = () => {
   
           return (
             <div
-              key={booking.id}
+              key={booking._id}
               className="flex bg-gray-900 rounded-lg shadow-md overflow-hidden mb-3"
               style={{ height: "150px" }} 
             >
@@ -148,7 +165,7 @@ const BookingList: React.FC = () => {
               {booking.paymentStatus !== "Cancelled" &&
                 booking.paymentStatus !== "Completed" && (
                   <button
-                    onClick={() => handleCancelBooking(booking.id)}
+                    onClick={() => handleCancelBooking(booking._id)}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   >
                     Cancel Booking

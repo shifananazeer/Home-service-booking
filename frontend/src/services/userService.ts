@@ -211,6 +211,7 @@ export const fetchBookigs = async (userId: string) => {
 
   export const cancelBooking = async(bookingId:string) => {
     const token = localStorage.getItem('accessToken');
+    console.log("bookid",bookingId)
     if(!token) {
       throw new Error('Authentication token is missing');
     }

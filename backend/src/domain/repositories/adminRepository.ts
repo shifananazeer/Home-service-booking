@@ -1,4 +1,6 @@
-  import { Service } from "../entities/Service";
+  import { Admin } from "../entities/Admin";
+import { Booking } from "../entities/Booking";
+import { Service } from "../entities/Service";
 import { User } from "../entities/User";
 import {Worker} from '../entities/worker'
 export interface AdminRepository {
@@ -6,4 +8,6 @@ export interface AdminRepository {
     findWorkers(skip: number, limit: number, search: string):Promise<Worker[]|null>
     findServices(skip: number , limit:number , search:string):Promise<Service[]|null>
     countServices(search: string): Promise<number>
+    findByEmail(email:string) :Promise<Admin|null>
+    getBookings() :Promise <Booking[]|[]>
 }

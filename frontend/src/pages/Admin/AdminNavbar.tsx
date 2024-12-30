@@ -9,6 +9,9 @@ const AdminNavbar = () => {
     const navigate = useNavigate()
     const handleLogout = () => {
         dispatch(logout()); 
+      localStorage.removeItem('admin_Id')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('accessToken')
                navigate('/admin/login');
         console.log("Logging out...");
     };

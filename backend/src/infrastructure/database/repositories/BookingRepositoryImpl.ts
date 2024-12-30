@@ -31,5 +31,19 @@ export const BookingRepositoryImpl : BookingRepository = {
     
     async countBookingsByWorkerId(workerId: string): Promise<number> {
         return await BookingModel.countDocuments({ workerId }).exec(); // Get total count of bookings
-    }
+    },
+    async cancelUpdate(bookingId: string): Promise<Booking | null> {
+        try {
+            const updatedBooking = await BookingModel.findByIdAndUpdate(
+                bookingId,
+                { paymentStatus: "Cancelled" }, // Set booking status to 'Cancelled'
+                { new: true } // Return the updated document
+            ).exec();
+            return updatedBooking;
+        } catch (error) {
+            console.error("Error cancelling booking:", error);
+            throw new Error("Failed to cancel booking");
+        }
+    },
+
 }

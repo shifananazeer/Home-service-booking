@@ -7,11 +7,12 @@ export const adminLogin = async (credentials: { email: string; password: string 
     try {
         const response = await axiosInstance.post('/admin/login', credentials); 
         console.log("response",response)
-        const token = response.data.token; 
-        console.log("tokent",token)
-        
-        
-        localStorage.setItem('admin_token', token);
+        const refresToken = response.data.refresh_token; 
+        const accessToken = response.data.accessToken
+        const adminId = response.data.adminId
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken',refresToken)
+        localStorage.setItem('admin_Id' , adminId)
         return response;
     } catch (error: any) {
         errorHandler(error);
@@ -156,3 +157,12 @@ export const updateService = async (serviceId: string, formData:FormData) => {
       throw error; 
     }
   };
+
+  export const fetchAllBookings = async () => {
+    try{
+    const response = await axiosInstance.get('/admin/bookings');
+    return response.data;
+    }catch (error){
+
+    }
+  }

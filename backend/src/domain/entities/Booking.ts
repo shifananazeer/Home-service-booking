@@ -17,4 +17,6 @@ export interface Booking {
     serviceName:string;
     serviceImage:string;
     paymentStatus: string; 
+    rate:number;
+  
 }
