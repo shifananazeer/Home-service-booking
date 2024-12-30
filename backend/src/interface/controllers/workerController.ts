@@ -19,7 +19,7 @@ import moment from 'moment';
 import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
 import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
-import { getBookingsByWorkerId, singleWorker, workerService } from '../../application/useCases/worker/workerService';
+import { fetchTodaysBookings, getBookingsByWorkerId, singleWorker, workerService } from '../../application/useCases/worker/workerService';
 import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
 
 
@@ -470,7 +470,27 @@ export const workerController  = {
                 console.error('Error in getWorkerLocation:', error);
                 res.status(500).json({ message: 'Internal server error' });
             }
-        }
+        },
+        todaysBooking : async (req:Request , res:Response) : Promise<void> => {
+            try {
+                const workerId = req.params.workerId as string; // Extract workerId from query parameters
+                if (!workerId) {
+              
+                  res.status(400).json({ message: 'Worker ID is required' });
+                  return 
+                }
+            
+                const bookings = await fetchTodaysBookings(workerId);
+            
+              res.status(200).json({ bookings });
+              return
+              } catch (error) {
+                console.error(error);
+              res.status(500).json({ message: 'Failed to fetch bookings', error });
+              return 
+              }
+            }
+     
     }
 
 

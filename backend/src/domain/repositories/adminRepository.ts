@@ -9,5 +9,5 @@ export interface AdminRepository {
     findServices(skip: number , limit:number , search:string):Promise<Service[]|null>
     countServices(search: string): Promise<number>
     findByEmail(email:string) :Promise<Admin|null>
-    getBookings() :Promise <Booking[]|[]>
+    getBookings(params: { page: number; limit: number; search: string }): Promise<{ bookings: Booking[]; total: number }>;
 }

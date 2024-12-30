@@ -158,11 +158,18 @@ export const updateService = async (serviceId: string, formData:FormData) => {
     }
   };
 
-  export const fetchAllBookings = async () => {
-    try{
-    const response = await axiosInstance.get('/admin/bookings');
-    return response.data;
-    }catch (error){
-
+  export const fetchAllBookings = async (page = 1, limit = 10, search = '') => {
+    try {
+        const response = await axiosInstance.get('/admin/bookings', {
+            params: {
+                page,
+                limit,
+                search,
+            },
+        });
+        return response.data; // Ensure you're returning the full response data
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        throw error; // Rethrow to handle it in the component
     }
-  }
+};

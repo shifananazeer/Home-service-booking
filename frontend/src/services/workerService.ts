@@ -196,7 +196,12 @@ export const updateSlotData = async (updateSlot:AvailabilitySlot , slotId : stri
 }
 
 export const  deleteAvailability  =  async (slotId:string)=> {
-    const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`);
+    const token = localStorage.getItem('worker_access_token');
+    const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        } 
+    });
     return response.data; 
 };
 
@@ -233,3 +238,8 @@ export const getWorkerLocation = async (workerId :string) => {
     console.log("response.......",response)
     return response.data;
   };
+
+  export const todaysBooking = async (workerId:string) => {
+    const response = await axiosInstance.get(`/workers/today-booking/${workerId}`);
+    return response.data
+  }

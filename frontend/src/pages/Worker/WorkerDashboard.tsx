@@ -7,6 +7,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import WorkerProfile from '../../components/worker/WorkerProfile'
 import AvailabilityManagement from '../../components/worker/AvailabilityManagement'
 import WorkerBookings from '../../components/worker/bookings'
+import WorkerTodayBookings from '../../components/worker/todaysBooking'
 
 const WorkerDashboard = () => {
  
@@ -24,6 +25,9 @@ const WorkerDashboard = () => {
             return <AvailabilityManagement/>
         case 'workerBookings' :
             return <WorkerBookings/>    
+        case 'todaysBooking':
+              return <WorkerTodayBookings/>
+        
         case "dashboard":
             return (
                 <>

@@ -23,4 +23,5 @@ router.get('/services',authenticateUser , workerController.getServices)
 router.put('/updateLocation',authenticateUser,workerController.updateLocation)
 router.get('/bookings/:workerId', workerController.allBookingsByworkerId);
 router.get('/:workerId', workerController.getWorkerLocation)
+router.get('/today-booking/:workerId',workerController.todaysBooking)
 export default router;

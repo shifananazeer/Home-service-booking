@@ -6,5 +6,5 @@ export interface BookingRepository {
     findBookingsByWorkerId(workerId: string, page: number, limit: number) :Promise <Booking[]|[]>;
     countBookingsByWorkerId(workerId: string): Promise<number>;
     cancelUpdate(bookidId:string) :Promise<Booking|null>
-
+    getTodaysBookingsByWorker(eorkrtId:string) :Promise<Booking[]|null>;
 }

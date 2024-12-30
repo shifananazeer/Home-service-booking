@@ -34,10 +34,22 @@ async findByEmail(email:string) :Promise<Admin|null> {
     const admin = await AdminModel.findOne({email});
     return admin ? admin.toObject():null;
 },
-async getBookings() :Promise<Booking[]|[]> {
-    return await BookingModel.find()
-    .populate('userId', 'name email') 
-  
-    .sort({ createdAt: -1 }); // Sort by latest bookings
+async getBookings(params: { page: number; limit: number; search: string }): Promise<{ bookings: Booking[]; total: number }> {
+    const { page, limit, search } = params; // Destructure parameters
+
+    const skip = (page - 1) * limit; // Calculate how many records to skip
+    const query = search ? { bookingId: { $regex: search, $options: 'i' } } : {};
+
+    // Fetch total count of bookings for pagination
+    const total = await BookingModel.countDocuments(query);
+
+    // Fetch bookings with pagination, sorting, and population
+    const bookings = await BookingModel.find(query)
+        .populate('userId', 'name email') // Populate userId with name and email
+        .sort({ createdAt: -1 }) // Sort by creation date descending
+        .skip(skip) // Skip records for pagination
+        .limit(limit); // Limit number of records
+
+    return { bookings, total }; // Return both bookings and total count
 }
 }

@@ -66,3 +66,13 @@ export const singleWorker = async (workerId:string) :Promise<AddressResponse>  =
         },
     }
 }
+
+export const fetchTodaysBookings = async (workerId:string) : Promise<Booking[]|[]> => {
+    if (!workerId) {
+        throw new Error('Worker ID is required');
+      }
+    
+      const bookings = await BookingRepositoryImpl.getTodaysBookingsByWorker(workerId);
+    
+      return bookings||[];
+}

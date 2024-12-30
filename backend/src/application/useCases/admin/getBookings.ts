@@ -2,7 +2,10 @@ import { Booking } from "../../../domain/entities/Booking";
 import { AdminRepository } from "../../../domain/repositories/adminRepository"
 
 export const fetchAllBookings = async (
-    adminRepository: AdminRepository
-): Promise<Booking[]> => {
-    return await adminRepository.getBookings();
+    adminRepository: AdminRepository,
+    page: number,
+    limit: number,
+    search: string
+): Promise<{ bookings: Booking[]; total: number }> => {
+    return await adminRepository.getBookings({ page, limit, search }); // Pass an object containing page, limit, and search
 };

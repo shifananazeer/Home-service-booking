@@ -141,13 +141,19 @@ deleteService : async (req:Request , res:Response) : Promise<void> => {
     }
 },
 
-getAllBookings : async (req:Request , res:Response) : Promise<void> => {
+getAllBookings: async (req: Request, res: Response): Promise<void> => {
+    // Destructure and validate query parameters
+    const page = Math.max(1, parseInt(req.query.page as string)) || 1; // Ensure page is at least 1
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit as string))) || 10; // Limit range between 1 and 100
+    const search = req.query.search as string || '';
+
     try {
-        const bookings = await fetchAllBookings( AdminRepositoryImpl);
-        console.log("booking",bookings)
+        const { bookings, total } = await fetchAllBookings(AdminRepositoryImpl, page, limit, search);
         res.status(200).json({
             message: "Bookings retrieved successfully",
             bookings,
+            total,
+            lastPage: Math.ceil(total / limit), // Calculate last page for pagination
         });
     } catch (error: any) {
         res.status(500).json({
@@ -156,5 +162,4 @@ getAllBookings : async (req:Request , res:Response) : Promise<void> => {
         });
     }
 }
-
 }
