@@ -34,7 +34,7 @@ export default function WorkerTodayBookings() {
   const navigate = useNavigate()
   useEffect(() => {
     const fetchTodayBookings = async () => {
-      const refreshToken = localStorage.getItem('worker_refresh_token')
+      const refreshToken = localStorage.getItem('refreshToken')
       try {
 
           if (refreshToken) {
@@ -97,7 +97,7 @@ export default function WorkerTodayBookings() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3  ">
           {bookings.map((booking) => (
-            <div key={booking._id} className="border-gray-950 border rounded-lg p-4 shadow-sm  bg-gray-600">
+            <div key={booking._id} className="border-gray-600 border rounded-lg p-4 shadow-sm  bg-gray-900">
               <div className="flex items-center mb-2">
                 <img src={booking.serviceImage} alt={booking.serviceName} className="w-10 h-10 rounded-full mr-2 text-white" />
                 <h2 className="text-lg font-semibold  text-white">{booking.serviceName}</h2>

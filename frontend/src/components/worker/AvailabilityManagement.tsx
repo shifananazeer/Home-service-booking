@@ -5,6 +5,8 @@ import Modal from './editModel';
 import { Slot } from './editModel';
 import { refreshAccessToken } from '../../utils/auth';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../../app/store';
+import { useSelector } from 'react-redux';
 
 const formatDate = (dateString: string): string => {
   return moment(dateString).format('YYYY-MM-DD dddd'); 
@@ -26,7 +28,7 @@ const navigate = useNavigate()
 
 useEffect(()=> {
 const refresh = async () => {
-  const refreshToken = localStorage.getItem('worker_refresh_token')
+  const refreshToken = useSelector((state: RootState) => state.worker.refreshToken);
    if (refreshToken) {
                 const newAccessToken = await refreshAccessToken();
                 if (!newAccessToken) {
@@ -195,23 +197,24 @@ refresh();
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 bg-white shadow-lg rounded-lg">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Manage Availability Slots</h1>
-        <p className="text-gray-600 text-sm">
+    <div className="max-w-4xl mx-auto p-6 bg-gray-900 text-white shadow-lg rounded-lg">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Manage Availability Slots</h1>
+        <p className="text-gray-400 text-sm">
           Define your availability to ensure users can book during your preferred time slots.
         </p>
       </div>
 
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {loading && <p className="text-blue-400 mb-4">Loading...</p>}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      <div className="space-y-6">
+      <div className="space-y-6 bg-gray-800 p-6 rounded-lg mb-8">
+        <h2 className="text-xl font-bold mb-4">Add New Slot</h2>
         <div className="flex flex-wrap gap-4">
           <select
             value={selectedDay}
             onChange={(e) => setSelectedDay(e.target.value)}
-            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
           >
             <option value="">Select a day</option>
             {days.map((day) => (
@@ -225,61 +228,61 @@ refresh();
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
           />
 
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
           />
 
           <button
             onClick={handleAddSlot}
             disabled={!selectedDay || !startTime || !endTime}
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
           >
             ADD SLOT
           </button>
         </div>
+      </div>
 
       
-        <div className="mt-6">
-          <h2 className="text-xl font-bold mb-4">Your Slots</h2>
-          {slots.length > 0 ? (
-            <ul className="space-y-2">
-              {slots.map((availability) =>
-                availability.slots.map((slot) => (
-                  <li
-                    key={slot.slotId}
-                    className="flex justify-between items-center px-4 py-2 border rounded-md"
-                  >
-                    <span>
-                      {formatDate(availability.date)}: {slot.startTime} - {slot.endTime}
-                    </span>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEditSlot(slot.slotId)}
-                        className="text-blue-500 hover:underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSlot(slot.slotId)}
-                        className="text-red-500 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
-                ))
-              )}
-            </ul>
-          ) : (
-            <p>No slots added yet.</p>
-          )}
-        </div>
+      <div className="bg-gray-800 p-6 rounded-lg">
+        <h2 className="text-2xl font-bold mb-4">Your Slots</h2>
+        {slots.length > 0 ? (
+          <ul className="space-y-4">
+            {slots.map((availability) =>
+              availability.slots.map((slot) => (
+                <li
+                  key={slot.slotId}
+                  className="flex justify-between items-center px-6 py-4 bg-gray-700 rounded-md transition duration-300 ease-in-out hover:bg-gray-600"
+                >
+                  <span className="text-lg">
+                    {formatDate(availability.date)}: {slot.startTime} - {slot.endTime}
+                  </span>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => handleEditSlot(slot.slotId)}
+                      className="text-blue-400 hover:text-blue-300 transition duration-300 ease-in-out"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSlot(slot.slotId)}
+                      className="text-red-400 hover:text-red-300 transition duration-300 ease-in-out"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        ) : (
+          <p className="text-gray-400">No slots added yet.</p>
+        )}
       </div>
 
       {/* Modal for editing slot */}
@@ -289,27 +292,28 @@ refresh();
         onSubmit={handleModalSubmit}
         initialData={editingSlot} 
       />
-      <div className="flex justify-between items-center mt-6">
-    <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-        Previous
-    </button>
-    <span className="text-gray-700">
-        Page {currentPage} of {totalPages}
-    </span>
-    <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-        Next
-    </button>
-</div>
+      <div className="flex justify-between items-center mt-8">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition duration-300 ease-in-out"
+        >
+          Previous
+        </button>
+        <span className="text-gray-400">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600 transition duration-300 ease-in-out"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
 
 export default AvailabilityManagement;
+

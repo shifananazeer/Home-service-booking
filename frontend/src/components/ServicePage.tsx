@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { fetchService } from '../services/workerService'
 import { fetchServices } from '../services/adminService'
 import { useNavigate } from 'react-router-dom'
+import { FaUserTie } from 'react-icons/fa'
 
 interface Service {
   _id: string
@@ -22,7 +23,7 @@ export default function ServicesPage() {
   useEffect(() => {
     async function loadServices() {
       try {
-        const  data = await fetchServices(currentPage , limit , searchQuery);// Replace with your API endpoint
+        const  data = await fetchServices(currentPage , limit , searchQuery);
     
         console.log("page................",currentPage , limit)
         console.log("ssssssssss",data.services)
@@ -55,7 +56,22 @@ const handlePageChange = (page: number) => {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-center mb-4">What We Offer</h1>
+    <h1 className="text-4xl font-bold text-center mb-4 flex items-center justify-center blink">
+        What We Offer <FaUserTie className="text-3xl ml-2" />
+      </h1>
+      <style >{`
+        @keyframes blink {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+        .blink {
+          animation: blink 1.5s infinite;
+        }
+      `}</style>
       <p className="text-center text-gray-600 mb-12">
         EXPLORE THE WIDE RANGE OF SERVICES WE PROVIDE TO MEET ALL YOUR NEEDS
       </p>
@@ -91,11 +107,12 @@ const handlePageChange = (page: number) => {
             <h3 className="text-xl font-semibold text-center mb-2">{service.name}</h3>
             <p className="text-gray-300 text-center text-sm mb-4">{service.description}</p>
             <button 
-              className="w-full bg-gray-300 hover:bg-gray-500 text-black py-2 px-4 rounded-lg transition-colors"
-              onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name , serviceImage : service.image , serviceDescription: service.description} })}
-            >
-              Book Now
-            </button>
+            className="w-full bg-gray-300 text-black py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg relative overflow-hidden group"
+            onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name, serviceImage: service.image, serviceDescription: service.description } })}
+          >
+            <span className="relative z-10 font-semibold">Book Now</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-gray-400 to-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+          </button>
           </div>
         ))}
       </div>

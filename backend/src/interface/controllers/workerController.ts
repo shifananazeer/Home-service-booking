@@ -361,7 +361,7 @@ export const workerController  = {
                 console.log("Fetching all services...");
                 try {
                     const services = await ServiceRepositoryImpl.getAllServices();
-                    if (!services) { // Check for null
+                    if (!services) { 
                          res.status(200).json({
                             success: true,
                             services: [],
@@ -370,7 +370,7 @@ export const workerController  = {
                         return
                     }
             
-                    if (services.length === 0) { // Check for empty array
+                    if (services.length === 0) {
                          res.status(200).json({
                             success: true,
                             services: [],
@@ -435,16 +435,15 @@ export const workerController  = {
                 const parsedPage = parseInt(page as string, 10)||1;
                 const parsedLimit = parseInt(limit as string, 10)||1;
             
-                // Fetch bookings using the workerId and parsed page and limit
+             
                 const result = await getBookingsByWorkerId(workerId, parsedPage, parsedLimit);
         
-                // Check if bookings exist
                 if (!result.bookings || result.bookings.length === 0) {
                     res.status(404).json({ message: 'No bookings found for this worker' });
                     return;
                 }
               console.log("result" , result)
-                // Return bookings along with total count, current page, and limit
+         
                 res.status(200).json(result);
             } catch (error) {
                 console.error('Error in getWorkerBookingsController:', error);
@@ -458,13 +457,11 @@ export const workerController  = {
             try {
                 const response = await singleWorker(workerId);
         
-                // If the worker does not have an address
                 if (!response.address) {
                     res.status(404).json({ message: response.message });
                     return;
                 }
         
-                // Successful retrieval of address
                 res.status(200).json(response);
             } catch (error) {
                 console.error('Error in getWorkerLocation:', error);
@@ -473,7 +470,7 @@ export const workerController  = {
         },
         todaysBooking : async (req:Request , res:Response) : Promise<void> => {
             try {
-                const workerId = req.params.workerId as string; // Extract workerId from query parameters
+                const workerId = req.params.workerId as string; 
                 if (!workerId) {
               
                   res.status(400).json({ message: 'Worker ID is required' });

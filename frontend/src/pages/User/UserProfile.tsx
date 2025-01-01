@@ -27,16 +27,13 @@ const UserProfile = () => {
               const newAccessToken = await refreshAccessToken();
               if (!newAccessToken) {
                 console.log('Failed to refresh token, redirecting to login...');
-                // Redirect to login page
                 return (window.location.href = '/login');
               }
             } else {
               console.log('No refresh token found, redirecting to login...');
-              // Redirect to login page
               return navigate('/login');
             }
     
-            // Fetch user profile data
             const data = await getUserProfile();
             console.log('Fetched user profile data:', data);
     

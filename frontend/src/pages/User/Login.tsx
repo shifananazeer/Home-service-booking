@@ -35,27 +35,20 @@ const Login = () => {
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user_Id' , userId)
     
-            // User data to save in Redux
-            const userData = {
+           const userData = {
                 name,
                 email: userEmail,
                 refreshToken: refreshToken,
                 accessToken: accessToken
             };
     
-            // Show success toast
+         
             toast.success('Login Successful');
             console.log('Dispatching loginSuccess:', userData);
-    
-            // Save to Redux store
-            dispatch(loginSuccess(userData));
-    
-            // Navigate to home page
+             dispatch(loginSuccess(userData));
             navigate('/');
         } catch (error: any) {
             console.error('Login error:', error);
-    
-            // Show error toast and dispatch failure
             const errorMessage = error.response?.data?.message || 'Login failed';
             toast.error(errorMessage);
             dispatch(loginFailure(errorMessage));

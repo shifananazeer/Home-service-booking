@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 
 interface Service {
-    id: string; // or number, depending on your API
+    id: string; 
     name: string;
 }
 
@@ -31,22 +31,21 @@ const WorkerSignup: React.FC = () => {
 
 
     useEffect(() => {
-        // Fetch services on component mount
+   
         const getServices = async () => {
             try {
                 const fetchedServicesResponse = await fetchService();
-                console.log('Fetched services:', fetchedServicesResponse); // Log the fetched response
+                console.log('Fetched services:', fetchedServicesResponse);
         
-                // Check if the response contains services
                 if (fetchedServicesResponse.success && Array.isArray(fetchedServicesResponse.services)) {
-                    setServices(fetchedServicesResponse.services); // Set services to the extracted array
+                    setServices(fetchedServicesResponse.services); 
                 } else {
                     console.warn('No valid services found:', fetchedServicesResponse);
-                    setServices([]); // Fallback to an empty array
+                    setServices([]); 
                 }
             } catch (err) {
                 console.error('Error fetching services:', err);
-                setServices([]); // Optionally reset to empty on error
+                setServices([]);
             } finally {
                 setIsLoadingServices(false);
             }
@@ -60,7 +59,7 @@ const WorkerSignup: React.FC = () => {
         if (name === 'skills') {
             setFormData((prev) => ({
                 ...prev,
-                skills: [value], // Single selection for now
+                skills: [value], 
             }));
         } else {
             setFormData((prev) => ({
@@ -75,14 +74,13 @@ const WorkerSignup: React.FC = () => {
         dispatch(signupStart());
         try {
             const response = await registerWorker(formData); 
-            // Check response success here if needed
             dispatch(signupSuccess());
             toast.success('Worker registered successfully');
             navigate('/worker/verify-otp');
         } catch (error: any) {
-            console.error('Registration error:', error); // Log error for debugging
+            console.error('Registration error:', error); 
             dispatch(signupFail(error.message || 'Registration failed'));
-            toast.error('Registration failed'); // Show user-friendly error
+            toast.error('Registration failed'); 
         }
     };
 

@@ -47,8 +47,6 @@ export const userController = {
             // Set cookies with tokens
             res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
             res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-    
-            // Send tokens in the response (optional)
             res.status(200).json({
                 message: "You can now log in",
                 accessToken,
@@ -62,8 +60,6 @@ export const userController = {
     validateOtp: async (req: Request, res: Response) => {
         try {
             const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(req.body.email, req.body.otp, 1);
-
-        // Set tokens in cookies
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
         res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
         res.status(200).json({

@@ -39,21 +39,23 @@ export default function AdminBookings() {
     setIsLoading(true);
     try {
       const data = await fetchAllBookings(currentPage, limit, searchQuery);
+      console.log("data",data)
       setBookings(data.bookings);
-      setTotalPages(data.totalPages); // Ensure this matches your API response
-    } catch (err) {
+      setTotalPages(data.totalPages); 
+      setError(null);
+    }catch (error) {
       setError('Failed to load bookings');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Debounce search query
+ 
   const debouncedSearch = useCallback(
     debounce((query: string) => {
       setSearchQuery(query);
-      setCurrentPage(1); // Reset to the first page on search
-    }, 300), // Adjust the debounce time as necessary
+      setCurrentPage(1); 
+    }, 300), 
     []
   );
 
@@ -63,8 +65,7 @@ export default function AdminBookings() {
 
   useEffect(() => {
     fetchBookings();
-  }, [currentPage, searchQuery]); // Refetch when these values change
-
+  }, [currentPage, searchQuery]); 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
@@ -72,8 +73,8 @@ export default function AdminBookings() {
   };
 
   const handleClearSearch = () => {
-    setSearchQuery(''); // Clear the search query
-    setCurrentPage(1); // Reset to the first page on clear
+    setSearchQuery(''); 
+    setCurrentPage(1); 
   };
 
   if (isLoading) {

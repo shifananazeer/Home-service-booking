@@ -105,8 +105,8 @@ export const AvailabilityRepositoryImpl: AvailabilityRepository = {
     updateSlotStatus: async (slotId: string): Promise<void> => {
         try {
             await AvailabilityModel.updateOne(
-                { "slots.slotId": slotId }, // Find the document where the slot exists
-                { $set: { "slots.$.isAvailable": false } } // Update the isAvailable field for the matching slot
+                { "slots.slotId": slotId },
+                { $set: { "slots.$.isAvailable": false } } 
             );
         } catch (error) {
             console.error('Error updating slot status:', error);

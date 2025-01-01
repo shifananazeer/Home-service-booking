@@ -12,8 +12,8 @@ export interface ProfileData {
     profilePic?: string;
     address: string;
     area: string;
-    latitude?: number; // Add latitude
-    longitude?: number; // Add longitude
+    latitude?: number; 
+    longitude?: number; 
 }
 
 const EditUserProfile: React.FC = () => {
@@ -29,7 +29,7 @@ const EditUserProfile: React.FC = () => {
         area: useraddress?.area || '',
         profilePic: null as File | null,
         profilePicPreview: user.profilePic || '',
-        latitude: user?.latitude || undefined, // Initialize latitude
+        latitude: user?.latitude || undefined, 
         longitude: user?.longitude || undefined,
     });
     const [message, setMessage] = useState<string | null>(null);
@@ -63,8 +63,6 @@ const EditUserProfile: React.FC = () => {
             ...prev,
             [name]: value,
         }));
-
-        // Update latitude and longitude when address or area changes
         if (name === 'area') {
             fetchCoordinates(value);
         }
@@ -72,7 +70,7 @@ const EditUserProfile: React.FC = () => {
 
     const fetchCoordinates = async (area: string) => {
         try {
-            const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY // Replace with your Geocoding API key
+            const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY 
             const response = await axios.get(
                 `https://maps.googleapis.com/maps/api/geocode/json`,
                 {
@@ -84,9 +82,9 @@ const EditUserProfile: React.FC = () => {
             );
 
             if (response.data.results && response.data.results.length > 0) {
-                const { lat, lng } = response.data.results[0].geometry.location; // Extracting latitude and longitude
+                const { lat, lng } = response.data.results[0].geometry.location; 
                 
-                // Update profileData state
+          
                 setProfileData((prev) => ({
                     ...prev,
                     latitude: lat,
@@ -108,15 +106,12 @@ const EditUserProfile: React.FC = () => {
 
     const updateCoordinatesInDatabase = async (lat: number, lng: number) => {
         const userId = localStorage.getItem('user_Id');
-    
-        // Check if workerId exists
         if (!userId) {
             toast.error('Worker ID is not available.');
             return;
         }
     
         try {
-            // Assuming updateCoordinates is a function that makes the API call
             const response = await updateCoordinates(lat, lng, userId)
             console.log('Coordinates updated successfully:', response.data);
             toast.success('Coordinates updated successfully!');

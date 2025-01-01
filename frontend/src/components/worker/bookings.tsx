@@ -42,7 +42,7 @@ const WorkerBookings: React.FC = () => {
    const navigate = useNavigate()
   useEffect(() => {
     const fetchBookingsAndLocation = async () => {
-      const refreshToken = localStorage.getItem('worker_refresh_token')
+      const refreshToken = localStorage.getItem('refreshToken')
       if (refreshToken) {
                       const newAccessToken = await refreshAccessToken();
                       if (!newAccessToken) {
@@ -125,25 +125,26 @@ console.log("workk",workerLocation)
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Bookings</h1>
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
+    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8 text-white">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold text-gray-100 mb-8 text-center">Your Bookings</h1>
+        <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+          <ul className="divide-y divide-gray-700">
             {bookings.map((booking) => (
-              <li key={booking.bookingId} className="px-6 py-4 hover:bg-gray-50">
-                <div className="flex items-center justify-between">
+              <li key={booking.bookingId} className="px-6 py-5 hover:bg-gray-700 transition duration-150 ease-in-out">
+                <div className="flex items-center space-x-4">
+                  <img src={booking.serviceImage || '/placeholder.svg?height=80&width=80'} alt={booking.serviceName} className="w-20 h-20 object-cover rounded-lg" />
                   <div className="flex-1">
-                    <h3 className="text-lg font-medium text-gray-900">{booking.customerName}</h3>
-                    <p className="mt-1 text-sm text-gray-500">{booking.serviceName}</p>
-                    <p className="mt-1 text-sm text-gray-500">{booking.workLocation.address}</p>
+                    <h3 className="text-lg font-medium text-gray-100">{booking.customerName}</h3>
+                    <p className="mt-1 text-sm text-gray-400">{booking.serviceName}</p>
+                    <p className="mt-1 text-sm text-gray-400">{booking.workLocation.address}</p>
                   </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <p className="text-sm font-medium text-gray-900">{new Date(booking.date).toLocaleDateString()}</p>
-                    <p className="mt-1 text-sm text-gray-500">{booking.slotId}</p>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-300">{new Date(booking.date).toLocaleDateString()}</p>
+                    <p className="mt-1 text-sm text-gray-400">{booking.slotId}</p>
                     <button
                       onClick={() => renderMap(booking)}
-                      className="mt-2 text-blue-500 hover:underline"
+                      className="mt-2 text-blue-400 hover:text-blue-300 transition duration-150 ease-in-out"
                     >
                       View on Map
                     </button>
@@ -155,50 +156,51 @@ console.log("workk",workerLocation)
         </div>
 
         {selectedBooking && workerLocation && (
-  <div className="mt-6 relative">
-    <h2 className="text-lg font-medium text-gray-900">Map View</h2>
-    <iframe
-      title="Google Map"
-      width="100%"
-      height="400"
-      frameBorder="0"
-      style={{ border: 0 }}
-      src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${workerLocation.latitude},${workerLocation.longitude}&destination=${selectedBooking.workLocation.latitude},${selectedBooking.workLocation.longitude}&mode=driving`}
-      allowFullScreen
-    ></iframe>
-    {distance && (
-      <p className="mt-2 text-sm text-gray-600">
-        Distance between worker and work location: {distance} km
-      </p>
-    )}
-    <button
-      onClick={() => setSelectedBooking(null)}
-      className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full shadow hover:bg-red-600 focus:outline-none"
-    >
-      Close
-    </button>
-  </div>
-)}
+          <div className="mt-8 bg-gray-800 rounded-lg p-4 relative">
+            <h2 className="text-xl font-medium text-gray-100 mb-4">Map View</h2>
+            <div className="relative pb-[56.25%] h-0">
+              <iframe
+                title="Google Map"
+                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                frameBorder="0"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${workerLocation.latitude},${workerLocation.longitude}&destination=${selectedBooking.workLocation.latitude},${selectedBooking.workLocation.longitude}&mode=driving`}
+                allowFullScreen
+              ></iframe>
+            </div>
+            {distance && (
+              <p className="mt-4 text-sm text-gray-400">
+                Distance between worker and work location: {distance} km
+              </p>
+            )}
+            <button
+              onClick={() => setSelectedBooking(null)}
+              className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full shadow hover:bg-red-600 focus:outline-none transition duration-150 ease-in-out"
+            >
+              Close
+            </button>
+          </div>
+        )}
 
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-6 flex justify-between items-center">
           <button 
             onClick={handlePreviousPage} 
             disabled={currentPage === 1}
-            className="text-blue-500 hover:underline"
+            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
           >
             Previous
           </button>
-          <p className="text-gray-600">Page {currentPage} of {totalPages}</p>
+          <p className="text-gray-400">Page {currentPage} of {totalPages}</p>
           <button 
             onClick={handleNextPage} 
             disabled={currentPage === totalPages}
-            className="text-blue-500 hover:underline"
+            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
           >
             Next
           </button>
         </div>
 
-        <p className="mt-4 text-center text-gray-600">
+        <p className="mt-4 text-center text-gray-400">
           Total Bookings: {bookings.length}
         </p>
       </div>
@@ -207,3 +209,4 @@ console.log("workk",workerLocation)
 };
 
 export default WorkerBookings;
+

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { createBooking, fetchingSlots } from '../../services/userService';
 import axios from 'axios';
 import { refreshAccessToken } from '../../utils/auth';
+import Swal from 'sweetalert2';
 
 interface Slot {
     slotId: string;
@@ -66,7 +67,6 @@ const BookingConfirm: React.FC = () => {
               return;
             }
     
-            // Generate available dates
             const today = new Date();
             const dates = Array.from({ length: 8 }, (_, i) => {
               const nextDate = new Date(today);
@@ -110,9 +110,14 @@ const BookingConfirm: React.FC = () => {
 
     const handleBookingSubmit = async () => {
         if (!workLocation || !workDescription || !selectedSlot) {
-            alert('Please fill all fields and select a slot.');
+            Swal.fire({
+              icon: 'warning',
+              title: 'Incomplete Details',
+              text: 'Please fill all fields and select a slot.',
+              confirmButtonText: 'OK',
+            });
             return;
-        }
+          }
     
         if (!userId) {
             alert('You need to be logged in to book a service.');
@@ -160,7 +165,7 @@ const BookingConfirm: React.FC = () => {
                     navigate('/payment', {
                         state: {
                             bookingDetails: {
-                                ...bookingDetails, // Spread bookingDetails to pass all its fields
+                                ...bookingDetails, 
                             },
                             workerRate
                         },
@@ -195,7 +200,7 @@ const BookingConfirm: React.FC = () => {
                             <p className="text-xl text-blue-200 mb-8">Complete your booking with {workerName} for {serviceName}</p>
                             <div className="flex items-center space-x-4 mb-8">
                                 <img
-                                    src={workerPic || '/avatar.jpeg'}
+                                    src={workerPic || '/avathar.jpeg'}
                                     alt="Worker"
                                     className="h-20 w-20 object-cover rounded-full border-4 border-white shadow-lg"
                                 />

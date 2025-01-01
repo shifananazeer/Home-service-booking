@@ -51,14 +51,10 @@ const WorkerOtp = () => {
             const response = await WorkerVerifyOtp(otp, email);
             console.log('Response:', response);
 
-            // Save tokens securely
             const { accessToken, refreshToken } = response.data;
            
-            // Dispatch to Redux
             dispatch(otpVerifySuccess(accessToken));
             toast.success('OTP Verified Successfully');
-
-            // Navigate to worker dashboard
             navigate('/worker/dashboard');
         } catch (error: any) {
             console.error('Verification Failed:', error.response?.data?.message);

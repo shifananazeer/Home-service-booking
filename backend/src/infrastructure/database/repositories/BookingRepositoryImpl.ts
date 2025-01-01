@@ -22,22 +22,22 @@ export const BookingRepositoryImpl : BookingRepository = {
         }
     },
     async findBookingsByWorkerId(workerId: string, page: number, limit: number): Promise<Booking[]> {
-        const skip = (page - 1) * limit; // Calculate how many records to skip
+        const skip = (page - 1) * limit; 
         return await BookingModel.find({ workerId })
             .skip(skip)
             .limit(limit)
-            .exec(); // Execute the query
+            .exec();
     },
     
     async countBookingsByWorkerId(workerId: string): Promise<number> {
-        return await BookingModel.countDocuments({ workerId }).exec(); // Get total count of bookings
+        return await BookingModel.countDocuments({ workerId }).exec(); 
     },
     async cancelUpdate(bookingId: string): Promise<Booking | null> {
         try {
             const updatedBooking = await BookingModel.findByIdAndUpdate(
                 bookingId,
-                { paymentStatus: "Cancelled" }, // Set booking status to 'Cancelled'
-                { new: true } // Return the updated document
+                { paymentStatus: "Cancelled" }, 
+                { new: true } 
             ).exec();
             return updatedBooking;
         } catch (error) {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { cancelBooking, fetchBookigs } from '../../services/userService';
 import Swal from 'sweetalert2';
+import { refreshAccessToken } from '../../utils/auth';
 
 interface Booking {
   _id: string;
@@ -27,8 +28,28 @@ const BookingList: React.FC = () => {
   };
 
   useEffect(() => {
+    const refreshToken = localStorage.getItem('refreshToken');
+
+   
+    
     const loadBookings = async () => {
-      const userId = localStorage.getItem('user_Id'); // Ensure this key matches your backend/localStorage setup
+   
+
+      if (refreshToken) {
+        const newAccessToken = await refreshAccessToken();
+        if (!newAccessToken) {
+          console.log('Failed to refresh token, redirecting to login...');
+          navigate('/login');
+          return;
+        }
+      } else {
+        console.log('No refresh token found, redirecting to login...');
+        navigate('/login');
+        return;
+      }
+
+
+      const userId = localStorage.getItem('user_Id'); 
       if (!userId) {
         setError('User ID is missing');
         setIsLoading(false);
@@ -64,13 +85,13 @@ const BookingList: React.FC = () => {
   
     if (result.isConfirmed) {
       try {
-        await cancelBooking(bookingId); // API call to cancel the booking
+        await cancelBooking(bookingId); 
   
-        // Immediately update the bookings state to reflect cancellation
+ 
         setBookings((prevBookings) =>
           prevBookings.map((booking) =>
             booking._id === bookingId
-              ? { ...booking, paymentStatus: 'Cancelled' } // Update the status
+              ? { ...booking, paymentStatus: 'Cancelled' } 
               : booking
           )
         );

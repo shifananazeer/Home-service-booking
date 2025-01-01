@@ -21,14 +21,14 @@ export const workerService = async (skill: string | undefined): Promise<Worker[]
 
 
 export const getBookingsByWorkerId = async (workerId: string, page: number , limit: number ): Promise<{ bookings: Booking[], total: number }> => {
-    // Fetch bookings from the repository
+ 
     const bookings = await BookingRepositoryImpl.findBookingsByWorkerId(workerId, page, limit);
-    // Count the total number of bookings for the worker
+  
     const totalBookings = await BookingRepositoryImpl.countBookingsByWorkerId(workerId);
     
     return {
         bookings,
-        total: totalBookings // Return the total count for pagination
+        total: totalBookings 
     };
 };
 
@@ -40,8 +40,8 @@ interface AddressResponse {
         userId: string;
         address: string;
         area: string;
-        latitude?: number; // Optional latitude
-        longitude?: number; // Optional longitude
+        latitude?: number; 
+        longitude?: number; 
         __v?: number;
     };
 }
@@ -60,8 +60,8 @@ export const singleWorker = async (workerId:string) :Promise<AddressResponse>  =
             userId: address.userId.toString(), 
             address: address.address,
             area: address.area,
-            latitude: address.location?.latitude, // Fetch latitude
-             longitude: address.location?.longitude, // Fetch longitude
+            latitude: address.location?.latitude, 
+             longitude: address.location?.longitude, 
             __v: address.__v,
         },
     }

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
-import { FaUser } from 'react-icons/fa'; 
+import { FaSignOutAlt, FaUser, FaUserTie } from 'react-icons/fa'; 
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -71,9 +71,9 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={handleSignupWorkerClick}
-            className="hidden md:block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500"
+            className=" hidden md:block px-4 py-2 text-sm font-medium  text-white bg-blue-600 rounded-md hover:bg-blue-500"
           >
-            Register as a Worker
+            Register as a Worker 
           </button>
 
           {!token ? (
@@ -98,15 +98,15 @@ const Navbar: React.FC = () => {
                 className="px-4 py-2 text-sm font-medium  text-white hover:text-white/80"
               >
                    <div style={{ display: 'flex', alignItems: 'center' }}>
-               <FaUser style={{ fontSize: '24px', marginRight: '8px' }} />
+               <FaUser style={{ fontSize: '22px', marginRight: '8px' }} />
                   <span>My Profile</span>
                    </div>
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-500"
+                className="px-4 py-2 flex text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-500"
               >
-                Logout
+              <FaSignOutAlt className="mr-2 mt-1" />   Logout  
               </button>
             </div>
           )}

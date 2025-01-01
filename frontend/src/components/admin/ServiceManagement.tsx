@@ -49,7 +49,7 @@ export default function ServiceManagement() {
     };
 
     const handlePageChange = (page: number) => {
-        console.log("Navigating to page:", page); // Debugging line
+        console.log("Navigating to page:", page); 
         if (page < 1 || page > totalPages) return;
         setCurrentPage(page);
     };

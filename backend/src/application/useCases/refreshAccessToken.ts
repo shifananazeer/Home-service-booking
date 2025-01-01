@@ -7,7 +7,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<string> 
         process.env.REFRESH_TOKEN_SECRET as string
       ) as { email: string };
   
-      // Generate a new access token
+   
       const accessToken = jwt.sign(
         { email: decoded.email, role: "user" },
         process.env.ACCESS_TOKEN_SECRET as string,

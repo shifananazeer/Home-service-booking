@@ -142,9 +142,9 @@ deleteService : async (req:Request , res:Response) : Promise<void> => {
 },
 
 getAllBookings: async (req: Request, res: Response): Promise<void> => {
-    // Destructure and validate query parameters
-    const page = Math.max(1, parseInt(req.query.page as string)) || 1; // Ensure page is at least 1
-    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit as string))) || 10; // Limit range between 1 and 100
+    
+    const page = Math.max(1, parseInt(req.query.page as string)) || 1; 
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit as string))) || 10; 
     const search = req.query.search as string || '';
 
     try {
@@ -153,7 +153,7 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
             message: "Bookings retrieved successfully",
             bookings,
             total,
-            lastPage: Math.ceil(total / limit), // Calculate last page for pagination
+            lastPage: Math.ceil(total / limit), 
         });
     } catch (error: any) {
         res.status(500).json({

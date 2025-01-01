@@ -37,14 +37,14 @@ const PaymentPage: React.FC = () => {
     useEffect(() => {
         if (bookingDetails && workerRate) {
             const calculateAmount = () => {
-                const { slotId = '', date } = bookingDetails; // Adjusted to use 'date'
+                const { slotId = '', date } = bookingDetails; 
 
                 if (!slotId) return;
 
                 const [startTime, endTime] = slotId.split('-').slice(1);
                 if (!startTime || !endTime) return;
 
-                const selectedDate = new Date(date); // Use date instead of selectedDate
+                const selectedDate = new Date(date); 
                 const start = new Date(selectedDate);
                 const end = new Date(selectedDate);
 
@@ -111,7 +111,7 @@ const PaymentPage: React.FC = () => {
                     </p>
                     <p className="text-white">
                         <strong>Booking Date:</strong>{' '}
-                        {new Date(bookingDetails.date || '').toDateString()} {/* Changed selectedDate to date */}
+                        {new Date(bookingDetails.date || '').toDateString()} 
                     </p>
                     <p className="text-white">
                         <strong>Slot:</strong> {bookingDetails.slotId}

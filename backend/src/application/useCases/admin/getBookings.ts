@@ -7,5 +7,5 @@ export const fetchAllBookings = async (
     limit: number,
     search: string
 ): Promise<{ bookings: Booking[]; total: number }> => {
-    return await adminRepository.getBookings({ page, limit, search }); // Pass an object containing page, limit, and search
+    return await adminRepository.getBookings({ page, limit, search }); 
 };

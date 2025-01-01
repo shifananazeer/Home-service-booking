@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (!token) {
             navigate('/admin/login');
-            // toast.error("Please log in to access the admin dashboard.");
+          
         }
     }, [ navigate]);
 
@@ -49,19 +49,19 @@ const AdminDashboard = () => {
         <div className="flex flex-col h-screen">
             {/* Admin Navbar */}
             <AdminNavbar />
-
+    
             {/* Admin Sidebar and Main Content */}
             <div className="flex flex-1">
                 {/* Sidebar */}
                 <AdminSidebar setCurrentComponent={setCurrentComponent} />
-
+    
                 {/* Main Content */}
-                <div className="flex-1 p-6 bg-gray-100">
+                <div className="flex-1 p-6 bg-gray-100" style={{ marginLeft: "16rem", marginTop: "4rem" }}>
                     {renderComponent()}
                 </div>
             </div>
         </div>
-    );
+    )
 };
 
 export default AdminDashboard;

@@ -17,7 +17,7 @@ const HomePage = () => {
         }}
       >
        
-<div className="absolute inset-0 flex flex-col justify-center px-4 sm:px-6 lg:px-8 -ml-2"> {/* Added negative margin here */}
+<div className="absolute inset-0 flex flex-col justify-center px-4 sm:px-6 lg:px-8 -ml-2"> 
   <div className="max-w-xl mx-auto text-center sm:text-left">
     <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
       Your Trusted Partner for Home Services
