@@ -1,13 +1,15 @@
 import { Service } from "../../../domain/entities/Service";
 import { ServiceRepository } from "../../../domain/repositories/serviceRepository";
+import { ServiceRepositoryImpl } from "../../../infrastructure/database/repositories/ServiceRepositoryIml";
 import { UserRepositoryImpl } from "../../../infrastructure/database/repositories/UserRepositoryImpl";
 interface CreateServiceInput {
     name: string;
     description: string;
     image: string;
 }
+const serviceRepository = new ServiceRepositoryImpl();
 const userRepository = new UserRepositoryImpl();
-export const createdServices = async (serviceRepository: ServiceRepository,serviceData: CreateServiceInput): Promise<Service> => {  
+export const createdServices = async (serviceData: CreateServiceInput): Promise<Service> => {  
     return await serviceRepository.createService(serviceData);
 };
 

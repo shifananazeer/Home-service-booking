@@ -10,6 +10,7 @@ import { Service } from "../../domain/entities/Service";
 import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
 import { fetchAllBookings } from "../../application/useCases/admin/getBookings";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
+import { deleteServiceUseCase, updateServiceUseCase } from "../../application/useCases/getAllService";
 
 
 export const adminController =  {
@@ -66,7 +67,7 @@ export const adminController =  {
             serviceImageUrl = await uploadProfilePic(req.file);
         }
         console.log('Received data:', { name, description, image: serviceImageUrl });
-        const createdService = await createdServices(ServiceRepositoryImpl, {
+        const createdService = await createdServices( {
             name,
             description,
             image: serviceImageUrl, 
@@ -100,44 +101,39 @@ getAllServices: async(req:Request , res:Response) => {
 updateService: async(req:Request , res:Response) :Promise<void>=> {
     const serviceId = req.params.serviceId;
     const { name, description } = req.body;
-    let imageUrl: string | undefined;
 
     try {
+        let imageUrl: string | undefined;
         if (req.file) {
             imageUrl = await uploadServiceImage(req.file, req.body.currentImageUrl);
         }
-        const updateData: Partial<Service> = {
+
+        const updatedService = await updateServiceUseCase({
+            serviceId,
             name,
             description,
-            ...(imageUrl && { image: imageUrl }),
-        };
-        const updatedService = await ServiceRepositoryImpl.updateService(serviceId, updateData);
-        if (!updatedService) {
-            res.status(404).json({ message: "Service not found" });
-            return 
-        }
-         res.status(200).json({ message: "Service updated successfully", updatedService });
-         return
+            imageUrl,
+        });
+
+        res.status(200).json({ message: "Service updated successfully", updatedService });
     } catch (error: any) {
-        console.error("Error updating service:", error);
-       
-         res.status(500).json({ message: "Internal server error", error: error.message });
-         return
+        if (error.message === "Service not found") {
+            res.status(404).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "Internal server error", error: error.message });
+        }
     }
 },
 
 deleteService : async (req:Request , res:Response) : Promise<void> => {
-    const {serviceId} = req.params;
+    const { serviceId } = req.params;
+
     try {
-        await ServiceRepositoryImpl.deleteService(serviceId);
-      
+        await deleteServiceUseCase(serviceId);
         res.status(200).json({ message: "Service deleted successfully." });
-        return 
     } catch (error: any) {
-        console.error("Error deleting service:", error);
+        console.error("Error deleting service:", error.message);
         res.status(500).json({ error: "Error deleting service." });
-    
-        return 
     }
 },
 

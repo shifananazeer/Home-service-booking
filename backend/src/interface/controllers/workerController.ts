@@ -21,6 +21,7 @@ import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
 import { fetchTodaysBookings, getBookingsByWorkerId, singleWorker, workerService } from '../../application/useCases/worker/workerService';
 import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
+import { getAllServicesUseCase } from '../../application/useCases/getAllService';
 
 
 export const workerController  = {
@@ -357,38 +358,20 @@ export const workerController  = {
                 }
             },
 
-            getServices: async (req: Request, res: Response):Promise<void> => {
+            getServices: async (req: Request, res: Response): Promise<void> => {
                 console.log("Fetching all services...");
                 try {
-                    const services = await ServiceRepositoryImpl.getAllServices();
-                    if (!services) { 
-                         res.status(200).json({
-                            success: true,
-                            services: [],
-                            message: 'No services found',
-                        });
-                        return
-                    }
-            
-                    if (services.length === 0) {
-                         res.status(200).json({
-                            success: true,
-                            services: [],
-                            message: 'No services available',
-                            
-                        });
-                        return
-                    }
-                    res.status(200).json({ success: true, services });
+                    const result = await getAllServicesUseCase();
+                    res.status(200).json(result);
                 } catch (error: any) {
-                    console.error('Error fetching services:', error.message);
                     res.status(500).json({
                         success: false,
-                        message: 'Failed to fetch services',
+                        message: "Failed to fetch services",
                         error: error.message,
                     });
                 }
             },
+    
 
             findWorkerBySkills: async (req: Request, res: Response): Promise<void> => {
                 const skill = req.query.skill as string; 
