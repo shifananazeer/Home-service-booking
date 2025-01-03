@@ -62,6 +62,21 @@ class BookingRepositoryImpl implements BookingRepository {
             },
         });
     }
+
+    async getAllBookings(params: { page: number; limit: number; search: string }): Promise<{ bookings: Booking[]; total: number }> {
+        const { page, limit, search } = params;
+    
+        const skip = (page - 1) * limit; 
+        const query = search ? { bookingId: { $regex: search, $options: 'i' } } : {};
+        const total = await BookingModel.countDocuments(query);
+        const bookings = await BookingModel.find(query)
+            .populate('userId', 'name email') 
+            .sort({ createdAt: -1 }) 
+            .skip(skip)
+            .limit(limit); 
+    
+        return { bookings, total };
+    }
 }
 
 export default new BookingRepositoryImpl();

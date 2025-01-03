@@ -1,9 +1,10 @@
 import { UserRepository } from "../../domain/repositories/userRepository";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
+const userRepository = new UserRepositoryImpl();
 export const loginUser = async (
-    userRepository: UserRepository,
+   
     email: string,
     password: string
 ): Promise<{ accessToken: string; refreshToken: string; userId: string }> => {

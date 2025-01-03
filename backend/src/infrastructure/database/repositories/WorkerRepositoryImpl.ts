@@ -46,7 +46,11 @@ export const WorkerRepositoryImpl: WorkerRepository = {
         const worker = await WorkerModel.findOne({ workerId }); 
         return worker; 
       },
-  
+      async findAllWorkers (skip: number, limit: number, search: string) : Promise<Worker[] | null> {
+        const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+        const workers = await WorkerModel.find(query).skip(skip).limit(limit);
+        return workers;
+    },
     
       
 }

@@ -12,4 +12,5 @@ export interface UserRepository {
     updateUserProfile(userEmail: string, updates: Partial<User>): Promise<User | null>;
      findServices(skip: number , limit:number , search:string):Promise<Service[]|null>;
      countServices(search: string): Promise<number>;
+     findAllUsers(skip: number, limit: number, search: string): Promise<User[] | null>;
 }

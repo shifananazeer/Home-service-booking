@@ -27,7 +27,7 @@ const addressRepository = new AddressRepositoryImpl();
 export const userController = {
     register: async (req: Request, res: Response) => {
         try {
-          const user = await registerUser(UserRepositoryImpl, req.body);
+          const user = await registerUser( req.body);
           await generateOtp(user.email,1);
           res
             .status(200)
@@ -40,7 +40,6 @@ export const userController = {
         console.log('Login request received:', req.body);
         try {
             const { accessToken, refreshToken ,userId } = await loginUser(
-                UserRepositoryImpl,
                 req.body.email,
                 req.body.password
             );
@@ -413,7 +412,6 @@ export const userController = {
     const { page = 1, limit = 10, search = '' } = req.query;  
     try{
         const {services , totalServices} = await allServices(
-        UserRepositoryImpl,
         parseInt(page as string), 
         parseInt(limit as string), 
         search as string

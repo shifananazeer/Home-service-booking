@@ -1,8 +1,9 @@
-import { AdminRepository } from "../../../domain/repositories/adminRepository";
-import { Worker } from "../../../domain/entities/worker";
 
-export const getWorkers = async(adminRepository:AdminRepository,page: number, limit: number, search: string): Promise<Worker[]|null> => {
+import { Worker } from "../../../domain/entities/worker";
+import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl";
+
+export const getWorkers = async(page: number, limit: number, search: string): Promise<Worker[]|null> => {
     const skip = (page - 1) * limit;
-    let workers = adminRepository.findWorkers(skip, limit, search)
+    let workers = WorkerRepositoryImpl.findAllWorkers(skip, limit, search)
     return workers;
 }

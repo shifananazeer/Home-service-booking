@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcryptjs";
-import { AdminRepository } from '../../domain/repositories/adminRepository';
 import { UserRepository } from '../../domain/repositories/userRepository';
-
+import { UserRepositoryImpl } from '../../infrastructure/database/repositories/UserRepositoryImpl';
+const userRepository = new UserRepositoryImpl();
 export const loginAdmin = async (
-    userRepository: UserRepository,
+   
     email: string,
     password: string
 ): Promise<{ accessToken: string; refreshToken: string; adminId: string }> => {

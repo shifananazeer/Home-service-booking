@@ -1,6 +1,5 @@
 import { Request,Response } from "express";
-import {loginAdmin}  from '../../application/useCases/loginAdmin'
-import { AdminRepositoryImpl } from "../../infrastructure/database/repositories/AdminRepositoryIml";
+import {loginAdmin}  from '../../application/useCases/loginAdmin';
 import { getUsers } from '../../application/useCases/admin/getUsers'
 import { getWorkers } from "../../application/useCases/admin/getWorkers";
 import { uploadProfilePic } from "../../utils/s3Servise";
@@ -18,7 +17,7 @@ export const adminController =  {
     console.log("body",req.body)
    try{
     const {email, password} = req.body
-    const { accessToken, refreshToken , adminId}= await loginAdmin(UserRepositoryImpl , email , password)
+    const { accessToken, refreshToken , adminId}= await loginAdmin( email , password)
     res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
     res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
     res.status(200).json({
@@ -35,7 +34,7 @@ export const adminController =  {
     const { page = 1, limit = 10, search = '' } = req.query;
 
     try {
-        const users = await getUsers(AdminRepositoryImpl, parseInt(page as string), parseInt(limit as string), search as string);
+        const users = await getUsers( parseInt(page as string), parseInt(limit as string), search as string);
         console.log(users);
         res.status(200).json({ users });
     } catch (error: any) {
@@ -45,7 +44,7 @@ export const adminController =  {
  getWorker: async (req:Request , res:Response) => {
     const { page = 1, limit = 10, search = '' } = req.query;
     try{
-        const workers = await getWorkers(AdminRepositoryImpl, parseInt(page as string), parseInt(limit as string), search as string);
+        const workers = await getWorkers(parseInt(page as string), parseInt(limit as string), search as string);
         console.log(workers);
         res.status(200).json({workers})
     }catch (error :any) {
@@ -84,7 +83,7 @@ getAllServices: async(req:Request , res:Response) => {
     const { page = 1, limit = 10, search = '' } = req.query;
     try {
         const { services, totalServices } = await allServices(
-            AdminRepositoryImpl, 
+        
             parseInt(page as string), 
             parseInt(limit as string), 
             search as string
@@ -149,7 +148,7 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
     const search = req.query.search as string || '';
 
     try {
-        const { bookings, total } = await fetchAllBookings(AdminRepositoryImpl, page, limit, search);
+        const { bookings, total } = await fetchAllBookings( page, limit, search);
         res.status(200).json({
             message: "Bookings retrieved successfully",
             bookings,
