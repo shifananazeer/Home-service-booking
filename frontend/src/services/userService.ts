@@ -222,3 +222,23 @@ export const fetchBookigs = async (userId: string) => {
     const response = await axiosInstance.post(`/auth/cancelBooking/${bookingId}`)
     return response.data;
   }
+
+  export const fetchServices = async (page = 1, limit = 5, search = '') => {
+  
+    try {
+      const response = await axiosInstance.get('/auth/services', {
+        params: {
+          page,
+          limit,
+          search,
+        },
+       
+      });
+  
+      // Return both services and totalServices
+      const { services, totalServices } = response.data;
+      return { services, totalServices };
+    } catch (error:any) {
+      throw new Error('Failed to fetch services: ' + error.message);
+    }
+  };

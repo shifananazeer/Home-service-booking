@@ -7,7 +7,7 @@ import { validateOtp } from '../../application/useCases/validateOTP';
 import { loginWorker } from '../../application/useCases/loginWorker';
 import { resetPassword, sendResetLink } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
-import { upadteAddress, userAddress } from '../../application/useCases/user/updateAddress';
+import { updateAddress, updateLocation, userAddress } from '../../application/useCases/user/updateAddress';
 import { workerProfile } from '../../application/useCases/worker/workerProfil';
 import { uploadProfilePic } from '../../utils/s3Servise';
 import { updateWorkerProfile } from '../../application/useCases/worker/updateWorkerProfile';
@@ -223,7 +223,7 @@ export const workerController  = {
                     };
             
                     const updatedWorker = await updateWorkerProfile(worker.email, updates);
-                    const workerAddress = await upadteAddress(worker._id.toString(), address, area);
+                    const workerAddress = await updateAddress(worker._id.toString(), address, area);
             
                     res.status(200).json({ worker: updatedWorker, address: workerAddress });
                 } catch (error) {
@@ -410,20 +410,21 @@ export const workerController  = {
             },
 
           updateLocation:async (req:Request , res:Response) : Promise<void> => {
-            const { latitude, longitude ,workerId } = req.body;
-           try{
-            const response = await AddressRepositoryImpl.updateLocation(latitude , longitude ,workerId)
-            if (!response) {
-                res.status(404).json({ message: "Address not found for the given workerId." });
-                return;
+            const { latitude, longitude, workerId } = req.body;
+
+            try {
+                const result = await updateLocation(workerId, latitude, longitude);
+                
+                if (!result.success) {
+                    res.status(404).json({ message: result.message });
+                    return;
+                }
+                
+                res.status(200).json({ message: result.message, data: result.updatedAddress });
+            } catch (error: any) {
+                console.error("Error updating coordinates:", error);
+                res.status(500).json({ message: "Failed to update coordinates in the database.", error: error.message });
             }
-            res.status(200).json({ message: "Coordinates updated successfully.", data: response });
-            return
-           }catch (error:any) {
-            console.error("Error updating coordinates:", error);
-            res.status(500).json({ message: "Failed to update coordinates in the database.", error: error.message });
-            return
-           }
           }  ,
           allBookingsByworkerId: async (req:Request , res:Response) :Promise<void> =>{
             const { page, limit } = req.query;

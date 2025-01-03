@@ -4,6 +4,7 @@ import {Booking} from  '../../../domain/entities/Booking'
 import bookingRepository from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/repositories/AddressRepositoryIml";
 import { Address } from "../../../domain/entities/Address";
+const addressRepository = new AddressRepositoryImpl();
 
 export const workerService = async (skill: string | undefined): Promise<Worker[]> => { 
     if (!skill) {
@@ -47,8 +48,9 @@ interface AddressResponse {
 }
 
 export const singleWorker = async (workerId:string) :Promise<AddressResponse>  => {
-     const address: Address | null = await AddressRepositoryImpl.findAddressByWorkerId(workerId);
-     if (!address) {
+    const address: Address | null = await addressRepository.findAddressByWorkerId(workerId);
+
+    if (!address) {
         return {
             message: "User doesn't have an address",
         };

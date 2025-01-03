@@ -10,6 +10,7 @@ import { Admin } from "../../../domain/entities/Admin";
 import { Booking } from "../../../domain/entities/Booking";
 import BookingModel from "../models/bookingModel";
 export const AdminRepositoryImpl: AdminRepository = {
+    
     async findUsers(skip: number, limit: number, search: string): Promise<User[] | null> {
         const query = search ? { firstName: { $regex: search, $options: 'i' } } : {};
         const users = await UserModel.find(query).skip(skip).limit(limit);

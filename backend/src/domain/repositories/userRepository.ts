@@ -1,3 +1,4 @@
+import { Service } from "../entities/Service";
 import { User } from "../entities/User";
 
 export interface UserRepository {
@@ -9,4 +10,6 @@ export interface UserRepository {
     setVerifiedFalse(email: string): Promise<void>;
     updateBlockStatus(userId: string, isBlocked: boolean): Promise<User | null>; 
     updateUserProfile(userEmail: string, updates: Partial<User>): Promise<User | null>;
+     findServices(skip: number , limit:number , search:string):Promise<Service[]|null>;
+     countServices(search: string): Promise<number>;
 }

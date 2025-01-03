@@ -14,14 +14,16 @@ import { userProfile } from "../../application/useCases/user/userProfile";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 import { updateUserProfile } from "../../application/useCases/user/updateUserProfile";
 import { uploadProfilePic } from "../../utils/s3Servise";
-import { upadteAddress, userAddress } from "../../application/useCases/user/updateAddress";
-import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
+import { updateAddress, userAddress } from "../../application/useCases/user/updateAddress";
+
 import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
 import { Booking } from "../../domain/entities/Booking";
 import { bookingCancelUpdate, createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
 import { getWorkers } from "../../application/useCases/admin/getWorkers";
 import { getWorker } from "../../application/useCases/user/getWorkerDetails";
-
+import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
+import { allServices } from "../../application/useCases/user/serviceDisplay";
+const addressRepository = new AddressRepositoryImpl();
 export const userController = {
     register: async (req: Request, res: Response) => {
         try {
@@ -290,7 +292,7 @@ export const userController = {
         const updatedUser = await updateUserProfile(user.email, updates);
 
 
-        const userAddress = await upadteAddress(user._id.toString(), address,area);
+        const userAddress = await updateAddress(user._id.toString(), address,area);
 
         
         res.status(200).json({ user: updatedUser ,address: userAddress });
@@ -300,6 +302,7 @@ export const userController = {
      }
         
     },
+    
     getAddress : async (req:Request , res:Response):Promise<void> => {
     const userId =  req.params.userId
     console.log("id.",userId)
@@ -308,10 +311,11 @@ export const userController = {
       }
     
      
-    const userAddress = await AddressRepositoryImpl.findAddressByUserId(userId)
+    const userAddress = await addressRepository.findAddressByUserId(userId)
     console.log("aaaaaaaaa",userAddress)
     res.status(200).json({  userAddress })
     },
+
     availableSlots : async (req:Request , res:Response) : Promise <void> => {
         const { workerId, date } = req.query;
         console.log("dd",date)
@@ -403,6 +407,24 @@ export const userController = {
             success: false,
             message: "Something went wrong while cancelling the booking",
         });
+    }
+ },
+ getServices : async (req:Request , res:Response) => {
+    const { page = 1, limit = 10, search = '' } = req.query;  
+    try{
+        const {services , totalServices} = await allServices(
+        UserRepositoryImpl,
+        parseInt(page as string), 
+        parseInt(limit as string), 
+        search as string
+        );
+        res.status(200).json({ 
+            services, 
+            totalServices 
+        });
+
+    }catch (error:any) {
+        res.status(400).json({ message: error.message });
     }
  }
 }

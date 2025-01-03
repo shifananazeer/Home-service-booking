@@ -1,6 +1,8 @@
 
+import { Service } from "../../../domain/entities/Service";
 import { User } from "../../../domain/entities/User";
 import { UserRepository } from "../../../domain/repositories/userRepository";
+import ServiceModel from "../models/serviceModel";
 import UserModel, { UserDocument } from "../models/userModels"; 
 
 export const UserRepositoryImpl: UserRepository = {
@@ -48,4 +50,15 @@ export const UserRepositoryImpl: UserRepository = {
             { new: true } 
         );
     },
+
+  async findServices(skip: number, limit:number,search:string):Promise<Service[]|null> {
+      const query = search ? { name: { $regex: search, $options: 'i' } } : {};
+      const services = await ServiceModel.find(query).skip(skip) .limit(limit);
+      return services;
+  },
+  async countServices(search: string): Promise<number> {
+      return await ServiceModel.countDocuments({
+          name: { $regex: search, $options: "i" }, 
+      });
+  },
 };

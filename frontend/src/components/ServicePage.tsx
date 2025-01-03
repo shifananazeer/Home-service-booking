@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { fetchService } from '../services/workerService'
-import { fetchServices } from '../services/adminService'
+
 import { useNavigate } from 'react-router-dom'
 import { FaUserTie } from 'react-icons/fa'
+import { fetchServices } from '../services/userService'
 
 interface Service {
   _id: string
