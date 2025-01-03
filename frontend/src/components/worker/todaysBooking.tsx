@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { todaysBooking } from '../../services/workerService'
+import { markBookingAsCompleted, todaysBooking } from '../../services/workerService'
 import { refreshAccessToken } from '../../utils/auth'
 import { useNavigate } from 'react-router-dom'
 
@@ -67,6 +67,21 @@ export default function WorkerTodayBookings() {
     fetchTodayBookings()
   }, [])
 
+
+  const markAsCompleted = async(bookingId:string) => {
+    try {
+      const updatedBooking = await markBookingAsCompleted(bookingId);
+  
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) =>
+          booking._id === bookingId ? { ...booking, paymentStatus: "Completed" } : booking
+        )
+      );
+    } catch (error) {
+      console.error("Failed to mark as completed:", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -112,6 +127,16 @@ export default function WorkerTodayBookings() {
               }`}>
                 Status: {booking.paymentStatus}
               </p>
+
+              {booking.paymentStatus !== "Completed" && (
+  <button
+    onClick={() => markAsCompleted(booking._id)}
+    className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition"
+  >
+    Mark as Completed
+  </button>
+)}
+
             </div>
           ))}
         </div>

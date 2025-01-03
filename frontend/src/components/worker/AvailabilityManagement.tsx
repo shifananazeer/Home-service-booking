@@ -110,6 +110,7 @@ refresh();
             return;
         }
         const { data, pagination }  = await fetchAvailabilitySlots(workerId, page, 5); 
+        console.log("dddd",data)
         if (data && pagination) {
           const now = moment();
           const validSlots = data.filter((availability: AvailabilityWithSlots) =>
@@ -257,25 +258,31 @@ refresh();
               availability.slots.map((slot) => (
                 <li
                   key={slot.slotId}
-                  className="flex justify-between items-center px-6 py-4 bg-gray-700 rounded-md transition duration-300 ease-in-out hover:bg-gray-600"
+                  className={`flex justify-between items-center px-6 py-4 ${
+                    slot.isAvailable
+                      ? "bg-gray-700 hover:bg-gray-600"
+                      : "bg-red-400 cursor-not-allowed"
+                  } rounded-md transition duration-300 ease-in-out`}
                 >
                   <span className="text-lg">
                     {formatDate(availability.date)}: {slot.startTime} - {slot.endTime}
                   </span>
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => handleEditSlot(slot.slotId)}
-                      className="text-blue-400 hover:text-blue-300 transition duration-300 ease-in-out"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSlot(slot.slotId)}
-                      className="text-red-400 hover:text-red-300 transition duration-300 ease-in-out"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  {slot.isAvailable && (
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => handleEditSlot(slot.slotId)}
+                  className="text-blue-400 hover:text-blue-300 transition duration-300 ease-in-out"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteSlot(slot.slotId)}
+                  className="text-red-400 hover:text-red-300 transition duration-300 ease-in-out"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
                 </li>
               ))
             )}

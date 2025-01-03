@@ -10,8 +10,8 @@ const AdminNavbar = () => {
     const handleLogout = () => {
         dispatch(logout()); 
       localStorage.removeItem('admin_Id')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('accessToken')
+      localStorage.removeItem('admin_refreshToken')
+      localStorage.removeItem('admin_accessToken')
                navigate('/admin/login');
         console.log("Logging out...");
     };

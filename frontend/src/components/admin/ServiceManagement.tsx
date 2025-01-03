@@ -3,6 +3,8 @@ import { PencilIcon, TrashIcon, PlusIcon } from "lucide-react";
 import { createService, fetchServices, updateService, deleteService } from "../../services/adminService";
 import ServiceModal from "./ServiceModel";
 import Swal from 'sweetalert2';
+import { useNavigate } from "react-router-dom";
+import { refreshAccessToken } from "../../utils/adminAthendication";
 
 export interface Service {
     _id?: string;
@@ -21,10 +23,30 @@ export default function ServiceManagement() {
     const [limit] = useState<number>(5);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
-
+    const navigate = useNavigate()
     useEffect(() => {
         const loadServices = async () => {
+            const refreshToken = localStorage.getItem('admin_refreshToken');
+            const token = localStorage.getItem('admin_accessToken')
             try {
+
+                 if(!token){
+                
+                                 if (refreshToken) {
+                                                              const newAccessToken = await refreshAccessToken();
+                                                              if (!newAccessToken) {
+                                                                console.log('Failed to refresh token, redirecting to login...');
+                                                                navigate('/admin/login');
+                                                                return;
+                                                              }
+                                                            } else {
+                                                              console.log('No refresh token found, redirecting to login...');
+                                                              navigate('/admin/login');
+                                                              return;
+                                                            }
+                
+                                                        }
+
                 setLoading(true);
                 const data = await fetchServices(currentPage, limit, searchQuery);
                 console.log("page................",currentPage , limit)
@@ -64,26 +86,43 @@ export default function ServiceManagement() {
     };
 
     const handleSubmit = async (formData: FormData) => {
-      try {
-          if (selectedService && selectedService.image) {
-              formData.append("image", selectedService.image);
-          }
-          if (selectedService) {
-              await updateService(selectedService._id!, formData);
-          } else {
-              await createService(formData);
-          }
-          const data = await fetchServices(currentPage, limit, searchQuery);
-          setServices(data.services || []);
-          setTotalPages(data.totalServices || 1);
-      } catch (error) {
-          console.error("Error saving service:", error);
-          setError("Failed to save service. Please try again.");
-      } finally {
-          handleCloseModal(); 
-      }
-  };
-
+        const name = formData.get('name') as string; 
+        const description = formData.get('description') as string;
+        const imageFile = formData.get('image') as File; // Assuming you're getting the image file directly from the formData
+        
+        console.log("Name:", name, "Description:", description, "Image:", imageFile);
+        
+        if (!name || !description || !imageFile) {
+            Swal.fire({
+                title: 'Validation Error',
+                text: 'Please fill in all fields: name, description, and image.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return; 
+        }
+    
+        try {
+            // If updating, append the existing image if it's not changed
+            if (selectedService && !imageFile) {
+                // Use the existing image if none is provided
+                formData.append("image", selectedService.image);
+            }
+            if (selectedService) {
+                await updateService(selectedService._id!, formData);
+            } else {
+                await createService(formData);
+            }
+            const data = await fetchServices(currentPage, limit, searchQuery);
+            setServices(data.services || []);
+            setTotalPages(data.totalServices || 1);
+        } catch (error) {
+            console.error("Error saving service:", error);
+            setError("Failed to save service. Please try again.");
+        } finally {
+            handleCloseModal(); 
+        }
+    };
 const handleDelete = async (serviceId: string) => {
     const result = await Swal.fire({
         title: 'Are you sure?',

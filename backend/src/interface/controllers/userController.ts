@@ -173,7 +173,8 @@ export const userController = {
             return;
         }
         try {
-            const accessToken = await refreshAccessToken(refreshToken);
+            const type = 'user'
+            const accessToken = await refreshAccessToken(refreshToken , type);
             res.status(200).json({ accessToken });
         } catch (error: any) {
             console.error("Error refreshing access token:", error.message);

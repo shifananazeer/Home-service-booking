@@ -87,6 +87,7 @@ const workerSlice = createSlice({
             localStorage.removeItem('accessToken'); 
             localStorage.removeItem('refreshToken'); 
             localStorage.removeItem('workerId')
+            localStorage.removeItem('email')
         },
     },
 });

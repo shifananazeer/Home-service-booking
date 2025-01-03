@@ -2,34 +2,49 @@ import { UserRepository } from "../../domain/repositories/userRepository";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const loginUser=async (
+export const loginUser = async (
     userRepository: UserRepository,
-     email:string, password:string
-    ) : Promise<{ accessToken: string; refreshToken: string  , userId : string}> => {
+    email: string,
+    password: string
+): Promise<{ accessToken: string; refreshToken: string; userId: string }> => {
+    // Check if the user exists
+    const user = await userRepository.findByEmail(email);
 
-    const user = await userRepository.findByEmail(email)
+    if (!user) {
+        throw new Error("Invalid email or password");
+    }
 
-    if(user?.isBlocked) throw new Error ('You are Blocked by Admin . please contact Admin')
-    if(!user) throw new Error("Invalid Email or Password")
+    // Check if the user is blocked
+    if (user.isBlocked) {
+        throw new Error("You are blocked by the admin. Please contact support.");
+    }
 
-    const isPasswordValid=await bcrypt.compare(password,user.password)
-    if(!isPasswordValid) throw new Error("Invalid Password")
+    // Validate the password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new Error("Invalid email or password");
+    }
 
-       // Generate Access Token
-  const accessToken = jwt.sign(
-    { email: user.email, role: user.role },
-    process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: "15m" } 
-  );
+    // Generate Access Token
+    const accessToken = jwt.sign(
+        { sub: user._id, email: user.email, role: user.role },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        { expiresIn: "15m" } // Adjust expiration time as needed
+    );
 
-  // Generate Refresh Token
-  const refreshToken = jwt.sign(
-    { email: user.email , role :user.role },
-    process.env.REFRESH_TOKEN_SECRET as string,
-    { expiresIn: "7d" } 
-  );
+    // Generate Refresh Token
+    const refreshToken = jwt.sign(
+        { sub: user._id, email: user.email, role: user.role },
+        process.env.REFRESH_TOKEN_SECRET as string,
+        { expiresIn: "7d" } // Adjust expiration time as needed
+    );
 
-  console.log("userId.................." , user._id)
+    // Log user ID for debugging
+    console.log("User ID:", user._id);
 
-  return { accessToken, refreshToken ,userId: user._id.toString()  };
-}
+    return {
+        accessToken,
+        refreshToken,
+        userId: user._id.toString(), // Ensure ID is returned as a string
+    };
+};

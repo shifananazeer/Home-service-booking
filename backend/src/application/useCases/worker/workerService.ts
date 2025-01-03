@@ -1,7 +1,7 @@
 import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl";
 import { Worker } from "../../../domain/entities/worker";
 import {Booking} from  '../../../domain/entities/Booking'
-import { BookingRepositoryImpl } from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
+import bookingRepository from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/repositories/AddressRepositoryIml";
 import { Address } from "../../../domain/entities/Address";
 
@@ -22,9 +22,9 @@ export const workerService = async (skill: string | undefined): Promise<Worker[]
 
 export const getBookingsByWorkerId = async (workerId: string, page: number , limit: number ): Promise<{ bookings: Booking[], total: number }> => {
  
-    const bookings = await BookingRepositoryImpl.findBookingsByWorkerId(workerId, page, limit);
+    const bookings = await bookingRepository.findBookingsByWorkerId(workerId, page, limit);
   
-    const totalBookings = await BookingRepositoryImpl.countBookingsByWorkerId(workerId);
+    const totalBookings = await bookingRepository.countBookingsByWorkerId(workerId);
     
     return {
         bookings,
@@ -72,7 +72,7 @@ export const fetchTodaysBookings = async (workerId:string) : Promise<Booking[]|[
         throw new Error('Worker ID is required');
       }
     
-      const bookings = await BookingRepositoryImpl.getTodaysBookingsByWorker(workerId);
+      const bookings = await bookingRepository.getTodaysBookingsByWorker(workerId);
     
       return bookings||[];
 }

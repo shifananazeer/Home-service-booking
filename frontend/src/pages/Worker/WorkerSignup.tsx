@@ -74,21 +74,23 @@ const WorkerSignup: React.FC = () => {
         dispatch(signupStart());
         try {
             const response = await registerWorker(formData); 
+            console.log("dddd",response)
+            localStorage.setItem('email', formData.email);
             dispatch(signupSuccess());
             toast.success('Worker registered successfully');
             navigate('/worker/verify-otp');
         } catch (error: any) {
             console.error('Registration error:', error); 
             dispatch(signupFail(error.message || 'Registration failed'));
-            toast.error('Registration failed'); 
+            toast.error(error); 
         }
     };
 
     return (
         <div className="items-center max-w-md mx-auto mt-10 p-4 border rounded-lg shadow-lg justify-center">
             <h2 className="text-lg font-bold mb-4">Sign Up as Worker</h2>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            {success && <p className="text-green-500 mb-4">Signup successful! Redirecting...</p>}
+            {/* {error && <p className="text-red-500 mb-4">{error}</p>}
+            {success && <p className="text-green-500 mb-4">Signup successful! Redirecting...</p>} */}
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label className="block mb-2" htmlFor="name">Name</label>

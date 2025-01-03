@@ -11,7 +11,7 @@ const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const token = localStorage.getItem('user_Id')
+    const token = localStorage.getItem('accessToken')
     useEffect(()=> {
         if(token) {
       navigate('/')

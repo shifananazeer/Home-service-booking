@@ -1,9 +1,10 @@
 import { Booking } from "../../../domain/entities/Booking";
-import { BookingRepositoryImpl } from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
+import  bookingRepository  from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
+
 
 export const createBookings = async (bookingDetails: Booking): Promise<Booking |null> => {
     try {
-        const createdBooking = await BookingRepositoryImpl.bookingDetailsUpdate(bookingDetails);
+        const createdBooking = await bookingRepository.bookingDetailsUpdate(bookingDetails);
         return createdBooking; 
     } catch (error) {
         console.error('Error creating booking:', error);
@@ -13,7 +14,7 @@ export const createBookings = async (bookingDetails: Booking): Promise<Booking |
 
 export const   getBookingsByUserId = async (userId:string) => {
     try{
-        const getBookingsDeatils = await BookingRepositoryImpl.getBookingsForUser(userId)
+        const getBookingsDeatils = await bookingRepository.getBookingsForUser(userId)
         return getBookingsDeatils;
     }catch(error) {
         console.error('Error fetching bookings:', error);
@@ -23,7 +24,7 @@ export const   getBookingsByUserId = async (userId:string) => {
 
 export const bookingCancelUpdate = async (bookingId: string): Promise<Booking | null> => {
     try {
-        const updateBooking = await BookingRepositoryImpl.cancelUpdate(bookingId);
+        const updateBooking = await bookingRepository.cancelUpdate(bookingId);
         return updateBooking;
     } catch (error) {
         console.error("Error updating booking status:", error);

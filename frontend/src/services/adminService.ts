@@ -7,12 +7,16 @@ export const adminLogin = async (credentials: { email: string; password: string 
     try {
         const response = await axiosInstance.post('/admin/login', credentials); 
         console.log("response",response)
-        const refresToken = response.data.refresh_token; 
+        const refresToken = response.data.refreshToken; 
         const accessToken = response.data.accessToken
         const adminId = response.data.adminId
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken',refresToken)
+        localStorage.setItem('admin_accessToken', accessToken);
+        localStorage.setItem('admin_refreshToken',refresToken)
         localStorage.setItem('admin_Id' , adminId)
+        const acc = localStorage.getItem('admin_accessToken')
+        const rfre = localStorage.getItem('admin_refreshToken')
+        console.log("acc",acc)
+        console.log("rfre",rfre)
         return response;
     } catch (error: any) {
         errorHandler(error);
@@ -21,13 +25,17 @@ export const adminLogin = async (credentials: { email: string; password: string 
 };
 
 export const fetchUsers = async (page = 1, limit = 10, search = '') => {
-    
+    const token = localStorage.getItem('admin_accessToken');
     try {
         const response = await axiosInstance.get('/admin/get-users',{
             params: {
                 page,
                 limit,
                 search,
+            },
+            headers: {
+             
+                'Authorization': `Bearer ${token}`, 
             },
         });
         console.log("respo", response);
@@ -66,12 +74,17 @@ export const unblockUser = async (userId:string) => {
 };
 
 export const fetchWorkers = async (page = 1, limit = 10, search = '') => {
+    const token = localStorage.getItem('admin_accessToken');
     try{
     const response = await axiosInstance.get('/admin/get-workers',{
         params: {
             page,
             limit,
             search,
+        },
+        headers: {
+             
+            'Authorization': `Bearer ${token}`, 
         },
     });
         console.log("respo", response);
@@ -82,36 +95,51 @@ export const fetchWorkers = async (page = 1, limit = 10, search = '') => {
     }
 }
 
-export const blockWorker = async (workerId:string) => {
+export const blockWorker = async (workerId: string) => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
-        const response = await axiosInstance.patch(`/admin/workers/${workerId}/block`);
-        console.log('Block worker response:', response.data); 
-        return response.data; 
+        const response = await axiosInstance.patch(`/admin/workers/${workerId}/block`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        console.log('Block worker response:', response.data);
+        return response.data;
     } catch (error) {
         console.error('Error blocking worker:', error);
-        throw error; 
-    } 
-}
-export const unblockWorker = async (workerId:string) => {
-    try {
-        const response = await axiosInstance.patch(`/admin/workers/${workerId}/unblock`);
-        console.log('Unblock worker response:', response.data); 
-        console.log("unblock",response)
-        return response.data; 
-       
-    } catch (error) {
-        console.error('Error unblocking worker:', error);
-        throw error; 
-    } 
+        throw error;
+    }
 }
 
+export const unblockWorker = async (workerId: string) => {
+    const token = localStorage.getItem('admin_accessToken');
+    try {
+        const response = await axiosInstance.patch(`/admin/workers/${workerId}/unblock`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        console.log('Unblock worker response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error unblocking worker:', error);
+        throw error;
+    }
+}
+
+
 export const fetchServices = async (page = 1, limit = 5, search = '') => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
       const response = await axiosInstance.get('/admin/services', {
         params: {
           page,
           limit,
           search,
+        },
+        headers: {
+             
+            'Authorization': `Bearer ${token}`, 
         },
       });
   
@@ -132,9 +160,11 @@ export const fetchServices = async (page = 1, limit = 5, search = '') => {
 
 
   export const createService = async (formData:FormData) => {
+    const token = localStorage.getItem('admin_accessToken');
     const response = await axiosInstance.post('/admin/services', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
+             'Authorization': `Bearer ${token}`,
         }
   });
     return response.data;
@@ -151,8 +181,14 @@ export const updateService = async (serviceId: string, formData:FormData) => {
   
  
   export const deleteService = async (serviceId:string) => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
-      const response = await axiosInstance.delete(`/admin/service/delete/${serviceId}`);
+      const response = await axiosInstance.delete(`/admin/service/delete/${serviceId}`,{
+        headers: {
+             
+            'Authorization': `Bearer ${token}`, 
+        },
+      });
       return response.data; 
     } catch (error) {
       throw error; 
@@ -160,12 +196,17 @@ export const updateService = async (serviceId: string, formData:FormData) => {
   };
 
   export const fetchAllBookings = async (page = 1, limit = 10, search = '') => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
         const response = await axiosInstance.get('/admin/bookings', {
             params: {
                 page,
                 limit,
                 search,
+            },
+            headers: {
+             
+                'Authorization': `Bearer ${token}`, 
             },
         });
         return response.data; // Ensure you're returning the full response data

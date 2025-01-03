@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { blockWorker, fetchWorkers, unblockWorker } from "../../services/adminService";
+import { useNavigate } from "react-router-dom";
+import { refreshAccessToken } from "../../utils/adminAthendication";
 
 
 
@@ -27,10 +29,31 @@ const WorkerManagement = () => {
      const [totalPages, setTotalPages] = useState<number>(1);
      const [searchQuery, setSearchQuery] = useState<string>('');
      const [limit] = useState<number>(10); 
+     const navigate = useNavigate()
 
     useEffect(()=> {
        const getWorkers = async () => {
+        const refreshToken = localStorage.getItem('admin_refreshToken');
+        const token = localStorage.getItem('admin_accessToken')
+        console.log("token", token)
                   try {
+                if(!token){
+              
+                               if (refreshToken) {
+                                                            const newAccessToken = await refreshAccessToken();
+                                                            if (!newAccessToken) {
+                                                              console.log('Failed to refresh token, redirecting to login...');
+                                                              navigate('/admin/login');
+                                                              return;
+                                                            }
+                                                          } else {
+                                                            console.log('No refresh token found, redirecting to login...');
+                                                            navigate('/admin/login');
+                                                            return;
+                                                          }
+              
+                                                      }
+                    
                       const workerList = await fetchWorkers(currentPage, limit, searchQuery);
                       console.log("API Response:", workerList);
                       setWorkers(workerList);

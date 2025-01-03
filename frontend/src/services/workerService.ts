@@ -57,12 +57,13 @@ export const LoginWorker = async (credentials: { email: string; password: string
 }
 
 export const WorkerVerifyOtp = async (otp:string , email:string) : Promise<any> => {
+    console.log("email:", email)
     try{
         const response = await axiosInstance.post('/workers/verify-otp', {otp , email });
         console.log('Verification Success:', response.data);
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        return response;
+        // localStorage.setItem('accessToken', response.data.accessToken);
+        // localStorage.setItem('refreshToken', response.data.refreshToken);
+        localStorage.setItem('workerId' , response.data.userId)
     }catch(error: any) {
         errorHandler(error);
         throw error;
@@ -206,11 +207,9 @@ export const  deleteAvailability  =  async (slotId:string)=> {
 };
 
 export const fetchService = async () => {
-    const token = localStorage.getItem('accessToken');
+   
 const response = await axiosInstance.get('/workers/services',{
-    headers : {
-        'Authorization':`Bearer ${token}`,
-    } 
+   
 });
 if (!response) {
     throw new Error('Failed to fetch services');
@@ -266,3 +265,9 @@ export const getWorkerLocation = async (workerId :string) => {
     });
     return response.data
   }
+
+
+  export const markBookingAsCompleted = async (bookingId: string) => {
+    const response = await axiosInstance.post("/bookings/mark-as-completed", { bookingId });
+    return response.data; 
+  };

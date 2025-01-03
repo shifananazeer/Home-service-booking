@@ -10,6 +10,7 @@ import { uploadServiceImage } from "../../utils/uploadServiseImage";
 import { Service } from "../../domain/entities/Service";
 import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
 import { fetchAllBookings } from "../../application/useCases/admin/getBookings";
+import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 
 
 export const adminController =  {
@@ -161,5 +162,27 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
             error: error.message,
         });
     }
-}
+},
+ refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
+        const { refreshToken } = req.body;
+    
+        if (!refreshToken) {
+            res.status(400).json({ error: "Refresh token is required" });
+            return;
+        }
+        try {
+            const type = 'admin'
+            const accessToken = await refreshAccessToken(refreshToken , type);
+            res.status(200).json({ accessToken });
+        } catch (error: any) {
+            console.error("Error refreshing access token:", error.message);
+            if (error.name === "TokenExpiredError") {
+                res.status(401).json({ error: "Refresh token expired. Please log in again." });
+            } else if (error.name === "JsonWebTokenError") {
+                res.status(401).json({ error: "Invalid refresh token. Please log in again." });
+            } else {
+                res.status(500).json({ error: error.message || "Internal server error" });
+            }
+        }
+    },
 }

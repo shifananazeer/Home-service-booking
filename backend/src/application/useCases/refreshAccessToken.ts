@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-export const refreshAccessToken = async (refreshToken: string): Promise<string> => {
+export const refreshAccessToken = async (refreshToken: string , type : string): Promise<string> => {
     try {
       // Verify the refresh token
       const decoded = jwt.verify(
@@ -9,7 +9,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<string> 
   
    
       const accessToken = jwt.sign(
-        { email: decoded.email, role: "user" },
+        { email: decoded.email, role: type },
         process.env.ACCESS_TOKEN_SECRET as string,
         { expiresIn: "15m" }
       );

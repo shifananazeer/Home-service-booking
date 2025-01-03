@@ -35,6 +35,8 @@ const WorkerOtp = () => {
         setIsResending(true);
         try {
             await WorkerResendOtp(email);
+            setEmail(email)
+            console.log("emai;",email)
             toast.success('OTP Resent successfully');
             setTimer(300);
         } catch (error: any) {
