@@ -22,6 +22,7 @@ import { ServiceRepositoryImpl } from '../../infrastructure/database/repositorie
 import { fetchTodaysBookings, getBookingsByWorkerId, singleWorker, workerService } from '../../application/useCases/worker/workerService';
 import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
 import { getAllServicesUseCase } from '../../application/useCases/getAllService';
+import { HttpStatus } from '../../utils/httpStatus';
 
 
 export const workerController  = {
@@ -30,13 +31,14 @@ export const workerController  = {
        const worker = await registerWorker( req.body);
        console.log("worker email" , worker.email)
        await generateOtp(worker.email , 0);
-       res.status(200).json({message: " worker OTP send to your email"})
+       res.status(HttpStatus.OK).json({message: " worker OTP send to your email"})
 
        }catch (error : any) {
-          res.status(400).json({message: error.message})
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message: error.message})
        }
 
     },
+
     validateOtp : async (req: Request , res:Response) => {
         console.log("otp body",req.body)
         try{
@@ -48,7 +50,7 @@ export const workerController  = {
         res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
 
         // Send tokens and role in the response
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
             message: 'OTP verified Successfully. You can Log in',
             valid,
             role,
@@ -59,28 +61,23 @@ export const workerController  = {
         });
         }catch (error:any) {
             console.error("Error verifying OTP:", error.message);
-           res.status(400).json({ message: error.message})
+           res.status(HttpStatus.BAD_REQUEST).json({ message: error.message})
         }
     },
+
      login : async (req: Request, res: Response) => {
         try {
-          
             const { accessToken, refreshToken , workerId} = await loginWorker( req.body.email, req.body.password);
-            
-           
             res.cookie('auth_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
-    
-          
             res.cookie('refresh_token', refreshToken, { httpOnly: true, maxAge: 604800000 }); // 7 days
-    
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 message: "You can now log in",
                 accessToken,
                 refreshToken,
                 workerId
             });
         }catch(error:any) {
-            res.status(400).json({message:error.message})
+            res.status(HttpStatus.BAD_REQUEST).json({message:error.message})
         }
     },
     resendOtp: async (req: Request, res: Response) => {
@@ -88,10 +85,10 @@ export const workerController  = {
         const { email } = req.body;
         try {
             await generateOtp(email ,0);
-            res.status(200).json({ message: 'OTP resent to your email' });
+            res.status(HttpStatus.OK).json({ message: 'OTP resent to your email' });
         } catch (error: any) {
             console.error('Error sending OTP:', error); 
-            res.status(400).json({ message: error.message || 'Failed to resend OTP' });
+            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message || 'Failed to resend OTP' });
         }
     },
 
@@ -101,16 +98,16 @@ export const workerController  = {
                 console.log("email", email)
         
                 if (!email) {
-                    res.status(400).json({ message: 'Email is required' });
+                    res.status(HttpStatus.BAD_REQUEST).json({ message: 'Email is required' });
                     return;
                 }
                 await sendResetLink(email , 0);
         
                 // Add logic to handle password reset
-                res.status(200).json({ message: 'Password reset link sent successfully.' });
+                res.status(HttpStatus.OK).json({ message: 'Password reset link sent successfully.' });
             } catch (error: any) {
                 console.error('Error in forgotPassword:', error.message);
-                res.status(500).json({ message: 'Internal server error' });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
             }
         },
 
@@ -120,14 +117,14 @@ export const workerController  = {
         
                     const isValid = await validateToken(token);
                     if (!isValid) {
-                        res.status(400).json({ message: 'Invalid token' });
+                        res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid token' });
                         return;
                     }
         
-                    res.status(200).json({ message: 'Token is valid' });
+                    res.status(HttpStatus.OK).json({ message: 'Token is valid' });
                 } catch (error: any) {
                     console.error('Error in validateResetToken:', error.message);
-                    res.status(500).json({ message: error.message });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
                 }
             },
         
@@ -138,10 +135,10 @@ export const workerController  = {
         
                     await resetPassword(token, newPassword);
         
-                    res.status(200).json({ message: 'Password reset successfully' });
+                    res.status(HttpStatus.OK).json({ message: 'Password reset successfully' });
                 } catch (error: any) {
                     console.error('Error in resetPassword:', error.message);
-                    res.status(500).json({ message: error.message });
+                    res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
                 }
             },
 
@@ -150,7 +147,7 @@ export const workerController  = {
                 try {
                     const workerEmail = (req.user as { email?: string })?.email;
                     if (!workerEmail) {
-                        res.status(404).json({ error: 'Worker email not found in request' });
+                        res.status(HttpStatus.NOT_FOUND).json({ error: 'Worker email not found in request' });
                         return;
                     }
             
@@ -161,7 +158,7 @@ export const workerController  = {
                     const { _id: workerId, name, email, phone, profilePic, expirience, status, skills , hourlyRate } = worker;
                   
                     if (!addressResponse.address) {
-                        res.status(200).json({
+                        res.status(HttpStatus.OK).json({
                             worker: {
                                 _id: workerId,
                                 name,
@@ -179,13 +176,13 @@ export const workerController  = {
                     }
             
                     const { id: addressId, userId: addressuserId, address: useraddress, area } = addressResponse.address;
-                    res.status(200).json({
+                    res.status(HttpStatus.OK).json({
                         worker: { _id: workerId, name, email, phone, expirience, skills, profilePic, hourlyRate ,status },
                         address: { id: addressId, userId: addressuserId, address: useraddress, area }
                     });
                 } catch (error) {
                     console.error('Error retrieving user profile:', error);
-                    res.status(500).json({ error: 'Internal server error' });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
                 }
             },
 
@@ -195,13 +192,13 @@ export const workerController  = {
                 try {
                     const workerEmail = (req.user as { email?: string })?.email;
                     if (!workerEmail) {
-                        res.status(404).json({ error: 'Worker email not found in request' });
+                        res.status(HttpStatus.NOT_FOUND).json({ error: 'Worker email not found in request' });
                         return;
                     }
             
                     const worker = await workerProfile(workerEmail);
                     if (!worker) {
-                        res.status(404).json({ error: "Worker not found" });
+                        res.status(HttpStatus.NOT_FOUND).json({ error: "Worker not found" });
                         return;
                     }
             
@@ -226,10 +223,10 @@ export const workerController  = {
                     const updatedWorker = await updateWorkerProfile(worker.email, updates);
                     const workerAddress = await updateAddress(worker._id.toString(), address, area);
             
-                    res.status(200).json({ worker: updatedWorker, address: workerAddress });
+                    res.status(HttpStatus.OK).json({ worker: updatedWorker, address: workerAddress });
                 } catch (error) {
                     console.error('Error updating worker profile:', error);
-                    res.status(500).json({ error: 'Failed to update worker profile' });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Failed to update worker profile' });
                 }
             },
 
@@ -244,22 +241,22 @@ export const workerController  = {
                 const utcDate = new Date(parsedDate.toUTCString());
                 const workerEmail = (req.user as { email?: string })?.email; 
                 if (!workerEmail) {
-                    res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
+                    res.status(HttpStatus.FORBIDDEN).json({ message: 'Unauthorized: Worker ID not found' });
                     return; 
                 }
                 const worker = await workerProfile(workerEmail);
                 const workerId = worker._id
                 console.log("workerId" , workerId)
                 if (!workerId) {
-                    res.status(403).json({ message: 'Unauthorized: Worker ID not found' });
+                    res.status(HttpStatus.FORBIDDEN).json({ message: 'Unauthorized: Worker ID not found' });
                     return; 
                 }
                 try {
                     const availability = await createAvailability(AvailabilityRepositoryImpl, workerId,utcDate, slots);
-                    res.status(201).json(availability);
+                    res.status(HttpStatus.CREATED).json(availability);
                 } catch (error: any) {
                     console.error("Error creating availability:", error.message);
-                    res.status(500).json({ message: error.message });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
                 }
             },
 
@@ -277,11 +274,11 @@ export const workerController  = {
                 }
                 const availabilities = await availableSlots(AvailabilityRepositoryImpl, workerId, page, limit);
                 if (!availabilities || availabilities.length === 0) {
-                    res.status(200).json({ message: "No slots available." });
+                    res.status(HttpStatus.OK).json({ message: "No slots available." });
                     return;
                 }
                 const totalCount = await AvailabilityRepositoryImpl.countAvailableSlots(workerId);
-                res.status(200).json({
+                res.status(HttpStatus.OK).json({
                     data: availabilities,
                     pagination: {
                         currentPage: page,
@@ -291,7 +288,7 @@ export const workerController  = {
                 });
             } catch (error: any) {
                 console.error("Error fetching available slots:", error);
-                res.status(500).json({ message: "An error occurred while fetching available slots.", error: error.message });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while fetching available slots.", error: error.message });
             }
     },
 
@@ -300,13 +297,13 @@ export const workerController  = {
         const { startTime, endTime, isAvailable } = req.body; 
         try {
             const updatedSlot = await updateSlot(slotId, { startTime, endTime, isAvailable }, AvailabilityRepositoryImpl);
-             res.status(200).json({
+             res.status(HttpStatus.OK).json({
                 message: 'Slot updated successfully',
                 slot: updatedSlot,
             });
             return;
         } catch (error:any) {
-             res.status(404).json({ message: error.message });
+             res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
              return;
         }
     },
@@ -317,7 +314,7 @@ export const workerController  = {
             const result = await deleteSlot(slotId);
     
          
-                res.status(200).json({ message: 'Slot deleted successfully' });
+                res.status(HttpStatus.OK).json({ message: 'Slot deleted successfully' });
                 return
           
         } catch (error) {
@@ -332,7 +329,7 @@ export const workerController  = {
         try{
             const updateWorker = await blockWorker(workerId);
             if (!updateWorker) {
-                res.status(404).json({ message: 'User not found' });
+                res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                 return;
             }
             res.json({ message: 'User blocked successfully', worker: updateWorker });
@@ -348,13 +345,13 @@ export const workerController  = {
                 try {
                     const updatedWorker = await unblockWorker(workerId);
                     if (!updatedWorker) {
-                        res.status(404).json({ message: 'User not found' });
+                        res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                         return;
                     }
                     res.json({ message: 'User unblocked successfully', worker: updatedWorker });
                 } catch (error) {
                     console.error('Error unblocking user:', error);
-                    res.status(500).json({ message: 'Server error' });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
                 }
             },
 
@@ -362,9 +359,9 @@ export const workerController  = {
                 console.log("Fetching all services...");
                 try {
                     const result = await getAllServicesUseCase();
-                    res.status(200).json(result);
+                    res.status(HttpStatus.OK).json(result);
                 } catch (error: any) {
-                    res.status(500).json({
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                         success: false,
                         message: "Failed to fetch services",
                         error: error.message,
@@ -379,11 +376,11 @@ export const workerController  = {
                 try {
                     const workers = await workerService(skill);
                     console.log("fetchWorkers",workers)
-                    res.status(200).json({ workers });
+                    res.status(HttpStatus.OK).json({ workers });
                 } catch (error: any) {
                     console.error(error);
                     if (error.message === 'Skill is required') {
-                        res.status(400).json({ error: error.message });
+                        res.status(HttpStatus.BAD_REQUEST).json({ error: error.message });
                     } else if (error.message === 'No workers found with this skill') {
                         res.status(404).json({ message: error.message });
                     } else {
@@ -399,14 +396,14 @@ export const workerController  = {
                 const result = await updateLocation(workerId, latitude, longitude);
                 
                 if (!result.success) {
-                    res.status(404).json({ message: result.message });
+                    res.status(HttpStatus.NOT_FOUND).json({ message: result.message });
                     return;
                 }
                 
-                res.status(200).json({ message: result.message, data: result.updatedAddress });
+                res.status(HttpStatus.OK).json({ message: result.message, data: result.updatedAddress });
             } catch (error: any) {
                 console.error("Error updating coordinates:", error);
-                res.status(500).json({ message: "Failed to update coordinates in the database.", error: error.message });
+                res.status(HttpStatus.OK).json({ message: "Failed to update coordinates in the database.", error: error.message });
             }
           }  ,
           allBookingsByworkerId: async (req:Request , res:Response) :Promise<void> =>{
@@ -418,20 +415,17 @@ export const workerController  = {
 
                 const parsedPage = parseInt(page as string, 10)||1;
                 const parsedLimit = parseInt(limit as string, 10)||1;
-            
-             
                 const result = await getBookingsByWorkerId(workerId, parsedPage, parsedLimit);
-        
                 if (!result.bookings || result.bookings.length === 0) {
-                    res.status(404).json({ message: 'No bookings found for this worker' });
+                    res.status(HttpStatus.NOT_FOUND).json({ message: 'No bookings found for this worker' });
                     return;
                 }
               console.log("result" , result)
          
-                res.status(200).json(result);
+                res.status(HttpStatus.OK).json(result);
             } catch (error) {
                 console.error('Error in getWorkerBookingsController:', error);
-                res.status(500).json({ message: 'Internal server error' });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
             }
           },
 
@@ -442,14 +436,14 @@ export const workerController  = {
                 const response = await singleWorker(workerId);
         
                 if (!response.address) {
-                    res.status(404).json({ message: response.message });
+                    res.status(HttpStatus.NOT_FOUND).json({ message: response.message });
                     return;
                 }
         
-                res.status(200).json(response);
+                res.status(HttpStatus.OK).json(response);
             } catch (error) {
                 console.error('Error in getWorkerLocation:', error);
-                res.status(500).json({ message: 'Internal server error' });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
             }
         },
         todaysBooking : async (req:Request , res:Response) : Promise<void> => {
@@ -457,17 +451,17 @@ export const workerController  = {
                 const workerId = req.params.workerId as string; 
                 if (!workerId) {
               
-                  res.status(400).json({ message: 'Worker ID is required' });
+                  res.status(HttpStatus.BAD_REQUEST).json({ message: 'Worker ID is required' });
                   return 
                 }
             
                 const bookings = await fetchTodaysBookings(workerId);
             
-              res.status(200).json({ bookings });
+              res.status(HttpStatus.OK).json({ bookings });
               return
               } catch (error) {
                 console.error(error);
-              res.status(500).json({ message: 'Failed to fetch bookings', error });
+              res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch bookings', error });
               return 
               }
             }

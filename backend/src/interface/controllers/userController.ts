@@ -23,6 +23,8 @@ import { getWorkers } from "../../application/useCases/admin/getWorkers";
 import { getWorker } from "../../application/useCases/user/getWorkerDetails";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
 import { allServices } from "../../application/useCases/user/serviceDisplay";
+import { HttpStatus } from "../../utils/httpStatus";
+import { HttpRequest } from "aws-sdk";
 const addressRepository = new AddressRepositoryImpl();
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -30,7 +32,7 @@ export const userController = {
           const user = await registerUser( req.body);
           await generateOtp(user.email,1);
           res
-            .status(200)
+            .status(HttpStatus.OK)
             .json({ message: "User registered. OTP sent to your email." });
         } catch (error: any) {
           res.status(400).json({ message: error.message });
@@ -48,14 +50,14 @@ export const userController = {
             // Set cookies with tokens
             res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
             res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 message: "You can now log in",
                 accessToken,
                 refreshToken,
                 userId
             });
         } catch (error: any) {
-            res.status(400).json({ message: error.message });
+            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
       },
     validateOtp: async (req: Request, res: Response) => {
@@ -63,7 +65,7 @@ export const userController = {
             const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(req.body.email, req.body.otp, 1);
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
         res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
             message: 'OTP verified Successfully. You can Log in',
             valid,
             role,
@@ -73,7 +75,7 @@ export const userController = {
         });
         } catch (error: any) {
             console.error("Error verifying OTP:", error.message);
-            res.status(400).json({ message: error.message });
+            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
     },
     resendOtp: async (req: Request, res: Response) => {
@@ -81,10 +83,10 @@ export const userController = {
         const { email } = req.body;
         try {
             await generateOtp(email ,1);
-            res.status(200).json({ message: 'OTP resent to your email' });
+            res.status(HttpStatus.OK).json({ message: 'OTP resent to your email' });
         } catch (error: any) {
             console.error('Error sending OTP:', error); 
-            res.status(400).json({ message: error.message || 'Failed to resend OTP' });
+            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message || 'Failed to resend OTP' });
         }
     },
 
@@ -93,15 +95,15 @@ export const userController = {
             const { email } = req.body;
     
             if (!email) {
-                res.status(400).json({ message: 'Email is required' });
+                res.status(HttpStatus.BAD_REQUEST).json({ message: 'Email is required' });
                 return;
             }
             await sendResetLink(email , 1);
 
-            res.status(200).json({ message: 'Password reset link sent successfully.' });
+            res.status(HttpStatus.OK).json({ message: 'Password reset link sent successfully.' });
         } catch (error: any) {
             console.error('Error in forgotPassword:', error.message);
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
         }
     },
     validateResetToken: async (req: Request, res: Response): Promise<void> => {
@@ -110,14 +112,14 @@ export const userController = {
 
             const isValid = await validateToken(token);
             if (!isValid) {
-                res.status(400).json({ message: 'Invalid token' });
+                res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid token' });
                 return;
             }
 
-            res.status(200).json({ message: 'Token is valid' });
+            res.status(HttpStatus.OK).json({ message: 'Token is valid' });
         } catch (error: any) {
             console.error('Error in validateResetToken:', error.message);
-            res.status(500).json({ message: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
     },
 
@@ -128,10 +130,10 @@ export const userController = {
 
             await resetPassword(token, newPassword);
 
-            res.status(200).json({ message: 'Password reset successfully' });
+            res.status(HttpStatus.OK).json({ message: 'Password reset successfully' });
         } catch (error: any) {
             console.error('Error in resetPassword:', error.message);
-            res.status(500).json({ message: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
     },
    
@@ -141,13 +143,13 @@ export const userController = {
         try {
             const updatedUser = await blockUser(userId);
             if (!updatedUser) {
-                res.status(404).json({ message: 'User not found' });
+                res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                 return;
             }
             res.json({ message: 'User blocked successfully', user: updatedUser });
         } catch (error) {
             console.error('Error blocking user:', error);
-            res.status(500).json({ message: 'Server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
         }
     },
 
@@ -157,59 +159,51 @@ export const userController = {
         try {
             const updatedUser = await unblockUser(userId);
             if (!updatedUser) {
-                res.status(404).json({ message: 'User not found' });
+                res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                 return;
             }
             res.json({ message: 'User unblocked successfully', user: updatedUser });
         } catch (error) {
             console.error('Error unblocking user:', error);
-            res.status(500).json({ message: 'Server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
         }
     },
     refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
         const { refreshToken } = req.body;
     
         if (!refreshToken) {
-            res.status(400).json({ error: "Refresh token is required" });
+            res.status(HttpStatus.BAD_REQUEST).json({ error: "Refresh token is required" });
             return;
         }
         try {
             const type = 'user'
             const accessToken = await refreshAccessToken(refreshToken , type);
-            res.status(200).json({ accessToken });
+            res.status(HttpStatus.OK).json({ accessToken });
         } catch (error: any) {
             console.error("Error refreshing access token:", error.message);
             if (error.name === "TokenExpiredError") {
-                res.status(401).json({ error: "Refresh token expired. Please log in again." });
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Refresh token expired. Please log in again." });
             } else if (error.name === "JsonWebTokenError") {
-                res.status(401).json({ error: "Invalid refresh token. Please log in again." });
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Invalid refresh token. Please log in again." });
             } else {
-                res.status(500).json({ error: error.message || "Internal server error" });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message || "Internal server error" });
             }
         }
     },
     getUserProfile: async (req: Request, res: Response): Promise<void> => {
         console.log("Request User:", req.user); 
-    
         try {
-          
-            const userEmail = (req.user as { email?: string })?.email; 
-    
-           
+            const userEmail = (req.user as { email?: string })?.email;
             if (!userEmail) {
-                res.status(404).json({ error: 'User email not found in request' });
+                res.status(HttpStatus.NOT_FOUND).json({ error: 'User email not found in request' });
                 return; 
             }
-    
-          
             const user = await userProfile(userEmail);
             const addressResponse = await userAddress(user._id); 
             console.log("address.............", addressResponse, "user", user);
-    
-         
             if (!addressResponse.address) {
           
-                res.status(200).json({
+                res.status(HttpStatus.OK).json({
                     user: {
                         _id: user._id,
                         firstName: user.firstName,
@@ -236,9 +230,7 @@ export const userController = {
                 address: useraddress,
                 area
             } = addressResponse.address; 
-    
-         
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 user: {
                     _id: userId,
                     firstName,
@@ -256,7 +248,7 @@ export const userController = {
             });
         } catch (error) {
             console.error('Error retrieving user profile:', error); 
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
         }
     },
 
@@ -265,39 +257,29 @@ export const userController = {
      try{
         const userEmail = (req.user as { email?: string })?.email;
         if (!userEmail) {
-            res.status(404).json({ error: 'User email not found in request' });
+            res.status(HttpStatus.NOT_FOUND).json({ error: 'User email not found in request' });
             return;
         }
         const user = await userProfile(userEmail)
         if (!user) {
-            res.status(404).json({ error: 'User not found' });
+            res.status(HttpStatus.NOT_FOUND).json({ error: 'User not found' });
             return;
         }
         const { firstName, lastName, address, area } = req.body;
         let profilePicUrl: string | undefined;
-
-     
         if (req.file) {
             profilePicUrl = await uploadProfilePic(req.file,user.profilePic);
         }
-
-       
         const updates: Partial<any> = {};
         if (firstName) updates.firstName = firstName;
         if (lastName) updates.lastName = lastName;
         if (profilePicUrl) updates.profilePic = profilePicUrl; 
-
-       
         const updatedUser = await updateUserProfile(user.email, updates);
-
-
         const userAddress = await updateAddress(user._id.toString(), address,area);
-
-        
-        res.status(200).json({ user: updatedUser ,address: userAddress });
+        res.status(HttpStatus.OK).json({ user: updatedUser ,address: userAddress });
      }catch (error:any) {
         console.error('Error updating profile:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
      }
         
     },
@@ -309,10 +291,9 @@ export const userController = {
         throw new Error('Invalid user ID format');
       }
     
-     
     const userAddress = await addressRepository.findAddressByUserId(userId)
     console.log("aaaaaaaaa",userAddress)
-    res.status(200).json({  userAddress })
+    res.status(HttpStatus.OK).json({  userAddress })
     },
 
     availableSlots : async (req:Request , res:Response) : Promise <void> => {
@@ -324,11 +305,11 @@ export const userController = {
             console.log("slots", slots);
 
             if (!slots ) {
-                res.status(404).json({ message: "No available slots for the given worker and date" });
+                res.status(HttpStatus.NOT_FOUND).json({ message: "No available slots for the given worker and date" });
                 return;
             }
 
-            res.status(200).json({ slots });
+            res.status(HttpStatus.OK).json({ slots });
         } catch (error) {
             console.error("Error fetching slots:", error);
             res.status(500).json({ message: "Failed to fetch available slots" });
@@ -356,10 +337,10 @@ export const userController = {
              bookingId: uuidv4(),
          };
         const createdBooking = await createBookings (bookingDetails);
-        res.status(201).json(createdBooking);
+        res.status(HttpStatus.CREATED).json(createdBooking);
         }catch (error) {
             console.error('Error creating booking:', error);
-            res.status(500).json({ message: 'Failed to create booking.' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create booking.' });
         }
  },
 
@@ -367,10 +348,10 @@ export const userController = {
     const {userId} = req.params;
     try{
      const bookings = await getBookingsByUserId(userId)
-     res.status(200).json({bookings})
+     res.status(HttpStatus.OK).json({bookings})
     } catch (error) {
         console.error('Error fetching bookings:', error);
-        res.status(500).json({ message: 'Failed to fetch bookings' });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch bookings' });
     }
  },
 
@@ -378,10 +359,10 @@ export const userController = {
    const { workerId } = req.params;
    try{
     const workerDetails = await getWorker(workerId)
-    res.status(200).json({workerDetails})
+    res.status(HttpStatus.OK).json({workerDetails})
    }catch(error) {
     console.error("failed to fetch worker " , error);
-    res.status(500).json({ message: 'Failed to fetch workerDetails' });
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch workerDetails' });
    }
  },
 
@@ -391,18 +372,18 @@ export const userController = {
         const updatedBooking = await bookingCancelUpdate(bookingId);
 
         if (!updatedBooking) {
-            res.status(404).json({ success: false, message: "Booking not found" });
+            res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Booking not found" });
             return;
         }
 
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
             success: true,
             message: "Booking cancelled successfully",
             data: updatedBooking,
         });
     } catch (error) {
         console.error("Error cancelling booking:", error);
-        res.status(500).json({
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong while cancelling the booking",
         });
@@ -416,13 +397,13 @@ export const userController = {
         parseInt(limit as string), 
         search as string
         );
-        res.status(200).json({ 
+        res.status(HttpStatus.OK).json({ 
             services, 
             totalServices 
         });
 
     }catch (error:any) {
-        res.status(400).json({ message: error.message });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
  }
 }
