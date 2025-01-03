@@ -8,7 +8,7 @@ import { verifyToken } from "../../utils/TokenGenerator";
 import bcrypt from 'bcryptjs';
 import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories/WorkerRepositoryImpl";
 const userRepository = new UserRepositoryImpl();
-
+const workerRepository = new WorkerRepositoryImpl();
 
 interface TokenPayload {
     email: string;
@@ -29,7 +29,7 @@ export const sendResetLink = async (email: string, personType: number): Promise<
         }
          // Worker
     } else if (personType === 0) {
-        entity = await WorkerRepositoryImpl.findByEmail(email);
+        entity = await workerRepository.findByEmail(email);
         if (!entity) {
             throw new Error('Worker not found');
         }
@@ -83,7 +83,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
     if (payload.role === 'user') {
         await userRepository.updatePassword(payload.email, hashedPassword);
     } else if (payload.role === 'worker') {
-        await WorkerRepositoryImpl.updatePassword(payload.email, hashedPassword);
+        await workerRepository.updatePassword(payload.email, hashedPassword);
     } else {
         throw new Error('Invalid role');
     }

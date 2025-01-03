@@ -5,13 +5,13 @@ import bookingRepository from "../../../infrastructure/database/repositories/Boo
 import { AddressRepositoryImpl } from "../../../infrastructure/database/repositories/AddressRepositoryIml";
 import { Address } from "../../../domain/entities/Address";
 const addressRepository = new AddressRepositoryImpl();
-
+const workerRepository = new WorkerRepositoryImpl();
 export const workerService = async (skill: string | undefined): Promise<Worker[]> => { 
     if (!skill) {
         throw new Error('Skill is required');
     }
 
-    const workers = await WorkerRepositoryImpl.findWorkersBySkill(skill);
+    const workers = await workerRepository.findWorkersBySkill(skill);
 
     if (workers.length === 0) {
         throw new Error('No workers found with this skill');

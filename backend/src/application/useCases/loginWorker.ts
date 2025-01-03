@@ -1,9 +1,10 @@
 import { WorkerRepository } from "../../domain/repositories/workerRepository";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories/WorkerRepositoryImpl";
+const workerRepository = new WorkerRepositoryImpl();
 
-
-export const loginWorker = async (workerRepository:WorkerRepository, email:string , password:string): Promise <{ accessToken: string; refreshToken: string; workerId: string }> => {
+export const loginWorker = async ( email:string , password:string): Promise <{ accessToken: string; refreshToken: string; workerId: string }> => {
     console.log("password", password)
     console.log("email", email)
     const user = await workerRepository.findByEmail(email)

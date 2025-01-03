@@ -26,7 +26,7 @@ import { AddressRepositoryImpl } from '../../infrastructure/database/repositorie
 export const workerController  = {
     signupWorker: async (req :Request , res: Response) =>{
        try{
-       const worker = await registerWorker(WorkerRepositoryImpl , req.body);
+       const worker = await registerWorker( req.body);
        console.log("worker email" , worker.email)
        await generateOtp(worker.email , 0);
        res.status(200).json({message: " worker OTP send to your email"})
@@ -64,7 +64,7 @@ export const workerController  = {
      login : async (req: Request, res: Response) => {
         try {
           
-            const { accessToken, refreshToken , workerId} = await loginWorker(WorkerRepositoryImpl, req.body.email, req.body.password);
+            const { accessToken, refreshToken , workerId} = await loginWorker( req.body.email, req.body.password);
             
            
             res.cookie('auth_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day

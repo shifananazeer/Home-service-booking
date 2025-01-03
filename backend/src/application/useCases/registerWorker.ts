@@ -1,8 +1,10 @@
 import { WorkerRepository } from "../../domain/repositories/workerRepository";
 import { Worker } from "../../domain/entities/worker";
 import bcrypt from 'bcryptjs'
+import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories/WorkerRepositoryImpl";
+const workerRepository = new WorkerRepositoryImpl();
 
-export const registerWorker = async(workerRepository : WorkerRepository , workerData:Worker): Promise<Worker> => {
+export const registerWorker = async(workerData:Worker): Promise<Worker> => {
     const existingWorker = await workerRepository.findByEmail(workerData.email)
     if(existingWorker) throw new Error ('Email already Exist')
         if (workerData.password.length < 6) {

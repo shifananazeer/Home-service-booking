@@ -1,8 +1,8 @@
 import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl"
-
+const workerRepository = new WorkerRepositoryImpl();
 export const workerProfile = async (email:string) => {
     try{
-    const worker = await WorkerRepositoryImpl.findByEmail(email);
+    const worker = await workerRepository.findByEmail(email);
     if(!worker) {
         throw new Error("Worker not found");
     }
