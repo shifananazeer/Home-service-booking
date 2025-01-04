@@ -3,16 +3,17 @@ import { AvailabilityRepository } from "../../../domain/repositories/availabilit
 import { Availability, AvailabilitySlot } from "../../../domain/entities/Availability";
 import mongoose from "mongoose";
 
+const availabilityRepository = new AvailabilityRepositoryImpl();
 
 
-export const createAvailability = async ( repository: AvailabilityRepository,workerId :string , date:Date ,slots:any[] ):Promise <Availability> => {
+export const createAvailability = async ( workerId :string , date:Date ,slots:any[] ):Promise <Availability> => {
   if(!workerId || !date || !Array.isArray(slots))  {
     throw new Error ("Invalid input data")
   }
   console.log("date")
   const workerObjectId = new mongoose.Types.ObjectId(workerId);
   const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const existingAvailability = await repository.getAvailability(workerId, normalizedDate);
+  const existingAvailability = await availabilityRepository.getAvailability(workerId, normalizedDate);
   console.log("date",date)
   console.log("existing",existingAvailability)
 
@@ -21,15 +22,15 @@ export const createAvailability = async ( repository: AvailabilityRepository,wor
     if (!existingAvailability._id) {
         throw new Error("Availability ID is missing");
       }
-    return await repository.updateAvailability(existingAvailability._id, existingAvailability.slots);
+    return await availabilityRepository.updateAvailability(existingAvailability._id, existingAvailability.slots);
   } else {
-    return await repository.createAvailability(workerObjectId.toString(),normalizedDate, slots);
+    return await availabilityRepository.createAvailability(workerObjectId.toString(),normalizedDate, slots);
   }
 }
 
 
 export const availableSlots = async (
-  availabilityRepository: AvailabilityRepository,
+
   workerId: string,
   page: number,
   limit: number
@@ -45,7 +46,7 @@ export const availableSlots = async (
 
 
 
-export const updateSlot = async (slotId: string,updateData: Partial<AvailabilitySlot>,availabilityRepository: AvailabilityRepository): Promise<AvailabilitySlot> => {
+export const updateSlot = async (slotId: string,updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> => {
     const updatedSlot = await availabilityRepository.updateSlot(slotId, updateData);
     return updatedSlot;
 };
@@ -54,7 +55,7 @@ export const deleteSlot = async(slotId:string) => {
   if (!slotId) {
     throw new Error("Slot ID is required");
     }
-const result = await AvailabilityRepositoryImpl.deleteSlot(slotId);
+const result = await availabilityRepository.deleteSlot(slotId);
 if (result === null) {
     throw new Error("Availability not found for the provided slot ID");
 }
@@ -64,7 +65,7 @@ return result;
 
 export const fetchAvailableSlots = async (workerId: string, date: Date): Promise<any[]> => {
   try {
-      const availability = await AvailabilityRepositoryImpl.getAvailableSlots(workerId, date);
+      const availability = await availabilityRepository.getAvailableSlots(workerId, date);
       return availability ? availability.slots : [];
   } catch (err) {
       console.error("Error in fetchAvailableSlots:", err);
@@ -73,5 +74,20 @@ export const fetchAvailableSlots = async (workerId: string, date: Date): Promise
 };
 
 export const updateStatusOfSlot = async (slotId:string) => {
-     await AvailabilityRepositoryImpl.updateSlotStatus(slotId)
+     await availabilityRepository.updateSlotStatus(slotId)
 }
+
+export const availableSlotsUseCase = async (workerId: string, page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+  const availabilities = await availabilityRepository.getAllAvailabilityByWorkerId(workerId, skip, limit);
+
+  const totalCount = await availabilityRepository.countAvailableSlots(workerId);
+
+  const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalCount,
+  };
+
+  return { availabilities, pagination };
+};

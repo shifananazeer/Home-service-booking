@@ -12,6 +12,7 @@ import { fetchAllBookings } from "../../application/useCases/admin/getBookings";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 import { deleteServiceUseCase, updateServiceUseCase } from "../../application/useCases/getAllService";
 import { HttpStatus } from "../../utils/httpStatus";
+import { Messages } from "../../utils/message";
 
 
 export const adminController =  {
@@ -23,7 +24,7 @@ export const adminController =  {
     res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
     res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
     res.status(HttpStatus.OK).json({
-        message: "You can now log in",
+        message: Messages.LOGIN,
         accessToken,
         refreshToken,
         adminId,
@@ -60,7 +61,7 @@ export const adminController =  {
         console.log('Received body:', req.body);
         console.log('Received file:', req.file);
         if (!name || !description) {
-            res.status(HttpStatus.BAD_REQUEST).json({ message: 'Name and description are required' });
+            res.status(HttpStatus.BAD_REQUEST).json({ message:Messages.REQUIRED  });
             return;
         }
         let serviceImageUrl: string = ""; 
@@ -73,10 +74,10 @@ export const adminController =  {
             description,
             image: serviceImageUrl, 
         });
-        res.status(HttpStatus.CREATED).json({ message: "Service created successfully", service: createdService });
+        res.status(HttpStatus.CREATED).json({ message:Messages.SERVICE_CREATE , service: createdService });
     } catch (error) {
         console.error("Error creating service:", error);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR });
     }
 },
 
@@ -116,12 +117,12 @@ updateService: async(req:Request , res:Response) :Promise<void>=> {
             imageUrl,
         });
 
-        res.status(HttpStatus.OK).json({ message: "Service updated successfully", updatedService });
+        res.status(HttpStatus.OK).json({ message: Messages.SERVICE_UPDATED_SUCCESS, updatedService });
     } catch (error: any) {
         if (error.message === "Service not found") {
             res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
         } else {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error", error: error.message });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error: error.message });
         }
     }
 },
@@ -131,10 +132,10 @@ deleteService : async (req:Request , res:Response) : Promise<void> => {
 
     try {
         await deleteServiceUseCase(serviceId);
-        res.status(HttpStatus.OK).json({ message: "Service deleted successfully." });
+        res.status(HttpStatus.OK).json({ message: Messages.SERVICE_DELETED_SUCCESS });
     } catch (error: any) {
         console.error("Error deleting service:", error.message);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: "Error deleting service." });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.SERVICE_DELETE_ERROR });
     }
 },
 
@@ -147,14 +148,14 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
     try {
         const { bookings, total } = await fetchAllBookings( page, limit, search);
         res.status(HttpStatus.OK).json({
-            message: "Bookings retrieved successfully",
+            message: Messages.BOOKING_RETRIVED,
             bookings,
             total,
             lastPage: Math.ceil(total / limit), 
         });
     } catch (error: any) {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            message: "Failed to retrieve bookings",
+            message: Messages.FAILED_RETRIVED,
             error: error.message,
         });
     }
@@ -163,7 +164,7 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
         const { refreshToken } = req.body;
     
         if (!refreshToken) {
-            res.status(HttpStatus.BAD_REQUEST).json({ error: "Refresh token is required" });
+            res.status(HttpStatus.BAD_REQUEST).json({ error:Messages.REFRESHTOKEN_REQUIRED });
             return;
         }
         try {
@@ -173,11 +174,11 @@ getAllBookings: async (req: Request, res: Response): Promise<void> => {
         } catch (error: any) {
             console.error("Error refreshing access token:", error.message);
             if (error.name === "TokenExpiredError") {
-                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Refresh token expired. Please log in again." });
-            } else if (error.name === "JsonWebTokenError") {
-                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Invalid refresh token. Please log in again." });
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.REFRESHTOKEN_EXPIRED});
+            } else if (error.name === Messages.TOKEN_ERROR) {
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.INVALID_REFRESHTOKEN });
             } else {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message || "Internal server error" });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message || Messages.INTERNAL_SERVER_ERROR });
             }
         }
     },

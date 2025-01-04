@@ -25,6 +25,7 @@ import { AddressRepositoryImpl } from "../../infrastructure/database/repositorie
 import { allServices } from "../../application/useCases/user/serviceDisplay";
 import { HttpStatus } from "../../utils/httpStatus";
 import { HttpRequest } from "aws-sdk";
+import { Messages } from "../../utils/message";
 const addressRepository = new AddressRepositoryImpl();
 export const userController = {
     register: async (req: Request, res: Response) => {
@@ -33,9 +34,9 @@ export const userController = {
           await generateOtp(user.email,1);
           res
             .status(HttpStatus.OK)
-            .json({ message: "User registered. OTP sent to your email." });
+            .json({ message: Messages.OTP_SEND });
         } catch (error: any) {
-          res.status(400).json({ message: error.message });
+          res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
       },
     login: async (req: Request, res: Response) => {
@@ -51,7 +52,7 @@ export const userController = {
             res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
             res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
             res.status(HttpStatus.OK).json({
-                message: "You can now log in",
+                message: Messages.LOGIN,
                 accessToken,
                 refreshToken,
                 userId
@@ -66,7 +67,7 @@ export const userController = {
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
         res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
         res.status(HttpStatus.OK).json({
-            message: 'OTP verified Successfully. You can Log in',
+            message: Messages.OTP_VERIFIED,
             valid,
             role,
             accessToken,
@@ -83,10 +84,10 @@ export const userController = {
         const { email } = req.body;
         try {
             await generateOtp(email ,1);
-            res.status(HttpStatus.OK).json({ message: 'OTP resent to your email' });
+            res.status(HttpStatus.OK).json({ message:Messages.RESEND });
         } catch (error: any) {
             console.error('Error sending OTP:', error); 
-            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message || 'Failed to resend OTP' });
+            res.status(HttpStatus.BAD_REQUEST).json({ message: error.message || Messages.FAILED_RESEND });
         }
     },
 
@@ -95,15 +96,15 @@ export const userController = {
             const { email } = req.body;
     
             if (!email) {
-                res.status(HttpStatus.BAD_REQUEST).json({ message: 'Email is required' });
+                res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.EMAIL_REQUIRED });
                 return;
             }
             await sendResetLink(email , 1);
 
-            res.status(HttpStatus.OK).json({ message: 'Password reset link sent successfully.' });
+            res.status(HttpStatus.OK).json({ message: Messages.PASSWORD_RESET_LINK_SEND });
         } catch (error: any) {
             console.error('Error in forgotPassword:', error.message);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
     },
     validateResetToken: async (req: Request, res: Response): Promise<void> => {
@@ -112,11 +113,11 @@ export const userController = {
 
             const isValid = await validateToken(token);
             if (!isValid) {
-                res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid token' });
+                res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.NOT_VALID });
                 return;
             }
 
-            res.status(HttpStatus.OK).json({ message: 'Token is valid' });
+            res.status(HttpStatus.OK).json({ message: Messages.VALID });
         } catch (error: any) {
             console.error('Error in validateResetToken:', error.message);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
@@ -130,7 +131,7 @@ export const userController = {
 
             await resetPassword(token, newPassword);
 
-            res.status(HttpStatus.OK).json({ message: 'Password reset successfully' });
+            res.status(HttpStatus.OK).json({ message: Messages.RESET_PASSWORD_SUCCESS });
         } catch (error: any) {
             console.error('Error in resetPassword:', error.message);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
@@ -143,13 +144,13 @@ export const userController = {
         try {
             const updatedUser = await blockUser(userId);
             if (!updatedUser) {
-                res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
+                res.status(HttpStatus.NOT_FOUND).json({ message:Messages.NOT_FOUNT });
                 return;
             }
-            res.json({ message: 'User blocked successfully', user: updatedUser });
+            res.json({ message: Messages.BLOCKED_SUCCESSFULLY, user: updatedUser });
         } catch (error) {
             console.error('Error blocking user:', error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
     },
 
@@ -162,17 +163,17 @@ export const userController = {
                 res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                 return;
             }
-            res.json({ message: 'User unblocked successfully', user: updatedUser });
+            res.json({ message: Messages.UNBLOCKED_SUCCESSFULLY, user: updatedUser });
         } catch (error) {
             console.error('Error unblocking user:', error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
     },
     refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
         const { refreshToken } = req.body;
     
         if (!refreshToken) {
-            res.status(HttpStatus.BAD_REQUEST).json({ error: "Refresh token is required" });
+            res.status(HttpStatus.BAD_REQUEST).json({ error: Messages.REFRESHTOKEN_REQUIRED });
             return;
         }
         try {
@@ -182,11 +183,11 @@ export const userController = {
         } catch (error: any) {
             console.error("Error refreshing access token:", error.message);
             if (error.name === "TokenExpiredError") {
-                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Refresh token expired. Please log in again." });
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.REFRESHTOKEN_EXPIRED });
             } else if (error.name === "JsonWebTokenError") {
-                res.status(HttpStatus.UNAUTHORIZED).json({ error: "Invalid refresh token. Please log in again." });
+                res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.INVALID_REFRESHTOKEN });
             } else {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message || "Internal server error" });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message ||Messages.INTERNAL_SERVER_ERROR });
             }
         }
     },
@@ -195,7 +196,7 @@ export const userController = {
         try {
             const userEmail = (req.user as { email?: string })?.email;
             if (!userEmail) {
-                res.status(HttpStatus.NOT_FOUND).json({ error: 'User email not found in request' });
+                res.status(HttpStatus.NOT_FOUND).json({ error: Messages.EMAIL_NOT_FOUNT });
                 return; 
             }
             const user = await userProfile(userEmail);
@@ -248,7 +249,7 @@ export const userController = {
             });
         } catch (error) {
             console.error('Error retrieving user profile:', error); 
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR });
         }
     },
 
@@ -257,12 +258,12 @@ export const userController = {
      try{
         const userEmail = (req.user as { email?: string })?.email;
         if (!userEmail) {
-            res.status(HttpStatus.NOT_FOUND).json({ error: 'User email not found in request' });
+            res.status(HttpStatus.NOT_FOUND).json({ error: Messages.EMAIL_NOT_FOUNT });
             return;
         }
         const user = await userProfile(userEmail)
         if (!user) {
-            res.status(HttpStatus.NOT_FOUND).json({ error: 'User not found' });
+            res.status(HttpStatus.NOT_FOUND).json({ error: Messages.NOT_FOUNT });
             return;
         }
         const { firstName, lastName, address, area } = req.body;
@@ -279,7 +280,7 @@ export const userController = {
         res.status(HttpStatus.OK).json({ user: updatedUser ,address: userAddress });
      }catch (error:any) {
         console.error('Error updating profile:', error);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR });
      }
         
     },
@@ -305,14 +306,14 @@ export const userController = {
             console.log("slots", slots);
 
             if (!slots ) {
-                res.status(HttpStatus.NOT_FOUND).json({ message: "No available slots for the given worker and date" });
+                res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NO_SLOTS });
                 return;
             }
 
             res.status(HttpStatus.OK).json({ slots });
         } catch (error) {
             console.error("Error fetching slots:", error);
-            res.status(500).json({ message: "Failed to fetch available slots" });
+            res.status(500).json({ message: Messages.ERROR_FETCHING });
         }
     },
     
@@ -340,7 +341,7 @@ export const userController = {
         res.status(HttpStatus.CREATED).json(createdBooking);
         }catch (error) {
             console.error('Error creating booking:', error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create booking.' });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message:Messages.ERROR_CREATING  });
         }
  },
 
@@ -351,7 +352,7 @@ export const userController = {
      res.status(HttpStatus.OK).json({bookings})
     } catch (error) {
         console.error('Error fetching bookings:', error);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch bookings' });
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERROR_FETCHING });
     }
  },
 
@@ -362,7 +363,7 @@ export const userController = {
     res.status(HttpStatus.OK).json({workerDetails})
    }catch(error) {
     console.error("failed to fetch worker " , error);
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch workerDetails' });
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERROR_FETCHING });
    }
  },
 
@@ -372,20 +373,20 @@ export const userController = {
         const updatedBooking = await bookingCancelUpdate(bookingId);
 
         if (!updatedBooking) {
-            res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Booking not found" });
+            res.status(HttpStatus.NOT_FOUND).json({ success: false, message:Messages.NOT_FOUNT });
             return;
         }
 
         res.status(HttpStatus.OK).json({
             success: true,
-            message: "Booking cancelled successfully",
+            message: Messages.CANCELLED_SUCCESSFULLY,
             data: updatedBooking,
         });
     } catch (error) {
         console.error("Error cancelling booking:", error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Something went wrong while cancelling the booking",
+            message: Messages.ERROR_CANCELLING ,
         });
     }
  },
