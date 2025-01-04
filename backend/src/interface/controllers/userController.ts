@@ -29,6 +29,7 @@ import { Messages } from "../../utils/message";
 const addressRepository = new AddressRepositoryImpl();
 export const userController = {
     register: async (req: Request, res: Response) => {
+        console.log("body", req.body)
         try {
           const user = await registerUser( req.body);
           await generateOtp(user.email,1);

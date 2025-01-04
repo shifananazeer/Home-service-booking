@@ -4,10 +4,12 @@ import { authenticateUser } from '../../middleware/auth'
 import multer from 'multer'
 import { adminController } from '../../interface/controllers/adminController'
 import { workerController } from '../../interface/controllers/workerController'
+import { validateRequest } from '../../middleware/validateRequest'
+import { registerSchema } from '../../validators/registerValidator'
 export const router = express.Router()
 
 export const upload = multer({storage: multer.memoryStorage()});
-router.post("/register",userController.register)
+router.post("/register",validateRequest(registerSchema) ,userController.register)
 router.post("/login",userController.login)
 router.post("/verify-otp",userController.validateOtp)
 router.post("/resend-otp",userController.resendOtp)
