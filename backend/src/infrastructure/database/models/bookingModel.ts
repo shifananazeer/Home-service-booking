@@ -27,6 +27,7 @@ paymentStatus: {type: String,
     enum: ['Pending', 'Completed','Confirmed', 'Cancelled'], 
     required: true,
 },
+createdAt: { type: Date, default: Date.now },
 
 
 })

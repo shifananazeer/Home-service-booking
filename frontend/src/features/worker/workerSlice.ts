@@ -61,8 +61,8 @@ const workerSlice = createSlice({
             state.success = true;
             state.accessToken = action.payload.accessToken; 
             state.refreshToken = action.payload.refreshToken; 
-            localStorage.setItem('accessToken', action.payload.accessToken); 
-            localStorage.setItem('refreshToken', action.payload.refreshToken); 
+            localStorage.setItem('worker_accessToken', action.payload.accessToken); 
+            localStorage.setItem('worker_refreshToken', action.payload.refreshToken); 
             localStorage.setItem('workerId' , action.payload.workerId)
         },
         loginFail: (state, action) => {
@@ -70,9 +70,10 @@ const workerSlice = createSlice({
             state.error = action.payload;
             state.accessToken = null;
             state.refreshToken = null; 
-            localStorage.removeItem('accessToken'); 
-            localStorage.removeItem('refreshToken'); 
+            localStorage.removeItem('worker_accessToken'); 
+            localStorage.removeItem('worker_refreshToken'); 
             localStorage.removeItem('workerId')
+             localStorage.removeItem('email')
         },
         resetLoginState: (state) => {
             state.isLoading = false;
@@ -84,8 +85,8 @@ const workerSlice = createSlice({
             state.refreshToken = null; 
             state.success = false; 
             state.isVerified = false; 
-            localStorage.removeItem('accessToken'); 
-            localStorage.removeItem('refreshToken'); 
+            localStorage.removeItem('worker_accessToken'); 
+            localStorage.removeItem('worker_refreshToken'); 
             localStorage.removeItem('workerId')
             localStorage.removeItem('email')
         },

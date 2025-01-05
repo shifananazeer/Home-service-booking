@@ -8,6 +8,7 @@ export const loginWorker = async ( email:string , password:string): Promise <{ a
     console.log("password", password)
     console.log("email", email)
     const user = await workerRepository.findByEmail(email)
+    console.log("role....",user?.role)
     if(!user) throw new Error ('Invalied Email Or Password')
         const isPasswordValid = await bcrypt.compare(password , user.password)
     if(!isPasswordValid) throw new Error ('Invalied Password')

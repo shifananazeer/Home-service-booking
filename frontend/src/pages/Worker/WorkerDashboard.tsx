@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import WorkerNavbar from './WorkerNavbar'
 import WorkerSidebar from './WorkerSidebar'
 import { useSelector } from 'react-redux'
@@ -8,14 +8,19 @@ import WorkerProfile from '../../components/worker/WorkerProfile'
 import AvailabilityManagement from '../../components/worker/AvailabilityManagement'
 import WorkerBookings from '../../components/worker/bookings'
 import WorkerTodayBookings from '../../components/worker/todaysBooking'
+import { refreshAccessToken } from '../../utils/auth'
 
 const WorkerDashboard = () => {
- 
-  const navigate = useNavigate()
-  const accessToken = useSelector((state: RootState) => state.worker.accessToken);
-  if(!accessToken) {
-    return <Navigate to="/worker/login" replace />;
-  }
+const navigate = useNavigate()
+
+     useEffect(()=> {
+            const accessToken = localStorage.getItem('worker_accessToken')
+            if(!accessToken) {
+                navigate('/worker/login')
+            }
+        })
+    
+    
    const [currentComponent, setCurrentComponent] = useState("dashboard"); 
    const renderComponent = () => {
     switch (currentComponent) {

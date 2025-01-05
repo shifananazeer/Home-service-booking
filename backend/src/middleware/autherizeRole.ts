@@ -6,7 +6,7 @@ export const authorizeRole = (roles: string[]) => {
         const user = req.user as UserPayload;
 
         if (!user || !roles.includes(user.role)) {
-         
+         console.log("error......")
             res.status(403).json({ error: 'Access denied: You do not have the required role' });
             return 
         }

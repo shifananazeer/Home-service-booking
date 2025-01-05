@@ -347,9 +347,12 @@ export const userController = {
  },
 
  getBookings : async (req:Request , res:Response) :Promise <void> => {
+    const { page, limit } = req.query;
     const {userId} = req.params;
     try{
-     const bookings = await getBookingsByUserId(userId)
+        const parsedPage = parseInt(page as string, 10)||1;
+        const parsedLimit = parseInt(limit as string, 10)||1;
+     const bookings = await getBookingsByUserId(userId ,  parsedPage, parsedLimit)
      res.status(HttpStatus.OK).json({bookings})
     } catch (error) {
         console.error('Error fetching bookings:', error);

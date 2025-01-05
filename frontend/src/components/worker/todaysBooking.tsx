@@ -34,21 +34,8 @@ export default function WorkerTodayBookings() {
   const navigate = useNavigate()
   useEffect(() => {
     const fetchTodayBookings = async () => {
-      const refreshToken = localStorage.getItem('refreshToken')
+    
       try {
-
-          if (refreshToken) {
-                        const newAccessToken = await refreshAccessToken();
-                        if (!newAccessToken) {
-                          console.log('Failed to refresh token, redirecting to login...');
-                        
-                          return navigate( '/login');
-                        }
-                      } else {
-                        console.log('No refresh token found, redirecting to login...');
-                     
-                        return navigate('/login');
-                      }
                       
         if(!workerId) {
             throw new Error ('invalied workerId')

@@ -95,7 +95,7 @@ const WorkerManagement = () => {
             setLoadingStatus((prev) => ({ ...prev, [workerId]: false })); 
         }
     };
-    
+
      const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSearchQuery(event.target.value);
             setCurrentPage(1); 

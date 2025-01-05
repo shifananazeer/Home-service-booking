@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance'; // Import your axiosInstance
 import { cancelBooking, fetchBookigs } from '../../services/userService';
 import Swal from 'sweetalert2';
-import { refreshAccessToken } from '../../utils/auth';
+import { userRefreshAccessToken } from '../../utils/auth';
 
 interface Booking {
   _id: string;
   workerName: string;
   serviceName: string;
   date: string;
- slotId:string;
- serviceImage:string;
- workDescription:string;
+  slotId: string;
+  serviceImage: string;
+  workDescription: string;
   paymentStatus: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 }
 
@@ -20,6 +20,9 @@ const BookingList: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+   const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [limit, setLimit] = useState<number>(5); 
   const navigate = useNavigate();
 
   const parseSlotId = (slotId: string) => {
@@ -28,37 +31,16 @@ const BookingList: React.FC = () => {
   };
 
   useEffect(() => {
-    const refreshToken = localStorage.getItem('refreshToken');
-
-   
-    
     const loadBookings = async () => {
-   
+      const userId = localStorage.getItem('user_Id');
 
-      if (refreshToken) {
-        const newAccessToken = await refreshAccessToken();
-        if (!newAccessToken) {
-          console.log('Failed to refresh token, redirecting to login...');
-          navigate('/login');
-          return;
-        }
-      } else {
-        console.log('No refresh token found, redirecting to login...');
-        navigate('/login');
-        return;
-      }
-
-
-      const userId = localStorage.getItem('user_Id'); 
       if (!userId) {
         setError('User ID is missing');
         setIsLoading(false);
         return;
       }
-
       try {
-      
-        const fetchedBookings = await fetchBookigs(userId);
+        const fetchedBookings = await fetchBookigs(userId , currentPage ,limit);
         console.log("Fetched Bookings:", fetchedBookings.bookings);
         setBookings(fetchedBookings.bookings);
         setIsLoading(false);
@@ -70,7 +52,7 @@ const BookingList: React.FC = () => {
     };
 
     loadBookings();
-  }, []);
+  }, [ currentPage , limit]);
 
   const handleCancelBooking = async (bookingId: string) => {
     const result = await Swal.fire({
@@ -82,20 +64,19 @@ const BookingList: React.FC = () => {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes, cancel it!',
     });
-  
+
     if (result.isConfirmed) {
       try {
-        await cancelBooking(bookingId); 
-  
- 
+        await cancelBooking(bookingId);
+
         setBookings((prevBookings) =>
           prevBookings.map((booking) =>
             booking._id === bookingId
-              ? { ...booking, paymentStatus: 'Cancelled' } 
+              ? { ...booking, paymentStatus: 'Cancelled' }
               : booking
           )
         );
-  
+
         Swal.fire('Cancelled!', 'Your booking has been cancelled.', 'success');
       } catch (error) {
         Swal.fire('Error!', 'Failed to cancel booking. Please try again.', 'error');
@@ -124,7 +105,18 @@ const BookingList: React.FC = () => {
       </div>
     );
   }
- 
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   return (
     <div className="container mx-auto px-3 py-8">
@@ -134,12 +126,12 @@ const BookingList: React.FC = () => {
       ) : (
         bookings.map((booking) => {
           const { day, startTime, endTime } = parseSlotId(booking.slotId);
-  
+
           return (
             <div
               key={booking._id}
               className="flex bg-gray-900 rounded-lg shadow-md overflow-hidden mb-3"
-              style={{ height: "150px" }} 
+              style={{ height: "150px" }}
             >
               {/* Left Section: Details */}
               <div className="flex-1 p-2 overflow-hidden ">
@@ -164,49 +156,67 @@ const BookingList: React.FC = () => {
                 >
                   {booking.paymentStatus}
                 </span>
-              
               </div>
 
-             {/* Second Section: Description */}
-             <div className="flex p-2 items-center justify-center">
-              <p className="text-sm text-white">Reason: {booking.workDescription}</p>
-            </div>
+              {/* Second Section: Description */}
+              <div className="flex p-2 items-center justify-center">
+                <p className="text-sm text-white">Reason: {booking.workDescription}</p>
+              </div>
 
-            {/* Third Section: Service Image */}
-            <div className="w-1/3 flex items-center justify-center p-2">
-              <img
-                src={booking.serviceImage} 
-                alt={booking.serviceName}
-                className="object-cover w-20 h-20 rounded-lg" 
-              />
-            </div>
+              {/* Third Section: Service Image */}
+              <div className="w-1/3 flex items-center justify-center p-2">
+                <img
+                  src={booking.serviceImage}
+                  alt={booking.serviceName}
+                  className="object-cover w-20 h-20 rounded-lg"
+                />
+              </div>
 
-             {/* Right Section: Cancel Button */}
-             <div className="w-1/5 flex items-center justify-center">
-              {booking.paymentStatus !== "Cancelled" &&
-                booking.paymentStatus !== "Completed" && (
-                  <button
-                    onClick={() => handleCancelBooking(booking._id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                  >
-                    Cancel Booking
-                  </button>
-                )}
+              {/* Right Section: Cancel Button */}
+              <div className="w-1/5 flex items-center justify-center">
+                {booking.paymentStatus !== "Cancelled" &&
+                  booking.paymentStatus !== "Completed" && (
+                    <button
+                      onClick={() => handleCancelBooking(booking._id)}
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    >
+                      Cancel Booking
+                    </button>
+                  )}
+              </div>
             </div>
-          </div>
-        );
-      })
-    )}
-    <button
-      onClick={() => navigate("/book")}
-      className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-    >
-      Book New Service
-    </button>
-  </div>
-);
-  
-}  
-    
+          );
+        })
+      )}
+        <div className="mt-6 flex justify-between items-center">
+          <button 
+            onClick={handlePreviousPage} 
+            disabled={currentPage === 1}
+            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          >
+            Previous
+          </button>
+          <p className="text-gray-400">Page {currentPage} of {totalPages}</p>
+          <button 
+            onClick={handleNextPage} 
+            disabled={currentPage === totalPages}
+            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          >
+            Next
+          </button>
+        </div>
+
+        <p className="mt-4 text-center text-gray-400">
+          Total Bookings: {bookings.length}
+        </p>
+      <button
+        onClick={() => navigate("/book")}
+        className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Book New Service
+      </button>
+    </div>
+  );
+};
 
 export default BookingList;

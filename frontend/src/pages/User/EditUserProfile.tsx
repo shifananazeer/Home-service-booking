@@ -41,7 +41,7 @@ const EditUserProfile: React.FC = () => {
                 ...prev,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                profilePicPreview: user.profilePic || '',
+                profilePicPreview: user.profilePic || 'avathar.jpeg',
             }));
         }
     }, [user]);

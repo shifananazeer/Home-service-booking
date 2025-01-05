@@ -12,9 +12,10 @@ export const createBookings = async (bookingDetails: Booking): Promise<Booking |
     }
 }
 
-export const   getBookingsByUserId = async (userId:string) => {
+export const   getBookingsByUserId = async (userId:string , page: number , limit: number ) => {
     try{
-        const getBookingsDeatils = await bookingRepository.getBookingsForUser(userId)
+        const getBookingsDeatils = await bookingRepository.getBookingsForUser(userId , page, limit)
+        const totalBookings = await bookingRepository.countBookingsByUserId(userId);
         return getBookingsDeatils;
     }catch(error) {
         console.error('Error fetching bookings:', error);

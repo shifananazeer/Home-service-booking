@@ -10,19 +10,22 @@ export interface UserPayload {
 export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-
+  console.log("token", token)
     if (!token) {
       
         res.status(401).json({ error: 'Access token is required' });
         return 
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, user) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, decodedToken) => {
         if (err) {
-            return res.status(403).json({ error: 'Invalid or expired token' });
+            res.status(403).json({ error: 'Invalid or expired token' });
+            return;
         }
-        
-        req.user = user as UserPayload; // Attach user payload
+        const decoded = decodedToken as UserPayload;
+        req.user = decoded;
+        console.log("Authenticated User:", req.user);
+
         next();
     });
 };

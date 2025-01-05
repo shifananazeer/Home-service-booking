@@ -107,7 +107,7 @@ const PaymentPage: React.FC = () => {
                         <p className="font-semibold">{bookingDetails.serviceName}</p>
                     </div>
                     <p className="text-white">
-                        <strong>Worker:</strong> {workerName}
+                        <strong>Worker:</strong> {bookingDetails.workerName}
                     </p>
                     <p className="text-white">
                         <strong>Booking Date:</strong>{' '}

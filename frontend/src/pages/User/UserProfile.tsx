@@ -20,20 +20,7 @@ const UserProfile = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-          const refreshToken = localStorage.getItem('refreshToken');
-    
           try {
-            if (refreshToken) {
-              const newAccessToken = await refreshAccessToken();
-              if (!newAccessToken) {
-                console.log('Failed to refresh token, redirecting to login...');
-                return (window.location.href = '/login');
-              }
-            } else {
-              console.log('No refresh token found, redirecting to login...');
-              return navigate('/login');
-            }
-    
             const data = await getUserProfile();
             console.log('Fetched user profile data:', data);
     
@@ -46,7 +33,6 @@ const UserProfile = () => {
             setLoading(false);
           }
         };
-    
         fetchData();
       }, []);
     

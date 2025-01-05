@@ -41,21 +41,7 @@ const WorkerBookings: React.FC = () => {
   const workerId = localStorage.getItem('workerId');
    const navigate = useNavigate()
   useEffect(() => {
-    const fetchBookingsAndLocation = async () => {
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (refreshToken) {
-                      const newAccessToken = await refreshAccessToken();
-                      if (!newAccessToken) {
-                        console.log('Failed to refresh token, redirecting to login...');
-                      
-                        return navigate( '/login');
-                      }
-                    } else {
-                      console.log('No refresh token found, redirecting to login...');
-                   
-                      return navigate('/login');
-                    }
-           
+    const fetchBookingsAndLocation = async () => {       
       try {
         if (!workerId) {
           console.error("Worker ID is null. Cannot fetch bookings.");

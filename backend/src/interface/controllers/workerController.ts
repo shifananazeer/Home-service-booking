@@ -24,6 +24,8 @@ import { AddressRepositoryImpl } from '../../infrastructure/database/repositorie
 import { getAllServicesUseCase } from '../../application/useCases/getAllService';
 import { HttpStatus } from '../../utils/httpStatus';
 import { Messages } from '../../utils/message';
+import { refreshAccessToken } from '../../application/useCases/refreshAccessToken';
+
 
 
 export const workerController  = {
@@ -142,6 +144,31 @@ export const workerController  = {
                     res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
                 }
             },
+          
+               refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
+                     const { refreshToken } = req.body;
+                 
+                     if (!refreshToken) {
+                         res.status(HttpStatus.BAD_REQUEST).json({ error: Messages.REFRESHTOKEN_REQUIRED });
+                         return;
+                     }
+                     try {
+                         const type = 'worker'
+                         const accessToken = await refreshAccessToken(refreshToken , type);
+                         res.status(HttpStatus.OK).json({ accessToken });
+                     } catch (error: any) {
+                         console.error("Error refreshing access token:", error.message);
+                         if (error.name === "TokenExpiredError") {
+                             res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.REFRESHTOKEN_EXPIRED });
+                         } else if (error.name === "JsonWebTokenError") {
+                             res.status(HttpStatus.UNAUTHORIZED).json({ error: Messages.INVALID_REFRESHTOKEN });
+                         } else {
+                             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message ||Messages.INTERNAL_SERVER_ERROR });
+                         }
+                     }
+                 },
+
+        
 
             getWorkerProfile: async (req: Request, res: Response) => {
                 console.log("Request User:", req.user);
@@ -231,33 +258,45 @@ export const workerController  = {
                 }
             },
 
-             handleCreateAvailability : async (req: Request, res: Response): Promise<void> => {
-                console.log("availability", req.body)
+            handleCreateAvailability: async (req: Request, res: Response): Promise<void> => {
+                console.log("availability", req.body);
                 const { date, slots } = req.body;
+            
                 if (!date || !Array.isArray(slots) || slots.length === 0) {
                     res.status(400).json({ message: Messages.DATE_SLOT_REQUIRED });
                     return;
                 }
+            
                 const parsedDate = new Date(date);
                 const utcDate = new Date(parsedDate.toUTCString());
-                const workerEmail = (req.user as { email?: string })?.email; 
+                const workerEmail = (req.user as { email?: string })?.email;
+            
                 if (!workerEmail) {
                     res.status(HttpStatus.FORBIDDEN).json({ message: Messages.UNAUTHORIZED });
-                    return; 
+                    return;
                 }
-                const worker = await workerProfile(workerEmail);
-                const workerId = worker._id
-                console.log("workerId" , workerId)
-                if (!workerId) {
-                    res.status(HttpStatus.FORBIDDEN).json({ message: Messages.UNAUTHORIZED });
-                    return; 
-                }
+            
                 try {
-                    const availability = await createAvailability( workerId,utcDate, slots);
+                    const worker = await workerProfile(workerEmail);
+                    const workerId = worker._id;
+            
+                    if (!workerId) {
+                        res.status(HttpStatus.FORBIDDEN).json({ message: Messages.UNAUTHORIZED });
+                        return;
+                    }
+            
+                    const availability = await createAvailability(workerId, utcDate, slots);
+            
                     res.status(HttpStatus.CREATED).json(availability);
                 } catch (error: any) {
                     console.error("Error creating availability:", error.message);
-                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+            
+                    // Handle specific error for duplicate slots
+                    if (error.message.includes("Conflicting slot")) {
+                        res.status(HttpStatus.CONFLICT).json({ message: error.message });
+                    } else {
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+                    }
                 }
             },
 

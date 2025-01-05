@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice';
 import { LoginWorker } from '../../services/workerService'; 
 import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RootState } from '../../app/store';
+import { refreshAccessToken } from '../../utils/auth';
 
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
@@ -12,12 +13,17 @@ const WorkerLogin: React.FC = () => {
    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const accessToken = useSelector((state: RootState) => state.worker.accessToken);
+   
+
     const { isLoading, error, success } = useSelector((state: RootState) => state.worker); 
 
-    if (accessToken) {
-        return <Navigate to="/worker/dashboard" replace />;
-    }
+    useEffect(()=> {
+        const accessToken = localStorage.getItem('worker_accessToken')
+        if(accessToken) {
+            navigate('/worker/dashboard')
+        }
+    })
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -15,21 +15,8 @@ const WorkerProfile = () => {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            const refreshToken = localStorage.getItem('refreshToken');
+          
             try {
-
-                  if (refreshToken) {
-                              const newAccessToken = await refreshAccessToken();
-                              if (!newAccessToken) {
-                                console.log('Failed to refresh token, redirecting to login...');
-                                navigate('/login');
-                                return;
-                              }
-                            } else {
-                              console.log('No refresh token found, redirecting to login...');
-                              navigate('/login');
-                              return;
-                            }
                             
                 const data: WorkerProfileResponse = await getWorkerProfile();
                 console.log("Fetched worker profile data:", data);

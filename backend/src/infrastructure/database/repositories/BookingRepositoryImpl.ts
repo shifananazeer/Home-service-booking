@@ -13,9 +13,14 @@ class BookingRepositoryImpl implements BookingRepository {
         }
     }
 
-    async getBookingsForUser(userId: string): Promise<Booking[]> {
+    async getBookingsForUser(userId: string , page: number, limit: number): Promise<Booking[]> {
+        const skip = (page - 1) * limit; 
         try {
-            const bookings = await BookingModel.find({ userId });
+            const bookings = await BookingModel.find({ userId })
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }) 
+            .exec();
             return bookings;
         } catch (error) {
             console.error('Error fetching bookings for user:', error);
@@ -23,11 +28,16 @@ class BookingRepositoryImpl implements BookingRepository {
         }
     }
 
+    async countBookingsByUserId(userId: string): Promise<number> {
+        return await BookingModel.countDocuments({ userId }).exec(); 
+    }
+
     async findBookingsByWorkerId(workerId: string, page: number, limit: number): Promise<Booking[]> {
         const skip = (page - 1) * limit; 
         return await BookingModel.find({ workerId })
             .skip(skip)
             .limit(limit)
+            .sort({ createdAt: -1 }) 
             .exec();
     }
 

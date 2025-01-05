@@ -186,13 +186,18 @@ export const createBooking = async(bookingDetails:Booking) => {
     });
     return response;
 }
-export const fetchBookigs = async (userId: string) => {
+export const fetchBookigs = async (userId: string,currentPage:number , limit: number) => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
       throw new Error('Authentication token is missing');
     }
   
     const response = await axiosInstance.get(`/auth/booking/${userId}`, {
+      params: {
+        page: currentPage, 
+        limit,
+
+    },
       headers: {
         Authorization: `Bearer ${token}`, // Send the token in headers
       },

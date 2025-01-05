@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createBooking, fetchingSlots } from '../../services/userService';
 import axios from 'axios';
-import { refreshAccessToken } from '../../utils/auth';
+import {  userRefreshAccessToken } from '../../utils/auth';
 import Swal from 'sweetalert2';
 
 interface Slot {
@@ -46,27 +46,6 @@ const BookingConfirm: React.FC = () => {
     useEffect(() => {
         const initialize = async () => {
           try {
-            const refreshToken = localStorage.getItem('refreshToken');
-    
-            if (refreshToken) {
-              const newAccessToken = await refreshAccessToken();
-              if (!newAccessToken) {
-                console.log('Failed to refresh token, redirecting to login...');
-                navigate('/login');
-                return;
-              }
-            } else {
-              console.log('No refresh token found, redirecting to login...');
-              navigate('/login');
-              return;
-            }
-    
-            if (!userId) {
-              alert('You need to be logged in to book a service.');
-              navigate('/login');
-              return;
-            }
-    
             const today = new Date();
             const dates = Array.from({ length: 8 }, (_, i) => {
               const nextDate = new Date(today);

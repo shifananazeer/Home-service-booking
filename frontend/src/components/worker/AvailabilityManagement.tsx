@@ -7,6 +7,7 @@ import { refreshAccessToken } from '../../utils/auth';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../app/store';
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 
 const formatDate = (dateString: string): string => {
   return moment(dateString).format('YYYY-MM-DD dddd'); 
@@ -26,24 +27,6 @@ const [totalPages, setTotalPages] = useState(1);
 const navigate = useNavigate()
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-useEffect(()=> {
-const refresh = async () => {
-  const refreshToken = useSelector((state: RootState) => state.worker.refreshToken);
-   if (refreshToken) {
-                const newAccessToken = await refreshAccessToken();
-                if (!newAccessToken) {
-                  console.log('Failed to refresh token, redirecting to login...');
-                
-                  return navigate( '/login');
-                }
-              } else {
-                console.log('No refresh token found, redirecting to login...');
-             
-                return navigate('/login');
-              }
-}
-refresh();
-}, [])
 
   const calculateDate = (selectedDay: string): string => {
     const today = moment();
@@ -92,9 +75,21 @@ refresh();
           setSelectedDay('');
           setStartTime('');
           setEndTime('');
+          Swal.fire({
+            icon: 'success',
+            title: 'Slot Added!',
+            text: 'Your availability slot has been successfully added.',
+            confirmButtonText: 'OK',
+          });
         }
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to add slot');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: err.response?.data?.error || 'Failed to add slot',
+          confirmButtonText: 'OK',
+        });
       } finally {
         setLoading(false);
       }
@@ -109,7 +104,7 @@ refresh();
             setError('Worker ID not found in localStorage.');
             return;
         }
-        const { data, pagination }  = await fetchAvailabilitySlots(workerId, page, 5); 
+        const { data, pagination ,message}  = await fetchAvailabilitySlots(workerId, page, 5); 
         console.log("dddd",data)
         if (data && pagination) {
           const now = moment();
@@ -120,7 +115,7 @@ refresh();
           setTotalPages(pagination.totalPages);
           setCurrentPage(pagination.currentPage);
       } else {
-          setError('Unexpected response structure');
+          setError(message);
       }
     } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to fetch slots');

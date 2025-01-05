@@ -39,15 +39,9 @@ const BookingPage: React.FC = () => {
   const [sortedWorkers, setSortedWorkers] = useState<WorkerAddress[]>([]);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const token = localStorage.getItem('accessToken');
   const userId = localStorage.getItem('user_Id');
 
-  useEffect(() => {
-    if (!token) {
-      toast.error('For booking, you need to login.');
-      navigate('/login');
-    }
-  }, [navigate, token]);
+  
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const toRadians = (deg: number) => (deg * Math.PI) / 180;

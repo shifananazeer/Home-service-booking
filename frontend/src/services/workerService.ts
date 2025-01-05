@@ -64,6 +64,7 @@ export const WorkerVerifyOtp = async (otp:string , email:string) : Promise<any> 
         // localStorage.setItem('accessToken', response.data.accessToken);
         // localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('workerId' , response.data.userId)
+        return response;
     }catch(error: any) {
         errorHandler(error);
         throw error;
@@ -106,7 +107,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 
 
 export const getWorkerProfile = async () : Promise <any> => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     try{
       const response = await axiosInstance.get('/workers/profile',{
         headers : {
@@ -122,7 +123,7 @@ export const getWorkerProfile = async () : Promise <any> => {
 }
 
 export const  updateWorkerProfile = async (formData : FormData): Promise <{ success: boolean; message: string }> => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     try{
        const response = await axiosInstance.put('/workers/profile/edit',formData,{
         headers: {
@@ -161,7 +162,7 @@ export interface AvailabilitySlot {
 export const addAvailability = async (
     availabilityData: AvailabilityWithSlots
 ): Promise<AddAvailability> => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     try {
         const response = await axiosInstance.post('/workers/availability', availabilityData, {
             headers : {
@@ -176,18 +177,19 @@ export const addAvailability = async (
 };
 
 export const fetchAvailabilitySlots = async(workerId: string, page: number, limit: number)=> {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.get(`/workers/availability/${workerId}`,{
         headers : {
             'Authorization':`Bearer ${token}`,
         },
         params: { page, limit }, 
     })
+    console.log("reeee",response.data)
     return response.data
 }
 
 export const updateSlotData = async (updateSlot:AvailabilitySlot , slotId : string) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.put(`/workers/availability/edit/${slotId}`,updateSlot ,{
         headers : {
             'Authorization':`Bearer ${token}`,
@@ -197,7 +199,7 @@ export const updateSlotData = async (updateSlot:AvailabilitySlot , slotId : stri
 }
 
 export const  deleteAvailability  =  async (slotId:string)=> {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.delete(`/workers/availability/delete/${slotId}`,{
         headers : {
             'Authorization':`Bearer ${token}`,
@@ -218,7 +220,7 @@ return  response.data;
 }
 
 export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
   const response = await axiosInstance.put('/workers/updateLocation',{
     workerId,
     latitude: lat,
@@ -231,7 +233,7 @@ export const updateCoordinates  = async(lat: number , lng:number, workerId:strin
 }
 
 export const getBookings = async(workerId:string , currentPage:number , limit: number) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.get(`/workers/bookings/${workerId}`,{
         params: {
             page: currentPage, 
@@ -246,7 +248,7 @@ export const getBookings = async(workerId:string , currentPage:number , limit: n
 }
 
 export const getWorkerLocation = async (workerId :string) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.get(`/workers/${workerId}`,{
         headers : {
             'Authorization':`Bearer ${token}`,
@@ -257,7 +259,7 @@ export const getWorkerLocation = async (workerId :string) => {
   };
 
   export const todaysBooking = async (workerId:string) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('worker_accessToken');
     const response = await axiosInstance.get(`/workers/today-booking/${workerId}`,{
         headers : {
             'Authorization':`Bearer ${token}`,
