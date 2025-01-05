@@ -3,6 +3,7 @@ import { fetchUsers, unblockUser, blockUser } from '../../services/adminService'
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { refreshAccessToken } from '../../utils/adminAthendication';
+import ManagementTable from './Table';
 
 interface User {
     _id: string;
@@ -33,19 +34,19 @@ const UserManagement = () => {
           if(!token){
 
                  if (refreshToken) {
-                                              const newAccessToken = await refreshAccessToken();
-                                              if (!newAccessToken) {
-                                                console.log('Failed to refresh token, redirecting to login...');
-                                                navigate('/admin/login');
-                                                return;
-                                              }
-                                            } else {
-                                              console.log('No refresh token found, redirecting to login...');
-                                              navigate('/admin/login');
-                                              return;
-                                            }
+                    const newAccessToken = await refreshAccessToken();
+                        if (!newAccessToken) {
+                              console.log('Failed to refresh token, redirecting to login...');
+                              navigate('/admin/login');
+                                return;
+                                  }
+                            } else {
+                      console.log('No refresh token found, redirecting to login...');
+                      navigate('/admin/login');
+                        return;
+                        }
 
-                                        }
+                      }
 
                 const userList = await fetchUsers(currentPage, limit, searchQuery);
                 console.log("API Response:", userList);
@@ -73,9 +74,7 @@ const UserManagement = () => {
             } else {
                 response = await blockUser(userId);
                 toast.success(`User ${response.user.name} has been blocked.`);
-            }
-
-            
+            } 
             setUsers((prevUsers) =>
                 prevUsers.map((user) =>
                     user._id === response.user._id ? { ...user, isBlocked: response.user.isBlocked } : user
@@ -117,78 +116,40 @@ const UserManagement = () => {
             </div>
           );
     }
-
     return (
         <div className="p-4">
-            <h2 className="text-xl font-bold mb-4">User Management</h2>
-            <div className="flex items-center mb-4">
-    <input
-        type="text"
-        placeholder="Search users..."
-        value={searchQuery}
-        onChange={handleSearch}
-        className="w-full py-2 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition duration-150 ease-in-out"
-    />
-    {searchQuery && (
-        <button
-            onClick={() => setSearchQuery('')} 
-            className="ml-2 py-2 px-3 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none transition duration-150 ease-in-out"
-        >
-            &times;
-        </button>
-    )}
-</div>
-            <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                    <tr>
-                        <th className="py-2 px-4 border-b text-center">Name</th>
-                        <th className="py-2 px-4 border-b text-center">Email</th>
-                        <th className="py-2 px-4 border-b text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(users) && users.map((user) => (
-                        <tr key={user._id} className="hover:bg-gray-100 transition-colors duration-200">
-                            <td className="py-2 px-4 border-b text-center">{user.firstName}</td>
-                            <td className="py-2 px-4 border-b text-center">{user.email}</td>
-                            <td className="py-2 px-4 border-b text-center">
-                                <button
-                                    onClick={() => handleToggleBlock(user._id, user.isBlocked)}
-                                    className={`py-1 px-3 rounded ${
-                                        user.isBlocked ? 'bg-red-500' : 'bg-green-500'
-                                    } text-white`}
-                                    disabled={loadingStatus[user._id]}
-                                >
-                                    {loadingStatus[user._id]
-                                        ? 'Loading...'
-                                        : user.isBlocked
-                                        ? 'Unblock'
-                                        : 'Block'}
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="mt-4 flex justify-between">
-                <button 
-                    onClick={() => handlePageChange(currentPage - 1)} 
-                    disabled={currentPage === 1}
-                    className="bg-gray-300 px-4 py-2 rounded"
-                >
-                    Previous
-                </button>
-                <span>Page {currentPage} of {totalPages}</span>
-                <button 
-                    onClick={() => handlePageChange(currentPage + 1)} 
-                    disabled={currentPage === totalPages}
-                    className="bg-gray-300 px-4 py-2 rounded"
-                >
-                    Next
-                </button>
-            </div>
+          <h2 className="text-xl font-bold mb-4">User Management</h2>
+          <div className="flex items-center mb-4">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="w-full py-2 px-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition duration-150 ease-in-out"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="ml-2 py-2 px-3 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none transition duration-150 ease-in-out"
+              >
+                &times;
+              </button>
+            )}
+          </div>
+          <ManagementTable
+            items={users}
+            columns={[
+              { header: 'Name', accessor: 'firstName' },
+              { header: 'Email', accessor: 'email' },
+            ]}
+            onToggleBlock={handleToggleBlock}
+            loadingStatus={loadingStatus}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
-    );
+      );
     
 }
 

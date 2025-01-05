@@ -47,8 +47,13 @@ export const fetchUsers = async (page = 1, limit = 10, search = '') => {
 };
 
 export const blockUser = async (userId:string) => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
-        const response = await axiosInstance.patch(`/admin/users/${userId}/block`);
+        const response = await axiosInstance.patch(`/admin/users/${userId}/block`,{},{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         console.log('Block user response:', response.data); 
         return response.data; 
     } catch (error) {
@@ -59,8 +64,13 @@ export const blockUser = async (userId:string) => {
 
 
 export const unblockUser = async (userId:string) => {
+    const token = localStorage.getItem('admin_accessToken');
     try {
-        const response = await axiosInstance.patch(`/admin/users/${userId}/unblock`);
+        const response = await axiosInstance.patch(`/admin/users/${userId}/unblock` ,{},{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         console.log('Unblock user response:', response.data); 
         console.log("unblock",response)
         return response.data; 
