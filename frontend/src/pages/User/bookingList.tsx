@@ -188,23 +188,25 @@ const BookingList: React.FC = () => {
           );
         })
       )}
-        <div className="mt-6 flex justify-between items-center">
-          <button 
-            onClick={handlePreviousPage} 
-            disabled={currentPage === 1}
-            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
-          >
-            Previous
-          </button>
-          <p className="text-gray-400">Page {currentPage} of {totalPages}</p>
-          <button 
-            onClick={handleNextPage} 
-            disabled={currentPage === totalPages}
-            className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
-          >
-            Next
-          </button>
-        </div>
+       {bookings.length > 0 && (
+  <div className="mt-6 flex justify-between items-center">
+    <button 
+      onClick={handlePreviousPage} 
+      disabled={currentPage === 1}
+      className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+    >
+      Previous
+    </button>
+    <p className="text-gray-400">Page {currentPage} of {totalPages}</p>
+    <button 
+      onClick={handleNextPage} 
+      disabled={currentPage === totalPages}
+      className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+    >
+      Next
+    </button>
+  </div>
+)}
 
         <p className="mt-4 text-center text-gray-400">
           Total Bookings: {bookings.length}

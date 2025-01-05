@@ -55,3 +55,24 @@ export const authenticateWorker = (req: Request, res: Response, next: NextFuncti
     console.log("Authenticated Worker:", req.user);
     next();
 };
+
+
+export const authenticateAdmin = (req: Request, res: Response, next: NextFunction): void => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (!token) {
+        res.status(401).json({ error: 'Access token is required' });
+        return;
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'admin') {
+        res.status(403).json({ error: 'Unauthorized access for admins' });
+        return;
+    }
+
+    req.user = decoded;
+    console.log("Authenticated Admin:", req.user);
+    next();
+};

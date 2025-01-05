@@ -26,27 +26,7 @@ export default function ServiceManagement() {
     const navigate = useNavigate()
     useEffect(() => {
         const loadServices = async () => {
-            const refreshToken = localStorage.getItem('admin_refreshToken');
-            const token = localStorage.getItem('admin_accessToken')
             try {
-
-                 if(!token){
-                
-                                 if (refreshToken) {
-                                                              const newAccessToken = await refreshAccessToken();
-                                                              if (!newAccessToken) {
-                                                                console.log('Failed to refresh token, redirecting to login...');
-                                                                navigate('/admin/login');
-                                                                return;
-                                                              }
-                                                            } else {
-                                                              console.log('No refresh token found, redirecting to login...');
-                                                              navigate('/admin/login');
-                                                              return;
-                                                            }
-                
-                                                        }
-
                 setLoading(true);
                 const data = await fetchServices(currentPage, limit, searchQuery);
                 console.log("page................",currentPage , limit)

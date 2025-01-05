@@ -27,23 +27,34 @@ interface UpdateServiceInput {
     serviceId: string;
     name?: string;
     description?: string;
-    imageUrl?: string;
+    imageUrl?: string; 
+}
+interface UpdateServiceData {
+    name?: string;
+    description?: string;
+    image?: string; 
 }
 
 export const updateServiceUseCase = async (data: UpdateServiceInput): Promise<Service | null> => {
-    const { serviceId, ...updateData } = data;
+    console.log("data", data);
+    const { serviceId, imageUrl, ...updateData } = data;
+    if (imageUrl) {
+       (updateData as UpdateServiceData).image = imageUrl; 
+    }
 
     try {
-        const updatedService = await serviceRepository.updateService(serviceId, updateData);
+        const updatedService = await serviceRepository.updateService(serviceId, updateData as UpdateServiceData); 
+        console.log("updated", updatedService);
         if (!updatedService) {
             throw new Error("Service not found");
         }
         return updatedService;
-    } catch (error:any) {
+    } catch (error: any) {
         console.error("Error updating service:", error.message);
         throw error;
     }
 };
+
 
 export const deleteServiceUseCase = async (serviceId: string): Promise<void> => {
     try {

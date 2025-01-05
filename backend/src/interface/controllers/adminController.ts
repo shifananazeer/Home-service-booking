@@ -66,7 +66,7 @@ export const adminController =  {
         }
         let serviceImageUrl: string = ""; 
         if (req.file) {
-            serviceImageUrl = await uploadProfilePic(req.file);
+            serviceImageUrl = await uploadServiceImage(req.file);
         }
         console.log('Received data:', { name, description, image: serviceImageUrl });
         const createdService = await createdServices( {
@@ -107,7 +107,13 @@ updateService: async(req:Request , res:Response) :Promise<void>=> {
     try {
         let imageUrl: string | undefined;
         if (req.file) {
+            // Upload new image and get the new image URL
             imageUrl = await uploadServiceImage(req.file, req.body.currentImageUrl);
+            console.log("imageurl",imageUrl)
+        } else {
+            // If no new file, retain the current image URL
+            imageUrl = req.body.currentImageUrl;
+            console.log("OLDurl",imageUrl)
         }
 
         const updatedService = await updateServiceUseCase({

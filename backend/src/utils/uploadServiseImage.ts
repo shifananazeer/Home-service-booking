@@ -36,7 +36,9 @@ const deletePreviousServiceImage = async (currentImageUrl?: string): Promise<voi
 // Function to upload service image to S3
 export const uploadServiceImage = async (file: Express.Multer.File, currentImageUrl?: string): Promise<string> => {
     // Delete the previous service image if it exists
-    await deletePreviousServiceImage(currentImageUrl);
+    if (currentImageUrl) {
+        await deletePreviousServiceImage(currentImageUrl);
+    }
 
     const params = {
         Bucket: process.env.BACKET_NAME as string,

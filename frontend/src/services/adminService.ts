@@ -181,9 +181,11 @@ export const fetchServices = async (page = 1, limit = 5, search = '') => {
 };
 
 export const updateService = async (serviceId: string, formData:FormData) => {
+    const token = localStorage.getItem('admin_accessToken');
     const response = await axiosInstance.put(`/admin/service/edit/${serviceId}`, formData,{
         headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`,
         } 
     });
     return response.data;
