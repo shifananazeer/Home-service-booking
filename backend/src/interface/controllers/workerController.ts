@@ -219,12 +219,14 @@ export const workerController  = {
             
                 try {
                     const workerEmail = (req.user as { email?: string })?.email;
+                    console.log("wemeil", workerEmail)
                     if (!workerEmail) {
                         res.status(HttpStatus.NOT_FOUND).json({ error: Messages.EMAIL_NOT_FOUNT });
                         return;
                     }
             
                     const worker = await workerProfile(workerEmail);
+                    console.log("workerrr",worker)
                     if (!worker) {
                         res.status(HttpStatus.NOT_FOUND).json({ error: Messages.NOT_FOUNT });
                         return;

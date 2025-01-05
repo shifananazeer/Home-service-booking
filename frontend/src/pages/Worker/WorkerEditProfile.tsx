@@ -45,7 +45,7 @@ const EditWorkerProfile = () => {
     });
 
     const [profilePicPreview, setProfilePicPreview] = useState<string>(
-        worker?.profilePic || '/path/to/default/profile/pic.png'
+        worker?.profilePic || '/avathar.jpeg'
     );
     const [message, setMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);

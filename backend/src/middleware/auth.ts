@@ -6,26 +6,52 @@ export interface UserPayload {
     role: string; // Role can be 'user', 'admin', etc.
     _id: string; 
 }
+const verifyToken = (token: string): UserPayload | null => {
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
+        return decoded as UserPayload;
+    } catch (err) {
+        return null;
+    }
+};
 
 export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  console.log("token", token)
+
     if (!token) {
-      
         res.status(401).json({ error: 'Access token is required' });
-        return 
+        return;
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, decodedToken) => {
-        if (err) {
-            res.status(403).json({ error: 'Invalid or expired token' });
-            return;
-        }
-        const decoded = decodedToken as UserPayload;
-        req.user = decoded;
-        console.log("Authenticated User:", req.user);
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'user') {
+        res.status(403).json({ error: 'Unauthorized access for users' });
+        return;
+    }
 
-        next();
-    });
+    req.user = decoded;
+    console.log("Authenticated User:", req.user);
+    next();
+};
+
+// Middleware for authenticating workers
+export const authenticateWorker = (req: Request, res: Response, next: NextFunction): void => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (!token) {
+        res.status(401).json({ error: 'Access token is required' });
+        return;
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'worker') {
+        res.status(403).json({ error: 'Unauthorized access for workers' });
+        return;
+    }
+
+    req.user = decoded;
+    console.log("Authenticated Worker:", req.user);
+    next();
 };

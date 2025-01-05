@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateUserProfile } from '../../services/userService';
+import { updateCoordinatesUser, updateUserProfile } from '../../services/userService';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Address } from '../../interfaces/addressInterface';
@@ -41,7 +41,7 @@ const EditUserProfile: React.FC = () => {
                 ...prev,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                profilePicPreview: user.profilePic || 'avathar.jpeg',
+                profilePicPreview: user.profilePic || '/avathar.jpeg',
             }));
         }
     }, [user]);
@@ -112,7 +112,7 @@ const EditUserProfile: React.FC = () => {
         }
     
         try {
-            const response = await updateCoordinates(lat, lng, userId)
+            const response = await updateCoordinatesUser(lat, lng, userId)
             console.log('Coordinates updated successfully:', response.data);
             toast.success('Coordinates updated successfully!');
         } catch (error) {
@@ -175,7 +175,7 @@ const EditUserProfile: React.FC = () => {
                 {message && <div className="mb-4 text-red-500">{message}</div>}
                 <div className="flex flex-col items-center mb-4">
                     <img
-                        src={profileData.profilePicPreview || '/path/to/default/profile/pic.png'}
+                        src={profileData.profilePicPreview || '/avathar.jpeg'}
                         alt="Profile Preview"
                         className="w-24 h-24 rounded-full border border-gray-300 mb-4"
                     />

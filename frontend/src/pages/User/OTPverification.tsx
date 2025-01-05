@@ -91,8 +91,8 @@ const OTPverification = () => {
                     </p>
                     <button
                         onClick={handleResendOtp}
-                        disabled={isResending}
-                        className={`mt-2 text-blue-500 hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={timer > 0 || isResending} // Disable if timer > 0 or already resending
+                        className={`mt-2 text-blue-500 hover:underline ${timer > 0 || isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isResending ? 'Resending...' : 'Resend OTP'}
                     </button>

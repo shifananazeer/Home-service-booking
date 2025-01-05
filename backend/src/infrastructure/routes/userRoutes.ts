@@ -20,6 +20,7 @@ router.post("/refresh-token", userController.refreshAccessToken);
 router.get('/services', userController.getServices)
 router.get("/profile", authenticateUser, userController.getUserProfile); 
 router.put('/profile/edit', authenticateUser ,upload.single('profilePic'),userController.editProfile)
+router.put('/updateLocation',authenticateUser,userController.updateLocation)
 router.get('/address/:userId',authenticateUser , userController.getAddress)
 router.get('/workers',authenticateUser,workerController.findWorkerBySkills)
 router.get('/available-slots',authenticateUser,userController.availableSlots)

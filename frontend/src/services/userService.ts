@@ -247,3 +247,19 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
       throw new Error('Failed to fetch services: ' + error.message);
     }
   };
+
+  export const updateCoordinatesUser  = async(lat: number , lng:number, userId:string) =>{
+    const token = localStorage.getItem('accessToken');
+  const response = await axiosInstance.put('/auth/updateLocation',{
+    
+        userId,
+        latitude: lat,
+        longitude: lng,
+    },
+    {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+  return response;
+}

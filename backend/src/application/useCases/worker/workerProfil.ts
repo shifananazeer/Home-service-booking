@@ -3,6 +3,7 @@ const workerRepository = new WorkerRepositoryImpl();
 export const workerProfile = async (email:string) => {
     try{
     const worker = await workerRepository.findByEmail(email);
+    console.log("wwwww",worker)
     if(!worker) {
         throw new Error("Worker not found");
     }

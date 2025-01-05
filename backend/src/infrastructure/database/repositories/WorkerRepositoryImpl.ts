@@ -9,7 +9,9 @@ export class WorkerRepositoryImpl implements WorkerRepository {
     }
 
     async findByEmail(email: string): Promise<Worker | null> {
+        console.log()
         const worker = await WorkerModel.findOne({ email });
+        console.log("workerfind",worker)
         return worker ? (worker.toObject() as Worker) : null;
     }
 

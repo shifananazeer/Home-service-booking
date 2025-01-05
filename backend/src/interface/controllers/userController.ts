@@ -14,7 +14,7 @@ import { userProfile } from "../../application/useCases/user/userProfile";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 import { updateUserProfile } from "../../application/useCases/user/updateUserProfile";
 import { uploadProfilePic } from "../../utils/s3Servise";
-import { updateAddress, userAddress } from "../../application/useCases/user/updateAddress";
+import { updateAddress, updateLocation, userAddress } from "../../application/useCases/user/updateAddress";
 
 import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
 import { Booking } from "../../domain/entities/Booking";
@@ -410,7 +410,25 @@ export const userController = {
     }catch (error:any) {
         res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
- }
+ },
+
+ updateLocation:async (req:Request , res:Response) : Promise<void> => {
+             const { latitude, longitude, userId } = req.body;
+ 
+             try {
+                 const result = await updateLocation(userId, latitude, longitude);
+                 
+                 if (!result.success) {
+                     res.status(HttpStatus.NOT_FOUND).json({ message: result.message });
+                     return;
+                 }
+                 
+                 res.status(HttpStatus.OK).json({ message: result.message, data: result.updatedAddress });
+             } catch (error: any) {
+                 console.error("Error updating coordinates:", error);
+                 res.status(HttpStatus.OK).json({ message:Messages.FAIL_UPDATE_COORDINATES , error: error.message });
+             }
+           }  ,
 }
 
 

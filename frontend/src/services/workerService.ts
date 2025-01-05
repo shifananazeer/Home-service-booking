@@ -222,13 +222,16 @@ return  response.data;
 export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
     const token = localStorage.getItem('worker_accessToken');
   const response = await axiosInstance.put('/workers/updateLocation',{
-    workerId,
-    latitude: lat,
-    longitude: lng,
-    headers : {
-        'Authorization':`Bearer ${token}`,
-    } 
-  })  
+    
+        workerId,
+        latitude: lat,
+        longitude: lng,
+    },
+    {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
   return response;
 }
 

@@ -1,6 +1,6 @@
 import express from 'express'
 import { workerController } from '../../interface/controllers/workerController';
-import  { authenticateUser } from '../../middleware/auth';
+import  { authenticateUser, authenticateWorker } from '../../middleware/auth';
 import multer from 'multer';
 import { authorizeRole } from '../../middleware/autherizeRole';
 
@@ -16,14 +16,14 @@ router.get('/reset-password/:token', workerController.validateResetToken);
 router.post('/reset-password', workerController.resetPassword);
 router.post("/refresh-token", workerController.refreshAccessToken);
 router.get('/services', workerController.getServices)
-router.get('/profile',authenticateUser,authorizeRole(['worker']), workerController.getWorkerProfile); 
-router.put('/profile/edit', authenticateUser ,authorizeRole(['worker']),upload.single('profilePic'), workerController.updateWorkerProfile);
-router.post('/availability',authenticateUser,authorizeRole(['worker']),workerController.handleCreateAvailability)
-router.get('/availability/:workerId',authenticateUser,authorizeRole(['worker']), workerController.fetchAvailabilitySlotForWorker);
-router.put('/availability/edit/:slotId',authenticateUser,authorizeRole(['worker']), workerController.editAvailabilitySlot);
-router.delete('/availability/delete/:slotId',authenticateUser,authorizeRole(['worker']), workerController.deleteAvailabilitySlot);
-router.put('/updateLocation',authenticateUser,authorizeRole(['worker']),workerController.updateLocation)
-router.get('/bookings/:workerId',authenticateUser,authorizeRole(['worker']), workerController.allBookingsByworkerId);
-router.get('/:workerId',authenticateUser ,authorizeRole(['worker']), workerController.getWorkerLocation)
-router.get('/today-booking/:workerId',authenticateUser,authorizeRole(['worker']),workerController.todaysBooking)
+router.get('/profile',authenticateWorker,authorizeRole(['worker']), workerController.getWorkerProfile); 
+router.put('/profile/edit', authenticateWorker ,authorizeRole(['worker']),upload.single('profilePic'), workerController.updateWorkerProfile);
+router.post('/availability',authenticateWorker,authorizeRole(['worker']),workerController.handleCreateAvailability)
+router.get('/availability/:workerId',authenticateWorker,authorizeRole(['worker']), workerController.fetchAvailabilitySlotForWorker);
+router.put('/availability/edit/:slotId',authenticateWorker,authorizeRole(['worker']), workerController.editAvailabilitySlot);
+router.delete('/availability/delete/:slotId',authenticateWorker,authorizeRole(['worker']), workerController.deleteAvailabilitySlot);
+router.put('/updateLocation',authenticateWorker,authorizeRole(['worker']),workerController.updateLocation)
+router.get('/bookings/:workerId',authenticateWorker,authorizeRole(['worker']), workerController.allBookingsByworkerId);
+router.get('/:workerId',authenticateWorker ,authorizeRole(['worker']), workerController.getWorkerLocation)
+router.get('/today-booking/:workerId',authenticateWorker,authorizeRole(['worker']),workerController.todaysBooking)
 export default router;
