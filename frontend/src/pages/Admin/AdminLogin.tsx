@@ -14,11 +14,6 @@ const AdminLogin = () => {
     const { isLoading, error } = useSelector((state: RootState) => state.admin); 
     const token = localStorage.getItem('admin_Id')
 
-    
-    // if (token) {
-    //     return <Navigate to="/admin/dashboard" replace />;
-    // }
-
     useEffect(() => {
         if (token) {
             navigate('/admin/dashboard');
