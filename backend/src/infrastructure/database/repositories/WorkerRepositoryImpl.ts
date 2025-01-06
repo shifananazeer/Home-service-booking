@@ -54,7 +54,9 @@ export class WorkerRepositoryImpl implements WorkerRepository {
 
     async findAllWorkers(skip: number, limit: number, search: string): Promise<Worker[] | null> {
         const query = search ? { name: { $regex: search, $options: "i" } } : {};
-        const workers = await WorkerModel.find(query).skip(skip).limit(limit);
+        const workers = await WorkerModel.find(query)
+        .select("name email profilePic") 
+        .skip(skip).limit(limit);
         return workers;
     }
 }

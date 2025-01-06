@@ -65,7 +65,9 @@ export class UserRepositoryImpl implements UserRepository {
 
     async findAllUsers(skip: number, limit: number, search: string): Promise<User[] | null> {
         const query = search ? { firstName: { $regex: search, $options: "i" } } : {};
-        const users = await UserModel.find(query).skip(skip).limit(limit);
+        const users = await UserModel.find(query)
+        .select("firstName lastName email profilePic") 
+        .skip(skip).limit(limit);
         return users;
     }
 }

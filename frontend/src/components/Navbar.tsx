@@ -9,6 +9,7 @@ const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const userData = useAppSelector((state) => state.user.userData)
   const token = localStorage.getItem('accessToken')
+  const userId = localStorage.getItem('user_Id')
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -76,7 +77,7 @@ const Navbar: React.FC = () => {
             Register as a Worker 
           </button>
 
-          {!token ? (
+          {!token && !userId ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLoginClick}
