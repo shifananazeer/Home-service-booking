@@ -1,7 +1,7 @@
 
 
 import axios from 'axios';
-import { userRefreshAccessToken, workerRefreshAccessToken } from './auth'; 
+import { adminRefreshAccessToken, userRefreshAccessToken, workerRefreshAccessToken } from './auth'; 
 
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:3000/api',
@@ -28,18 +28,27 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response && error.response.status === 401||403) {
-            const refreshToken = localStorage.getItem('refreshToken') || localStorage.getItem('worker_refreshToken'); // Retrieve refresh token from storage
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            const refreshToken = 
+                localStorage.getItem('refreshToken') || 
+                localStorage.getItem('worker_refreshToken') || 
+                localStorage.getItem('admin_refreshToken'); // Retrieve refresh token from storage
 
             if (refreshToken) {
                 if (!isRefreshing) {
                     isRefreshing = true; 
 
                     try {
-                        const isWorker = originalRequest.url.includes('/workers'); // Determine if the request is for a worker
-                        const newAccessToken = isWorker 
-                            ? await workerRefreshAccessToken(refreshToken) 
-                            : await userRefreshAccessToken(refreshToken); 
+                        let newAccessToken: string | null = null;
+                        
+                        // Determine the request type (user, worker, or admin)
+                        if (originalRequest.url.includes('/workers')) {
+                            newAccessToken = await workerRefreshAccessToken(refreshToken); 
+                        } else if (originalRequest.url.includes('/admin')) {
+                            newAccessToken = await adminRefreshAccessToken(refreshToken); 
+                        } else {
+                            newAccessToken = await userRefreshAccessToken(refreshToken); 
+                        }
 
                         if (newAccessToken) {
                             originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
@@ -62,6 +71,7 @@ axiosInstance.interceptors.response.use(
             } else {
                 // Handle case where refresh token is missing (e.g., redirect to login)
                 console.log('No refresh token found, redirecting to login...');
+                // Optionally redirect to login page here
             }
         }
 
