@@ -1,8 +1,8 @@
-import { WorkerRepository } from "../../../domain/repositories/workerRepository";
-import { Worker } from "../../../domain/entities/worker";
+import { WorkerRepository } from "../../domain/repositories/workerRepository";
+import { Worker } from "../../domain/entities/worker";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl";
+import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories/WorkerRepositoryImpl";
 
 export class WorkerService {
     private workerRepository: WorkerRepository;
@@ -110,7 +110,33 @@ export class WorkerService {
             throw new Error('Database error');
         }
     }
+    public async getWorkers(page: number, limit: number, search: string): Promise<Worker[] | null> {
+        const skip = (page - 1) * limit;
+        const workers = await this.workerRepository.findAllWorkers(skip, limit, search);
+        return workers;
+    }
+    public async findWorkerById(workerId: string): Promise<Worker> {
+    if (!workerId) {
+      throw new Error('Worker ID is required');
+    }
 
+    const worker = await this.workerRepository.getWorkerById(workerId);
+
+    if (!worker) {
+      throw new Error('Worker not found');
+    }
+
+    return worker;
+  }
+  public async getWorker(workerId: string): Promise<Worker | null> {
+    try {
+      const worker = await this.workerRepository.getWorkerById(workerId);
+      return worker;
+    } catch (error) {
+      console.error('Error Finding worker', error);
+      throw new Error("Failed to retrieve worker");
+    }
+  }
 }
 
 

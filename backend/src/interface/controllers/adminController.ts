@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
 import { AdminService} from '../../application/useCases/loginAdmin';
-import { UserService } from '../../application/useCases/admin/getUsers';
-import { WorkerService } from "../../application/useCases/admin/getWorkers";
+import { UserService } from '../../application/useCases/userService';
+import { WorkerService } from "../../application/useCases/workerService";
 import { uploadProfilePic } from "../../utils/s3Servise";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/repositories/ServiceRepositoryIml";
-import {  ServiceManagement } from "../../application/useCases/admin/services";
+import {  ServiceManagement } from "../../application/useCases/servicesManagement";
 import { uploadServiceImage } from "../../utils/uploadServiseImage";
 import { Service } from "../../domain/entities/Service";
 import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
-import { BookingManagement } from "../../application/useCases/admin/getBookings";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 import { HttpStatus } from "../../utils/httpStatus";
 import { Messages } from "../../utils/message";
 import {BookingRepositoryImpl} from "../../infrastructure/database/repositories/BookingRepositoryImpl";
+import { BookingService } from "../../application/useCases/bookingService";
 const adminService = new AdminService();
 const userService = new UserService();
 const workerService = new WorkerService();
 const serviceManagement = new ServiceManagement();
-const bookingManagement = new BookingManagement();
+const bookingService = new BookingService();
 
  
 class AdminController {
@@ -156,7 +156,7 @@ class AdminController {
 
         try {
             const params = { page, limit, search };
-            const { bookings, total } = await bookingManagement.fetchAllBookings(params);
+            const { bookings, total } = await bookingService.fetchAllBookings(params);
             res.status(HttpStatus.OK).json({
                 message: Messages.BOOKING_RETRIVED,
                 bookings,

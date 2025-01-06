@@ -1,8 +1,8 @@
 // ServiceManagement.ts
-import { Service } from "../../../domain/entities/Service";
-import { ServiceRepository } from "../../../domain/repositories/serviceRepository";
-import { ServiceRepositoryImpl } from "../../../infrastructure/database/repositories/ServiceRepositoryIml"
-import { UserRepositoryImpl } from "../../../infrastructure/database/repositories/UserRepositoryImpl";
+import { Service } from "../../domain/entities/Service";
+import { ServiceRepository } from "../../domain/repositories/serviceRepository";
+import { ServiceRepositoryImpl } from "../../infrastructure/database/repositories/ServiceRepositoryIml"
+import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
 
 interface CreateServiceInput {
     name: string;

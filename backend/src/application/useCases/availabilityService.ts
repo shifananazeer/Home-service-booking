@@ -1,5 +1,5 @@
-import { AvailabilityRepositoryImpl } from "../../../infrastructure/database/repositories/AvailabilityRepositoryIml";
-import { Availability, AvailabilitySlot } from "../../../domain/entities/Availability";
+import { AvailabilityRepositoryImpl } from "../../infrastructure/database/repositories/AvailabilityRepositoryIml";
+import { Availability, AvailabilitySlot } from "../../domain/entities/Availability";
 import mongoose from "mongoose";
 const availabilityRepository = new AvailabilityRepositoryImpl()
 export class AvailabilityService {
@@ -133,36 +133,36 @@ export class AvailabilityService {
 
 
 
-export const updateStatusOfSlot = async (slotId:string) => {
-  await availabilityRepository.updateSlotStatus(slotId)
-}
+// export const updateStatusOfSlot = async (slotId:string) => {
+//   await availabilityRepository.updateSlotStatus(slotId)
+// }
 
-export const updateSlot = async (slotId: string,updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> => {
-  const updatedSlot = await availabilityRepository.updateSlot(slotId, updateData);
-  return updatedSlot;
-};
+// export const updateSlot = async (slotId: string,updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> => {
+//   const updatedSlot = await availabilityRepository.updateSlot(slotId, updateData);
+//   return updatedSlot;
+// };
 
-export const fetchAvailableSlots = async (workerId: string, date: Date): Promise<any[]> => {
-  try {
-      const availability = await availabilityRepository.getAvailableSlots(workerId, date);
-      return availability ? availability.slots : [];
-  } catch (err) {
-      console.error("Error in fetchAvailableSlots:", err);
-      throw new Error("Error fetching available slots");
-  }
-};
+// export const fetchAvailableSlots = async (workerId: string, date: Date): Promise<any[]> => {
+//   try {
+//       const availability = await availabilityRepository.getAvailableSlots(workerId, date);
+//       return availability ? availability.slots : [];
+//   } catch (err) {
+//       console.error("Error in fetchAvailableSlots:", err);
+//       throw new Error("Error fetching available slots");
+//   }
+// };
 
-export const availableSlots = async (
+// export const availableSlots = async (
 
-  workerId: string,
-  page: number,
-  limit: number
-) => {
-  try {
-    const skip = (page - 1) * limit;
-    return await availabilityRepository.getAllAvailabilityByWorkerId(workerId, skip, limit);
-  } catch (error) {
-    console.error("Error fetching available slots:", error);
-    throw new Error("Could not fetch available slots.");
-  }
-};
+//   workerId: string,
+//   page: number,
+//   limit: number
+// ) => {
+//   try {
+//     const skip = (page - 1) * limit;
+//     return await availabilityRepository.getAllAvailabilityByWorkerId(workerId, skip, limit);
+//   } catch (error) {
+//     console.error("Error fetching available slots:", error);
+//     throw new Error("Could not fetch available slots.");
+//   }
+// };

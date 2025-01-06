@@ -33,16 +33,22 @@ const BookingList: React.FC = () => {
   useEffect(() => {
     const loadBookings = async () => {
       const userId = localStorage.getItem('user_Id');
-
       if (!userId) {
         setError('User ID is missing');
         setIsLoading(false);
         return;
       }
+  
       try {
-        const fetchedBookings = await fetchBookigs(userId , currentPage ,limit);
-        console.log("Fetched Bookings:", fetchedBookings.bookings);
-        setBookings(fetchedBookings.bookings);
+        const fetchedData = await fetchBookigs(userId, currentPage, limit);
+        console.log("Fetched Bookings:", fetchedData);
+
+        if (fetchedData && fetchedData.bookings && Array.isArray(fetchedData.bookings.bookings)) {
+          setBookings(fetchedData.bookings.bookings);
+          setTotalPages(Math.ceil(fetchedData.bookings.total / limit));
+        } else {
+          setError('Invalid data structure received from the server');
+        }
         setIsLoading(false);
       } catch (err) {
         console.error('Error fetching bookings:', err);
@@ -50,9 +56,9 @@ const BookingList: React.FC = () => {
         setIsLoading(false);
       }
     };
-
+  
     loadBookings();
-  }, [ currentPage , limit]);
+  }, [currentPage, limit]);
 
   const handleCancelBooking = async (bookingId: string) => {
     const result = await Swal.fire({
@@ -212,7 +218,7 @@ const BookingList: React.FC = () => {
           Total Bookings: {bookings.length}
         </p>
       <button
-        onClick={() => navigate("/book")}
+        onClick={() => navigate("/services")}
         className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
       >
         Book New Service

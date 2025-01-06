@@ -2,24 +2,22 @@ import { Request, Response } from 'express';
 import { Worker, WorkerUpdates } from '../../domain/entities/worker';
 import { WorkerRepositoryImpl } from '../../infrastructure/database/repositories/WorkerRepositoryImpl';
 import { generateOtp } from '../../application/useCases/generateOtp';
-import {  WorkerService } from '../../application/useCases/worker/workerAuth';
+import {  WorkerService } from '../../application/useCases/workerService';
 import { validateOtp } from '../../application/useCases/validateOTP';
 
 import { resetPassword, sendResetLink } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
-import { AddressService} from '../../application/useCases/user/updateAddress';
+import { AddressService} from '../../application/useCases/addressService';
 
 import { uploadProfilePic } from '../../utils/s3Servise';
-import { updateWorkerProfile } from '../../application/useCases/worker/updateWorkerProfile';
 import { Availability } from '../../domain/entities/Availability';
-import { AvailabilityService, } from '../../application/useCases/worker/availability';
+import { AvailabilityService, } from '../../application/useCases/availabilityService';
 import { AvailabilityRepositoryImpl } from '../../infrastructure/database/repositories/AvailabilityRepositoryIml';
 import AvailabilityModel from '../../infrastructure/database/models/availabilityModel';
 import moment from 'moment';
-import { blockWorker, unblockWorker } from '../../application/useCases/worker/blockWorker';
 import { getServers } from 'dns';
 import { ServiceRepositoryImpl } from '../../infrastructure/database/repositories/ServiceRepositoryIml';
-import { BookingService, singleWorker } from '../../application/useCases/worker/workerService';
+import { BookingService, singleWorker } from '../../application/useCases/bookingService';
 import { AddressRepositoryImpl } from '../../infrastructure/database/repositories/AddressRepositoryIml';
 import { getAllServicesUseCase } from '../../application/useCases/getAllService';
 import { HttpStatus } from '../../utils/httpStatus';

@@ -202,6 +202,7 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
         Authorization: `Bearer ${token}`, // Send the token in headers
       },
     });
+    console.log("ppp", response)
     return response.data; // Ensure only the data is returned
   };
 

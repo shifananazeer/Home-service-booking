@@ -1,5 +1,5 @@
 import { NextFunction , Request , Response } from "express";
-import { registerUser } from "../../application/useCases/registerUser";
+import {  UserService } from "../../application/useCases/userService";
 import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
 import { loginUser } from "../../application/useCases/loginUser";
 import { validateOtp } from "../../application/useCases/validateOTP";
@@ -7,32 +7,35 @@ import { generateOtp } from "../../application/useCases/generateOtp";
 import { sendResetLink } from "../../application/useCases/passwordResent";
 import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
-import { blockUser,unblockUser } from "../../application/useCases/user/blockUser";
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken'
-import { userProfile } from "../../application/useCases/user/userProfile";
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
-import { updateUserProfile } from "../../application/useCases/user/updateUserProfile";
 import { uploadProfilePic } from "../../utils/s3Servise";
-import { updateAddress, updateLocation, userAddress } from "../../application/useCases/user/updateAddress";
+import { AddressService, updateAddress, updateLocation, userAddress } from "../../application/useCases/addressService";
 
-import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
+import { AvailabilityService } from "../../application/useCases/availabilityService";
 import { Booking } from "../../domain/entities/Booking";
-import { bookingCancelUpdate, createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
 
-import { getWorker } from "../../application/useCases/user/getWorkerDetails";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
-import { allServices } from "../../application/useCases/user/serviceDisplay";
 import { HttpStatus } from "../../utils/httpStatus";
 import { HttpRequest } from "aws-sdk";
 import { Messages } from "../../utils/message";
+import { BookingService } from "../../application/useCases/bookingService";
+import { WorkerService } from "../../application/useCases/workerService";
+import { ServiceManagement } from "../../application/useCases/servicesManagement";
 const addressRepository = new AddressRepositoryImpl();
 
-export const userController = {
-    register: async (req: Request, res: Response) => {
+const addressService = new AddressService();
+const userService = new UserService();
+const availabilityService = new AvailabilityService()
+const bookingService = new BookingService();
+const serviceManagement = new ServiceManagement();
+const workerService = new WorkerService()
+class UserController  {
+   async register (req: Request, res: Response) {
         console.log("body", req.body)
         try {
-          const user = await registerUser( req.body);
+          const user = await userService.registerUser( req.body);
           await generateOtp(user.email,1);
           res
             .status(HttpStatus.OK)
@@ -40,11 +43,11 @@ export const userController = {
         } catch (error: any) {
           res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
-      },
-    login: async (req: Request, res: Response) => {
+      }
+   async login (req: Request, res: Response)  {
         console.log('Login request received:', req.body);
         try {
-            const { accessToken, refreshToken ,userId } = await loginUser(
+            const { accessToken, refreshToken ,userId } = await userService.loginUser(
                 req.body.email,
                 req.body.password
             );
@@ -62,8 +65,8 @@ export const userController = {
         } catch (error: any) {
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
-      },
-    validateOtp: async (req: Request, res: Response) => {
+      }
+    async validateOtp (req: Request, res: Response)  {
         try {
             const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(req.body.email, req.body.otp, 1);
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
@@ -80,8 +83,8 @@ export const userController = {
             console.error("Error verifying OTP:", error.message);
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
         }
-    },
-    resendOtp: async (req: Request, res: Response) => {
+    }
+   async resendOtp (req: Request, res: Response)  {
         console.log("body" ,req.body)
         const { email } = req.body;
         try {
@@ -91,9 +94,9 @@ export const userController = {
             console.error('Error sending OTP:', error); 
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message || Messages.FAILED_RESEND });
         }
-    },
+    }
 
-     forgotPassword :async (req: Request, res: Response): Promise<void> => {
+    async forgotPassword  (req: Request, res: Response): Promise<void>  {
         try {
             const { email } = req.body;
     
@@ -108,8 +111,8 @@ export const userController = {
             console.error('Error in forgotPassword:', error.message);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
-    },
-    validateResetToken: async (req: Request, res: Response): Promise<void> => {
+    }
+    async validateResetToken (req: Request, res: Response): Promise<void>  {
         try {
             const { token } = req.params;
 
@@ -124,9 +127,9 @@ export const userController = {
             console.error('Error in validateResetToken:', error.message);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
-    },
+    }
 
-    resetPassword: async (req: Request, res: Response): Promise<void> => {
+   async resetPassword (req: Request, res: Response): Promise<void> {
         console.log("body",req.body)
         try {
             const { token, newPassword } = req.body;
@@ -138,13 +141,13 @@ export const userController = {
             console.error('Error in resetPassword:', error.message);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
         }
-    },
+    }
    
-    blockUser : async (req: Request, res: Response): Promise<void> => {
+   async blockUser  (req: Request, res: Response): Promise<void> {
         const { userId } = req.params;
     
         try {
-            const updatedUser = await blockUser(userId);
+            const updatedUser = await userService.blockUser(userId);
             if (!updatedUser) {
                 res.status(HttpStatus.NOT_FOUND).json({ message:Messages.NOT_FOUNT });
                 return;
@@ -154,13 +157,13 @@ export const userController = {
             console.error('Error blocking user:', error);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
-    },
+    }
 
-    unblockUser : async (req: Request, res: Response): Promise<void> => {
+   async unblockUser  (req: Request, res: Response): Promise<void>  {
         const { userId } = req.params;
     
         try {
-            const updatedUser = await unblockUser(userId);
+            const updatedUser = await userService.unblockUser(userId);
             if (!updatedUser) {
                 res.status(HttpStatus.NOT_FOUND).json({ message: 'User not found' });
                 return;
@@ -170,8 +173,8 @@ export const userController = {
             console.error('Error unblocking user:', error);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR });
         }
-    },
-    refreshAccessToken: async (req: Request, res: Response): Promise<void> => {
+    }
+    async refreshAccessToken (req: Request, res: Response): Promise<void>  {
         const { refreshToken } = req.body;
     
         if (!refreshToken) {
@@ -192,8 +195,8 @@ export const userController = {
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message ||Messages.INTERNAL_SERVER_ERROR });
             }
         }
-    },
-    getUserProfile: async (req: Request, res: Response): Promise<void> => {
+    }
+   async getUserProfile (req: Request, res: Response): Promise<void>  {
         console.log("Request User:", req.user); 
         try {
             const userEmail = (req.user as { email?: string })?.email;
@@ -201,8 +204,11 @@ export const userController = {
                 res.status(HttpStatus.NOT_FOUND).json({ error: Messages.EMAIL_NOT_FOUNT });
                 return; 
             }
-            const user = await userProfile(userEmail);
-            const addressResponse = await userAddress(user._id); 
+            const user = await userService.userProfile(userEmail);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            const addressResponse = await addressService.userAddress(user._id); 
             console.log("address.............", addressResponse, "user", user);
             if (!addressResponse.address) {
           
@@ -253,9 +259,9 @@ export const userController = {
             console.error('Error retrieving user profile:', error); 
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR });
         }
-    },
+    }
 
-    editProfile: async (req: Request, res: Response) => {
+    async editProfile (req: Request, res: Response)  {
         console.log("edit Request User:", req.user); 
      try{
         const userEmail = (req.user as { email?: string })?.email;
@@ -263,7 +269,7 @@ export const userController = {
             res.status(HttpStatus.NOT_FOUND).json({ error: Messages.EMAIL_NOT_FOUNT });
             return;
         }
-        const user = await userProfile(userEmail)
+        const user = await userService.userProfile(userEmail)
         if (!user) {
             res.status(HttpStatus.NOT_FOUND).json({ error: Messages.NOT_FOUNT });
             return;
@@ -277,17 +283,17 @@ export const userController = {
         if (firstName) updates.firstName = firstName;
         if (lastName) updates.lastName = lastName;
         if (profilePicUrl) updates.profilePic = profilePicUrl; 
-        const updatedUser = await updateUserProfile(user.email, updates);
-        const userAddress = await updateAddress(user._id.toString(), address,area);
+        const updatedUser = await userService.updateUserProfile(user.email, updates);
+        const userAddress = await addressService.updateAddress(user._id.toString(), address,area);
         res.status(HttpStatus.OK).json({ user: updatedUser ,address: userAddress });
      }catch (error:any) {
         console.error('Error updating profile:', error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR });
      }
         
-    },
+    }
     
-    getAddress : async (req:Request , res:Response):Promise<void> => {
+    async getAddress  (req:Request , res:Response):Promise<void> {
     const userId =  req.params.userId
     console.log("id.",userId)
     if (!/^[a-fA-F0-9]{24}$/.test(userId)) {
@@ -297,14 +303,14 @@ export const userController = {
     const userAddress = await addressRepository.findAddressByUserId(userId)
     console.log("aaaaaaaaa",userAddress)
     res.status(HttpStatus.OK).json({  userAddress })
-    },
+    }
 
-    availableSlots : async (req:Request , res:Response) : Promise <void> => {
+    async availableSlots  (req:Request , res:Response) : Promise <void> {
         const { workerId, date } = req.query;
         console.log("dd",date)
 
         try {
-            const slots = await fetchAvailableSlots(workerId as string, new Date(date as string));
+            const slots = await availabilityService.fetchAvailableSlots(workerId as string, new Date(date as string));
             console.log("slots", slots);
 
             if (!slots ) {
@@ -317,14 +323,14 @@ export const userController = {
             console.error("Error fetching slots:", error);
             res.status(500).json({ message: Messages.ERROR_FETCHING });
         }
-    },
+    }
     
-    createBooking : async (req:Request , res:Response):Promise <void>=> {
+   async  createBooking  (req:Request , res:Response):Promise <void> {
         console.log('Request body:', req.body);
         try{
          const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus , rate} = req.body ;
 
-         const updateSlotStatus = await updateStatusOfSlot(slotId)
+         const updateSlotStatus = await availabilityService.updateStatusOfSlot(slotId)
          const bookingDetails: Booking = {
              date, 
              slotId,
@@ -339,43 +345,44 @@ export const userController = {
              paymentStatus: paymentStatus || 'Pending',
              bookingId: uuidv4(),
          };
-        const createdBooking = await createBookings (bookingDetails);
+        const createdBooking = await bookingService.createBooking (bookingDetails);
         res.status(HttpStatus.CREATED).json(createdBooking);
         }catch (error) {
             console.error('Error creating booking:', error);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message:Messages.ERROR_CREATING  });
         }
- },
+ }
 
- getBookings : async (req:Request , res:Response) :Promise <void> => {
+ async getBookings (req:Request , res:Response) :Promise <void> {
     const { page, limit } = req.query;
     const {userId} = req.params;
     try{
         const parsedPage = parseInt(page as string, 10)||1;
         const parsedLimit = parseInt(limit as string, 10)||1;
-     const bookings = await getBookingsByUserId(userId ,  parsedPage, parsedLimit)
+     const bookings = await bookingService.getBookingsByUserId(userId ,  parsedPage, parsedLimit)
+     console.log("booki", bookings)
      res.status(HttpStatus.OK).json({bookings})
     } catch (error) {
         console.error('Error fetching bookings:', error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERROR_FETCHING });
     }
- },
+ }
 
- fetchWorkerDetails: async (req:Request , res:Response) : Promise<void> => {
+ async fetchWorkerDetails (req:Request , res:Response) : Promise<void>  {
    const { workerId } = req.params;
    try{
-    const workerDetails = await getWorker(workerId)
+    const workerDetails = await workerService.getWorker(workerId)
     res.status(HttpStatus.OK).json({workerDetails})
    }catch(error) {
     console.error("failed to fetch worker " , error);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERROR_FETCHING });
    }
- },
+ }
 
- cancelBooking : async (req:Request , res:Response) :Promise<void> => {
+ async cancelBooking (req:Request , res:Response) :Promise<void> {
     const { bookingId } = req.params;
     try {
-        const updatedBooking = await bookingCancelUpdate(bookingId);
+        const updatedBooking = await bookingService.cancelBooking(bookingId);
 
         if (!updatedBooking) {
             res.status(HttpStatus.NOT_FOUND).json({ success: false, message:Messages.NOT_FOUNT });
@@ -394,11 +401,12 @@ export const userController = {
             message: Messages.ERROR_CANCELLING ,
         });
     }
- },
- getServices : async (req:Request , res:Response) => {
+ }
+
+ async getServices  (req:Request , res:Response)  {
     const { page = 1, limit = 10, search = '' } = req.query;  
     try{
-        const {services , totalServices} = await allServices(
+        const {services , totalServices} = await serviceManagement.getAllServices(
         parseInt(page as string), 
         parseInt(limit as string), 
         search as string
@@ -411,13 +419,13 @@ export const userController = {
     }catch (error:any) {
         res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
     }
- },
+ }
 
- updateLocation:async (req:Request , res:Response) : Promise<void> => {
+ async updateLocation (req:Request , res:Response) : Promise<void> {
              const { latitude, longitude, userId } = req.body;
  
              try {
-                 const result = await updateLocation(userId, latitude, longitude);
+                 const result = await addressService.updateLocation(userId, latitude, longitude);
                  
                  if (!result.success) {
                      res.status(HttpStatus.NOT_FOUND).json({ message: result.message });
@@ -429,8 +437,12 @@ export const userController = {
                  console.error("Error updating coordinates:", error);
                  res.status(HttpStatus.OK).json({ message:Messages.FAIL_UPDATE_COORDINATES , error: error.message });
              }
-           }  ,
+           }  
 }
+
+
+
+export const userController  = new UserController();
 
 
 
