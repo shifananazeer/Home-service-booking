@@ -1,11 +1,12 @@
 import { WorkerRepositoryImpl } from "../../../infrastructure/database/repositories/WorkerRepositoryImpl";
 import { Worker } from "../../../domain/entities/worker";
 import {Booking} from  '../../../domain/entities/Booking'
-import bookingRepository from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
+import {BookingRepositoryImpl} from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
 import { AddressRepositoryImpl } from "../../../infrastructure/database/repositories/AddressRepositoryIml";
 import { Address } from "../../../domain/entities/Address";
 const addressRepository = new AddressRepositoryImpl();
 const workerRepository = new WorkerRepositoryImpl();
+const bookingRepository = new BookingRepositoryImpl();
 export const workerService = async (skill: string | undefined): Promise<Worker[]> => { 
     if (!skill) {
         throw new Error('Skill is required');

@@ -2,7 +2,7 @@ import { Booking } from "../../../domain/entities/Booking";
 import { BookingRepository } from "../../../domain/repositories/bookingRepository";
 import BookingModel from "../models/bookingModel";
 
-class BookingRepositoryImpl implements BookingRepository {
+export class BookingRepositoryImpl implements BookingRepository {
     async bookingDetailsUpdate(bookingDetails: Booking): Promise<Booking> {
         try {
             const createdBooking = await BookingModel.create(bookingDetails);
@@ -89,4 +89,4 @@ class BookingRepositoryImpl implements BookingRepository {
     }
 }
 
-export default new BookingRepositoryImpl();
+

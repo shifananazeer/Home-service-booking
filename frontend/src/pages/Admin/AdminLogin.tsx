@@ -29,6 +29,7 @@ const AdminLogin = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+       
         dispatch(loginStart()); 
 
         try {
@@ -41,11 +42,8 @@ const AdminLogin = () => {
 
            
             const response = await adminLogin({ email, password });
-            const { accessToken, refreshToken ,adminId } = response;
+           
 
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', refreshToken);
-            localStorage.setItem('admin_Id' , adminId)
             if (response.status === 200) {
                 dispatch(loginSuccess(response.data.accessToken)); 
                 toast.success('Login successful!');

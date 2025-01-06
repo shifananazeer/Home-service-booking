@@ -1,7 +1,7 @@
 import { Booking } from "../../../domain/entities/Booking";
-import  bookingRepository  from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
+import {BookingRepositoryImpl}  from "../../../infrastructure/database/repositories/BookingRepositoryImpl";
 
-
+const bookingRepository = new BookingRepositoryImpl()
 export const createBookings = async (bookingDetails: Booking): Promise<Booking |null> => {
     try {
         const createdBooking = await bookingRepository.bookingDetailsUpdate(bookingDetails);

@@ -6,7 +6,7 @@ export const refreshAccessToken = async (refreshToken: string, endpoint: string)
         console.warn('No refresh token found');
         return null; 
     }
-
+  console.log("refresh", refreshToken)
     try {
         const response = await axiosInstance.post(endpoint, {
             refreshToken, 

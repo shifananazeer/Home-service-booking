@@ -19,7 +19,7 @@ import { updateAddress, updateLocation, userAddress } from "../../application/us
 import { availableSlots, fetchAvailableSlots, updateSlot, updateStatusOfSlot } from "../../application/useCases/worker/availability";
 import { Booking } from "../../domain/entities/Booking";
 import { bookingCancelUpdate, createBookings, getBookingsByUserId } from "../../application/useCases/user/booking";
-import { getWorkers } from "../../application/useCases/admin/getWorkers";
+
 import { getWorker } from "../../application/useCases/user/getWorkerDetails";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
 import { allServices } from "../../application/useCases/user/serviceDisplay";
@@ -27,6 +27,7 @@ import { HttpStatus } from "../../utils/httpStatus";
 import { HttpRequest } from "aws-sdk";
 import { Messages } from "../../utils/message";
 const addressRepository = new AddressRepositoryImpl();
+
 export const userController = {
     register: async (req: Request, res: Response) => {
         console.log("body", req.body)
