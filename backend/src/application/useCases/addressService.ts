@@ -3,7 +3,7 @@ import AddressModel from "../../infrastructure/database/models/addressModel";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml"; 
 import { Address } from "../../domain/entities/Address";
 
-// Create an instance of AddressRepositoryImpl
+
 const addressRepository = new AddressRepositoryImpl();
 interface AddressResponse {
     message: string;    

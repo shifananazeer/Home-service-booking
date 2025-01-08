@@ -51,8 +51,25 @@ export class AddressRepositoryImpl implements AddressRepository {
             );
 
             if (!address) {
-                return null;
+                const newAddress = new AddressModel({
+                    userId: workerId,
+                    location: {
+                        latitude: latitude,
+                        longitude: longitude
+                    }
+                });
+    
+                const savedAddress = await newAddress.save(); // Save the new address
+                return {
+                    ...this.mapAddressToResponse(savedAddress),
+                    location: {
+                        latitude: savedAddress.location.latitude,
+                        longitude: savedAddress.location.longitude
+                    }
+                } as Address; // Return the new address
             }
+    
+            // Return the updated address without changing the structure
             return {
                 ...this.mapAddressToResponse(address),
                 location: {

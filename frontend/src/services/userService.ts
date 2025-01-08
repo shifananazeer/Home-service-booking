@@ -264,3 +264,30 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
     })
   return response;
 }
+
+
+export const resetPasswordFromPassword = async ( newPassword: string): Promise<string> => {
+  const userId = localStorage.getItem('user_Id')
+  try {
+      const response = await axiosInstance.post('/auth/user/reset-password', { newPassword });
+      return response.data.message;
+  } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to reset password.');
+  }
+};
+    
+
+
+export const createCheckoutSession = async (data:{amount:number}) => {
+  try{
+    const response = await axiosInstance.post('/auth/create-checkout-session',data ,{
+      headers: {
+        'Content-Type': 'application/json',
+    },
+    });
+    return response.data;
+  }catch (error) {
+    console.error('Error creating checkout session:', error)
+    throw error
+  }
+}

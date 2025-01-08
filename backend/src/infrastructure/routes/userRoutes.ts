@@ -28,4 +28,7 @@ router.post('/create-booking',authenticateUser , userController.createBooking)
 router.get('/booking/:userId' ,authenticateUser , userController.getBookings)
 router.get('/worker/:workerId' ,authenticateUser , userController.fetchWorkerDetails)
 router.post('/cancelBooking/:bookingId' , authenticateUser , userController.cancelBooking)
+router.post('/user/reset-password',)
+router.post ('/create-checkout-session',userController.createCheckoutSession)
+router.post('/create-payment',userController.createPayment)
 export default router;

@@ -19,16 +19,28 @@ const BookingSchema = new Schema<BookingDocument>({
     latitude: { type: Number,required: true},
      longitude: { type: Number, required: true},
 },
-rate:{type:Number},
 workerName:{type:String} ,
 serviceImage:{type:String},
 serviceName:{type:String},
-paymentStatus: {type: String,
-    enum: ['Pending', 'Completed','Confirmed', 'Cancelled'], 
-    required: true,
-},
-createdAt: { type: Date, default: Date.now },
+// paymentStatus: {type: String,
+//     enum: ['Pending', 'Completed','Confirmed', 'Cancelled'], 
+//     required: true,
+// },
 
+paymentStatus: {
+  type: String,
+  enum: ['pending', 'advance_paid', 'balance_due', 'paid'],
+  default: 'pending',
+},
+workStatus: {
+  type: String,
+  enum: ['not_started', 'in_progress', 'completed', 'canceled'],
+  default: 'not_started',
+},
+advancePayment: { type: Number, required: true },
+totalPayment: { type: Number, required: true },
+balancePayment: { type: Number, default: 0 },
+createdAt: { type: Date, default: Date.now },
 
 })
 

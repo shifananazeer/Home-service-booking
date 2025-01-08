@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AdminService} from '../../application/useCases/loginAdmin';
+import { AdminService} from '../../application/useCases/adminService';
 import { UserService } from '../../application/useCases/userService';
 import { WorkerService } from "../../application/useCases/workerService";
 import { uploadProfilePic } from "../../utils/s3Servise";

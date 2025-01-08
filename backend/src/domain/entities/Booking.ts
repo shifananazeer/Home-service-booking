@@ -17,7 +17,10 @@ export interface Booking {
     serviceName:string;
     serviceImage:string;
     paymentStatus: string; 
-    rate:number;
+    workStatus:string;
+    totalPayment:number;
+    advancePayment: number;
+    balancePayment: number;
     createdAt?: Date;
   
 }

@@ -1,7 +1,7 @@
 import { AvailabilityRepositoryImpl } from "../../infrastructure/database/repositories/AvailabilityRepositoryIml";
 import { Availability, AvailabilitySlot } from "../../domain/entities/Availability";
 import mongoose from "mongoose";
-const availabilityRepository = new AvailabilityRepositoryImpl()
+
 export class AvailabilityService {
     private availabilityRepository: AvailabilityRepositoryImpl;
 
@@ -26,14 +26,11 @@ export class AvailabilityService {
             if (!existingAvailability._id) {
                 throw new Error("Availability ID is missing");
             }
-
             const existingSlots = existingAvailability.slots;
-
-            // Check for duplicate or conflicting slots
             const conflictingSlot = slots.find((newSlot) =>
                 existingSlots.some((existingSlot: any) => {
                     return (
-                        existingSlot.slotId === newSlot.slotId || // Duplicate slotId
+                        existingSlot.slotId === newSlot.slotId || 
                         this.areSlotsOverlapping(existingSlot.startTime, existingSlot.endTime, newSlot.startTime, newSlot.endTime)
                     );
                 })
@@ -44,8 +41,6 @@ export class AvailabilityService {
                     `Conflicting slot already exists for time range ${conflictingSlot.startTime} - ${conflictingSlot.endTime}`
                 );
             }
-
-            // Add non-conflicting slots
             existingAvailability.slots.push(...slots);
             return await this.availabilityRepository.updateAvailability(
                 existingAvailability._id,
@@ -55,8 +50,6 @@ export class AvailabilityService {
             return await this.availabilityRepository.createAvailability(workerObjectId.toString(), normalizedDate, slots);
         }
     }
-
-    // Utility function to check for overlapping slots
     private areSlotsOverlapping(
         start1: string,
         end1: string,
@@ -133,36 +126,3 @@ export class AvailabilityService {
 
 
 
-// export const updateStatusOfSlot = async (slotId:string) => {
-//   await availabilityRepository.updateSlotStatus(slotId)
-// }
-
-// export const updateSlot = async (slotId: string,updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> => {
-//   const updatedSlot = await availabilityRepository.updateSlot(slotId, updateData);
-//   return updatedSlot;
-// };
-
-// export const fetchAvailableSlots = async (workerId: string, date: Date): Promise<any[]> => {
-//   try {
-//       const availability = await availabilityRepository.getAvailableSlots(workerId, date);
-//       return availability ? availability.slots : [];
-//   } catch (err) {
-//       console.error("Error in fetchAvailableSlots:", err);
-//       throw new Error("Error fetching available slots");
-//   }
-// };
-
-// export const availableSlots = async (
-
-//   workerId: string,
-//   page: number,
-//   limit: number
-// ) => {
-//   try {
-//     const skip = (page - 1) * limit;
-//     return await availabilityRepository.getAllAvailabilityByWorkerId(workerId, skip, limit);
-//   } catch (error) {
-//     console.error("Error fetching available slots:", error);
-//     throw new Error("Could not fetch available slots.");
-//   }
-// };

@@ -1,7 +1,6 @@
 import { NextFunction , Request , Response } from "express";
 import {  UserService } from "../../application/useCases/userService";
 import { UserRepositoryImpl } from "../../infrastructure/database/repositories/UserRepositoryImpl";
-import { loginUser } from "../../application/useCases/loginUser";
 import { validateOtp } from "../../application/useCases/validateOTP";
 import { generateOtp } from "../../application/useCases/generateOtp";
 import { sendResetLink } from "../../application/useCases/passwordResent";
@@ -23,6 +22,8 @@ import { Messages } from "../../utils/message";
 import { BookingService } from "../../application/useCases/bookingService";
 import { WorkerService } from "../../application/useCases/workerService";
 import { ServiceManagement } from "../../application/useCases/servicesManagement";
+import Stripe from "stripe";
+import { PaymentService } from "../../application/useCases/paymentService";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -31,6 +32,7 @@ const availabilityService = new AvailabilityService()
 const bookingService = new BookingService();
 const serviceManagement = new ServiceManagement();
 const workerService = new WorkerService()
+const paymentService = new PaymentService()
 class UserController  {
    async register (req: Request, res: Response) {
         console.log("body", req.body)
@@ -328,22 +330,25 @@ class UserController  {
    async  createBooking  (req:Request , res:Response):Promise <void> {
         console.log('Request body:', req.body);
         try{
-         const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus , rate} = req.body ;
+         const { date , slotId ,workerName , serviceImage , serviceName, workLocation , workDescription , workerId , userId , paymentStatus , totalPayment,advancePayment,balancePayment} = req.body ;
 
          const updateSlotStatus = await availabilityService.updateStatusOfSlot(slotId)
          const bookingDetails: Booking = {
-             date, 
+             date,
              slotId,
              workLocation,
              workDescription,
              workerId,
-             workerName ,
+             workerName,
              serviceImage,
              serviceName,
              userId,
-             rate,
-             paymentStatus: paymentStatus || 'Pending',
+             paymentStatus:'pending',
              bookingId: uuidv4(),
+             workStatus: 'not_started',
+             totalPayment,
+             advancePayment,
+             balancePayment,
          };
         const createdBooking = await bookingService.createBooking (bookingDetails);
         res.status(HttpStatus.CREATED).json(createdBooking);
@@ -438,6 +443,32 @@ class UserController  {
                  res.status(HttpStatus.OK).json({ message:Messages.FAIL_UPDATE_COORDINATES , error: error.message });
              }
            }  
+
+           async createPayment(req: Request, res: Response) {
+            const { amount } = req.body; 
+    
+            try {
+                const paymentIntent = await paymentService.createPaymentIntent(amount);
+                res.status(HttpStatus.OK).json({
+                    clientSecret: paymentIntent.client_secret,
+                });
+            } catch (error: any) {
+                console.error('Error creating payment:', error);
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Payment processing failed' });
+            }
+        }
+    
+        async createCheckoutSession(req: Request, res: Response) {
+            const { amount } = req.body; // Get amount from request body
+    
+            try {
+                const session = await paymentService.createCheckoutSession(amount);
+                res.status(HttpStatus.OK).json({ url: session.url });
+            } catch (error: any) {
+                console.error('Error creating checkout session:', error);
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create checkout session' });
+            }
+        }
 }
 
 

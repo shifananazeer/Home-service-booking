@@ -128,7 +128,7 @@ const BookingConfirm: React.FC = () => {
                     workDescription,
                     workerId,
                     userId,
-                    paymentStatus: 'Pending',
+                    paymentStatus: 'pending',
                     workerName,
                     serviceImage,
                     serviceName,

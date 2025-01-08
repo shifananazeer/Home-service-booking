@@ -71,7 +71,8 @@ const navigate = useNavigate()
         };
 
         if (createdSlot) {
-          setSlots((prevSlots) => [...prevSlots, createdSlot]);
+          // setSlots((prevSlots) => [...prevSlots, createdSlot]);
+          fetchSlots();
           setSelectedDay('');
           setStartTime('');
           setEndTime('');
@@ -86,8 +87,8 @@ const navigate = useNavigate()
         setError(err.response?.data?.error || 'Failed to add slot');
         Swal.fire({
           icon: 'error',
-          title: 'Error!',
-          text: err.response?.data?.error || 'Failed to add slot',
+          title: 'Slot unable to add!',
+          text: err.response?.data?.error || 'Already you  have slot on  this time .  please choose different time',
           confirmButtonText: 'OK',
         });
       } finally {
@@ -256,7 +257,7 @@ const navigate = useNavigate()
                   className={`flex justify-between items-center px-6 py-4 ${
                     slot.isAvailable
                       ? "bg-gray-700 hover:bg-gray-600"
-                      : "bg-red-400 cursor-not-allowed"
+                      : "bg-gray-400 disabled:opacity-50  cursor-not-allowed"
                   } rounded-md transition duration-300 ease-in-out`}
                 >
                   <span className="text-lg">

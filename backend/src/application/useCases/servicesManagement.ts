@@ -43,6 +43,7 @@ export class ServiceManagement {
 
         return { services, totalServices };
     }
+
     public async fetchAllServices(): Promise<{ success: boolean; services: Service[]; message?: string }> {
         try {
             const services = await this.serviceRepository.getAllServices();
@@ -66,7 +67,6 @@ export class ServiceManagement {
         if (imageUrl) {
             (updateData as UpdateServiceData).image = imageUrl; 
         }
-
         try {
             const updatedService = await this.serviceRepository.updateService(serviceId, updateData as UpdateServiceData); 
             console.log("updated", updatedService);

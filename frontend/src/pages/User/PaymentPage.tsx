@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { createBooking } from '../../services/userService';
+import { createBooking, createCheckoutSession } from '../../services/userService';
 import Swal from 'sweetalert2';
 
 interface BookingDetails {
@@ -33,6 +33,7 @@ const PaymentPage: React.FC = () => {
     const [platformCharge, setPlatformCharge] = useState<number>(0);
     const [advancePayment, setAdvancePayment] = useState<number>(0);
     const [finalAmount, setFinalAmount] = useState<number>(0);
+    const [balanceAmount , setBalanceAmount] = useState<number>(0);
 
     useEffect(() => {
         if (bookingDetails && workerRate) {
@@ -57,12 +58,13 @@ const PaymentPage: React.FC = () => {
                 const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
                 const total = durationInHours * workerRate;
                 const platformFee = total * 0.1;
-                const advance = (total + platformFee) * 0.5;
+                const advance = platformFee + (total * 0.2);
 
                 setTotalAmount(total);
                 setPlatformCharge(platformFee);
                 setAdvancePayment(advance);
                 setFinalAmount(total + platformFee);
+                setBalanceAmount(finalAmount-advance)
             };
 
             calculateAmount();
@@ -70,18 +72,29 @@ const PaymentPage: React.FC = () => {
     }, [bookingDetails, workerRate]);
 
     const handleBookingSubmit = async () => {
-        console.log("bbbb",bookingDetails)
+        console.log("bbbb", bookingDetails);
         const newBooking = {
             ...bookingDetails,
-          
-            rate: finalAmount,
+            totalPayment: finalAmount, 
+            advancePayment:advancePayment,
+            balancePayment:balanceAmount,
         };
-   console.log("newBooking", newBooking)
+        console.log("newBooking", newBooking);
+        
         try {
+            // Create the booking
             const response = await createBooking(newBooking);
             if (response.status === 201) {
                 Swal.fire('Success', 'Booking created successfully!', 'success');
-                navigate('/booking-confirmation', { state: { booking: response.data } });
+    
+                // Create a checkout session with Stripe
+                const checkoutResponse = await createCheckoutSession({ amount: advancePayment * 100 });
+                if (checkoutResponse.url) {
+                    // Redirect to the Stripe checkout page
+                    window.location.href = checkoutResponse.url;
+                } else {
+                    Swal.fire('Error', 'Failed to create Stripe session', 'error');
+                }
             } else {
                 Swal.fire('Error', response.data.message || 'Failed to create booking', 'error');
             }
@@ -90,7 +103,7 @@ const PaymentPage: React.FC = () => {
             Swal.fire('Error', 'An error occurred while creating the booking', 'error');
         }
     };
-
+    
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6 text-center">Review and Proceed to Payment</h1>

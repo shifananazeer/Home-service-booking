@@ -8,7 +8,7 @@ interface Worker {
   name: string;
   profilePic?:string;
   hourlyRate?:number;
-
+   status:string;
 }
 
 export interface WorkerAddress extends Worker {
@@ -103,7 +103,7 @@ const BookingPage: React.FC = () => {
   const geocodeAddress = async (address: string) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+        `${import.meta.env.VITE_GOOGLE_MAPS_API_URL}?address=${encodeURIComponent(address)}&key=${apiKey}`
       );
       const data = await response.json();
       if (data.status === 'OK') {
@@ -264,6 +264,9 @@ const BookingPage: React.FC = () => {
                       <p className="text-gray-400">Rate Per Hour: <span className='text-gray-200 font-bold'>{worker.hourlyRate || "Not Specified"}</span></p>
                     </div>
                   </div>
+                  {worker.status === "Unavailable" ? (
+                      <p className="text-red-400 font-bold">Status: Unavailable</p>
+                    ) : (
                   <button
                     onClick={() => navigate(`/confirm-booking/${worker._id}`, {
                       state: {
@@ -281,6 +284,7 @@ const BookingPage: React.FC = () => {
                   >
                     Select Worker
                   </button>
+                    )}
                 </div>
               </div>
             ))}

@@ -5,9 +5,12 @@ import { Address } from '../../interfaces/addressInterface'
 import { getWorkerProfile } from '../../services/workerService'
 import { ProfileSkeleton } from '../ProfileSkelton'
 import { refreshAccessToken } from '../../utils/auth'
+import { logout } from '../../features/worker/workerSlice'
+import { useDispatch } from 'react-redux'
 
 const WorkerProfile = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [workerProfile, setWorkerProfile] = useState<WorkerProfileInterface | null>(null);
     const [workerAddress, setWorkerAddress] = useState<Address | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -30,6 +33,12 @@ const WorkerProfile = () => {
         }
         fetchProfile()
     }, [])
+     const handleLogout = () => {
+            dispatch(logout()); 
+            navigate('/worker/login'); 
+            console.log("Logging out...");
+        };
+    
 
     if (loading) {
         return <ProfileSkeleton />;
@@ -107,7 +116,9 @@ const WorkerProfile = () => {
                     >
                         Edit Profile
                     </button>
-                    <button className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                    <button 
+                      onClick={handleLogout}
+                    className="px-6 py-2 bg-blue-900 text-white rounded-md hover:bg-gray-400 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
                         Logout
                     </button>
                 </div>

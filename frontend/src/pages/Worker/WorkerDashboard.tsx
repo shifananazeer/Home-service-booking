@@ -36,8 +36,8 @@ const navigate = useNavigate()
         case "dashboard":
             return (
                 <>
-                    <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                    <p className="mt-4">Welcome to your admin dashboard!</p>
+                    <h1 className="text-2xl font-bold">Worker Dashboard</h1>
+                    <p className="mt-4">Welcome to your Worker dashboard!</p>
                 </>
             );
         default:

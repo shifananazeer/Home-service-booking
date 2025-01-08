@@ -98,7 +98,7 @@ const EditWorkerProfile = () => {
 
     const fetchCoordinates = async (area: string) => {
         try {
-            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+            const response = await axios.get(import.meta.env.VITE_GOOGLE_MAPS_API_URL, {
                 params: {
                     address: area,
                     key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -119,12 +119,12 @@ const EditWorkerProfile = () => {
                 updateCoordinatesInDatabase(lat, lng);
             } else {
                 console.warn('No results found for the area:', area);
-                toast.error('No results found for the area.');
+                // toast.error('No results found for the area.');
             }
         } catch (error: any) {
             console.error('Error fetching coordinates:', error);
             const errorMessage = error.response?.data?.error_message || error.message || 'Failed to fetch coordinates.';
-            toast.error(errorMessage);
+            // toast.error(errorMessage);
         }
     };
 
@@ -142,7 +142,7 @@ const EditWorkerProfile = () => {
             toast.success('Coordinates updated successfully!');
         } catch (error) {
             console.error('Error updating coordinates in the database:', error);
-            toast.error('Failed to update coordinates in the database.');
+            // toast.error('Failed to update coordinates in the database.');
         }
     };
     
