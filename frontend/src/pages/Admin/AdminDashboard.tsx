@@ -6,24 +6,33 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import toast from "react-hot-toast";
 import UserManagement from "../../components/admin/UserManagement"; 
+import WorkerManagement from "../../components/admin/WorkerManagement";
+import ServiceManagement from "../../components/admin/ServiceManagement";
+import AdminBookings from "../../components/admin/bookings";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const current = useSelector((state: RootState) => state.admin.token);
+    const token = localStorage.getItem('admin_Id')
     const [currentComponent, setCurrentComponent] = useState("dashboard"); 
 
     useEffect(() => {
-        if (!current) {
+        if (!token) {
             navigate('/admin/login');
-            // toast.error("Please log in to access the admin dashboard.");
+          
         }
-    }, [current, navigate]);
+    }, [ navigate]);
 
    
     const renderComponent = () => {
         switch (currentComponent) {
             case "userManagement":
                 return <UserManagement />;
+            case "workerManagement":
+                return <WorkerManagement/>;
+            case "serviceManagement" :
+                return <ServiceManagement/>   
+            case "bookings" :
+                return <AdminBookings/>    
             case "dashboard":
                 return (
                     <>
@@ -40,19 +49,19 @@ const AdminDashboard = () => {
         <div className="flex flex-col h-screen">
             {/* Admin Navbar */}
             <AdminNavbar />
-
+    
             {/* Admin Sidebar and Main Content */}
             <div className="flex flex-1">
                 {/* Sidebar */}
                 <AdminSidebar setCurrentComponent={setCurrentComponent} />
-
+    
                 {/* Main Content */}
-                <div className="flex-1 p-6 bg-gray-100">
+                <div className="flex-1 p-6 bg-gray-100" style={{ marginLeft: "16rem", marginTop: "4rem" }}>
                     {renderComponent()}
                 </div>
             </div>
         </div>
-    );
+    )
 };
 
 export default AdminDashboard;

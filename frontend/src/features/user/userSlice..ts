@@ -3,7 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface UserData {
     name: string;
     email: string;
-    token: string;
+    accessToken: string;   
+    refreshToken: string;  
     
 }
 
@@ -62,12 +63,16 @@ const userSlice = createSlice({
        
         logout: (state) => {
             state.userData = null;
-            state.error = null; 
+            state.error = null;
+            state.loading = false;
 
             try {
-                localStorage.removeItem('userData');
+             localStorage.removeItem('userData');
+                localStorage.removeItem('user_Id')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
             } catch (error) {
-                console.error('Error removing userData from localStorage:', error);
+                console.error('Error removing data from localStorage during logout:', error);
             }
         },
 
@@ -75,9 +80,9 @@ const userSlice = createSlice({
         clearUserData: (state) => {
             state.userData = null;
             state.error = null;
-
             try {
                 localStorage.removeItem('userData');
+                localStorage.removeItem('user_Id')
             } catch (error) {
                 console.error('Error removing userData from localStorage:', error);
             }

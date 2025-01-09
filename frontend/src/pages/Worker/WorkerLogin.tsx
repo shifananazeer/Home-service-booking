@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice' 
+import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice';
 import { LoginWorker } from '../../services/workerService'; 
 import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RootState } from '../../app/store';
+import { refreshAccessToken } from '../../utils/auth';
 
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const token = useSelector((state: RootState) => state.worker.token);
-    const { isLoading , error , success } = useSelector((state: any) => state.worker); 
+   
 
+    const { isLoading, error, success } = useSelector((state: RootState) => state.worker); 
 
-
-    
-    if (token) {
-        return <Navigate to="/worker/dashboard" replace />;
-    }
-
+    useEffect(()=> {
+        const accessToken = localStorage.getItem('worker_accessToken')
+        if(accessToken) {
+            navigate('/worker/dashboard')
+        }
+    })
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -29,24 +30,25 @@ const WorkerLogin: React.FC = () => {
         dispatch(loginStart()); 
         try {
             const response = await LoginWorker({ email, password });
+          
             if (!response || !response.data) {
                 throw new Error('Invalid response from server');
             }
-            console.log("respo",response)
-            const token = response.data.token;
-            dispatch(loginSuccess(token));
-            toast.success("login successfull")
-            navigate('/worker/dashboard')
+            console.log("respo", response);
+            const { accessToken, refreshToken , workerId } = response.data; 
+            dispatch(loginSuccess({ accessToken, refreshToken , workerId })); 
+            toast.success("Login successful");
+            navigate('/worker/dashboard');
             
         } catch (error: any) {
-            dispatch(loginFail(error.message)); // Handle login failure
-            toast.error("login failed")
+            dispatch(loginFail(error.message));
+            toast.error("Login failed");
         }
     };
+
     const handleForgotPassword = () => {
         navigate('/worker/forgotPassword');
-    }
-
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">

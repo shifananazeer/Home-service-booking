@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -11,37 +11,52 @@ const Login = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
+    const token = localStorage.getItem('accessToken')
+    useEffect(()=> {
+        if(token) {
+      navigate('/')
+        }
+    } ,[token , navigate])
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        dispatch(loginStart()); 
-
+        dispatch(loginStart());
+        console.log('Dispatching loginStart');
+    
         try {
+         
             const response = await loginUser({ email, password });
-            if (!response || !response.data) {
-                throw new Error('Invalid response from server');
-            }
-
-            const userData = {
-                name: response.data.name,
-                email: response.data.email,
-                token: response.data.token,
+          console.log("ressssssssss",response)
+          
+            const { accessToken, refreshToken, name, email: userEmail ,userId } = response;
+              console.log("user....." , userId)
+          
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('user_Id' , userId)
+    
+           const userData = {
+                name,
+                email: userEmail,
+                refreshToken: refreshToken,
+                accessToken: accessToken
             };
-
+    
+         
             toast.success('Login Successful');
-            localStorage.setItem('userData', JSON.stringify(userData));
-            dispatch(loginSuccess(userData)); 
-            navigate('/'); 
+            console.log('Dispatching loginSuccess:', userData);
+             dispatch(loginSuccess(userData));
+            navigate('/');
         } catch (error: any) {
             console.error('Login error:', error);
-            toast.error('Login failed: ' + (error.response?.data?.message || 'Please try again'));
-            dispatch(loginFailure(error.response?.data?.message || 'Login failed')); 
+            const errorMessage = error.response?.data?.message || 'Login failed';
+            toast.error(errorMessage);
+            dispatch(loginFailure(errorMessage));
         } finally {
             setIsLoading(false);
         }
     };
-
+    
     const handleForgotPassword = () => {
         navigate('/forgot-password');
     };

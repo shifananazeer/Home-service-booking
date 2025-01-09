@@ -6,6 +6,8 @@ import workerRoutes from './infrastructure/routes/workerRoutes'
 import adminRoutes from './infrastructure/routes/adminRoutes'
 import cors from 'cors'
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser'
+import './sheduler'
 
 
 
@@ -14,13 +16,16 @@ dotenv.config();
 const app = express();
 
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json()); 
+app.use(express.urlencoded());
+app.use(cookieParser());
 
 //cors middleware to connect frontend
 app.use(cors({
   origin: 'http://localhost:5173', 
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 
   credentials: true, 
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 

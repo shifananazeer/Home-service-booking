@@ -12,23 +12,19 @@ const AdminLogin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isLoading, error } = useSelector((state: RootState) => state.admin); 
-    const token = useSelector((state: RootState) => state.admin.token);
-
-    
-    // if (token) {
-    //     return <Navigate to="/admin/dashboard" replace />;
-    // }
+    const token = localStorage.getItem('admin_Id')
 
     useEffect(() => {
-        if (!token) {
-            navigate('/admin/login');
+        if (token) {
+            navigate('/admin/dashboard');
             // toast.error("Please log in to access the admin dashboard.");
         }
-    }, [token, navigate]);
+    }, []);
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+       
         dispatch(loginStart()); 
 
         try {
@@ -41,9 +37,10 @@ const AdminLogin = () => {
 
            
             const response = await adminLogin({ email, password });
+           
 
             if (response.status === 200) {
-                dispatch(loginSuccess(response.data.token)); 
+                dispatch(loginSuccess(response.data.accessToken)); 
                 toast.success('Login successful!');
                 navigate('/admin/dashboard'); 
             } else {

@@ -35,6 +35,8 @@ const WorkerOtp = () => {
         setIsResending(true);
         try {
             await WorkerResendOtp(email);
+            setEmail(email)
+            console.log("emai;",email)
             toast.success('OTP Resent successfully');
             setTimer(300);
         } catch (error: any) {
@@ -48,15 +50,16 @@ const WorkerOtp = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-        const response = await  WorkerVerifyOtp(otp, email );
-           console.log("response", response)
-           const token = response.data.token;
-           console.log(token)
-        dispatch(otpVerifySuccess(token));
+            const response = await WorkerVerifyOtp(otp, email);
+            console.log('Response:', response);
+
+            const { accessToken, refreshToken } = response.data;
+           
+            dispatch(otpVerifySuccess(accessToken));
             toast.success('OTP Verified Successfully');
-            navigate('/worker/dashboard')
+            navigate('/worker/dashboard');
         } catch (error: any) {
-            console.log(error.response?.data?.message);
+            console.error('Verification Failed:', error.response?.data?.message);
             toast.error('Verification failed');
         }
     };

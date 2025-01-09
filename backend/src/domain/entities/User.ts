@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 export interface User {
    
+    _id:string;
     firstName: string;
     lastName: string;
     email: string;
@@ -16,4 +17,5 @@ export interface User {
     longitude?: number;
     locationName?: string;
     googleId?: string;
+    profilePic?:string
 }

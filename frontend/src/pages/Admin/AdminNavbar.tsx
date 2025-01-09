@@ -9,28 +9,30 @@ const AdminNavbar = () => {
     const navigate = useNavigate()
     const handleLogout = () => {
         dispatch(logout()); 
+      localStorage.removeItem('admin_Id')
+      localStorage.removeItem('admin_refreshToken')
+      localStorage.removeItem('admin_accessToken')
                navigate('/admin/login');
         console.log("Logging out...");
     };
 
     return (
-        <nav className="bg-gray-800 text-white flex justify-between items-center p-2 shadow-md">
+        <nav className="fixed top-0 left-0 w-full h-16 bg-gray-800 text-white flex justify-between items-center px-4 shadow-md z-50">
         <div className="flex items-center">
-        <img 
-src="/logo.png" 
-alt="Logo"
-className="h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16" 
-/>
-
-                <span className="text-lg font-bold">Admin Panel</span>
-            </div>
-            <button
-                onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition"
-            >
-                Logout
-            </button>
-        </nav>
+            <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16"
+            />
+            <span className="ml-4 text-lg font-bold">Admin Panel</span>
+        </div>
+        <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition"
+        >
+            Logout
+        </button>
+    </nav>
     );
 };
 

@@ -9,7 +9,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
     return (
-        <div className="bg-gray-800 text-white w-64 min-h-screen flex flex-col">
+        <div className="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-gray-800 text-white flex flex-col z-40">
             <div className="p-4 border-b border-gray-700">
                 <h2 className="text-lg font-bold">Admin Menu</h2>
             </div>
@@ -33,21 +33,27 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     </li>
                     <li>
                        
-                            <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button 
+                              onClick={() => setCurrentComponent("workerManagement")}
+                            className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Worker Management
                             </button>
                        
                     </li>
                     <li>
                         
-                            <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button
+                               onClick={() => setCurrentComponent("bookings")}
+                                className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Booking List
                             </button>
                         
                     </li>
                     <li>
                       
-                            <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                            <button 
+                              onClick={() => setCurrentComponent("serviceManagement")}
+                            className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Service Management
                             </button>
                        
