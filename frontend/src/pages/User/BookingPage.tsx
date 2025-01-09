@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { fetchAddress, fetchWorkersByService } from '../../services/userService';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaUserTie } from 'react-icons/fa';
 
 interface Worker {
   _id: string;
@@ -220,76 +221,108 @@ const BookingPage: React.FC = () => {
     );
   }
   return (
-    <div className="min-h-screen  text-gray-300">
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-gray-900 shadow-lg rounded-xl overflow-hidden mb-8">
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row items-center mb-6">
-              {serviceImage && (
-                <div className="mb-4 md:mb-0 md:mr-6">
-                  <img 
-                    src={serviceImage} 
-                    alt={serviceName} 
-                    className="w-32 h-32 object-cover rounded-lg shadow-md"
-                  />
+    <div className="min-h-screen text-gray-900 bg-white">
+       <h1 className="text-4xl font-bold text-center m-4 flex items-center justify-center blink">
+              Select Your Worker <FaUserTie className="text-3xl ml-2" />
+            </h1>
+            <style >{`
+              @keyframes blink {
+                0%, 100% {
+                  opacity: 1;
+                }
+                50% {
+                  opacity: 0.5;
+                }
+              }
+              .blink {
+                animation: blink 1.5s infinite;
+              }
+            `}</style>
+      <div className="container mx-auto px-4 py-8 bg-gray-200  mt-4">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left side: Map and Service Info */}
+          <div className="lg:w-1/2">
+            <div className="bg-gray-100 shadow-lg rounded-xl overflow-hidden mb-8">
+              <div className="p-6">
+                <div className="flex items-center mb-6">
+                  {serviceImage && (
+                    <div className="mr-6 ">
+                      <img 
+                        src={serviceImage} 
+                        alt={serviceName} 
+                        className="w-24 h-24 object-cover rounded-lg shadow-md "
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-2xl font-bold text-black">{serviceName}</h1>
+                    <p className="text-gray-800 mt-2">{serviceDescription || 'Service description not available'}</p>
+                  </div>
                 </div>
-              )}
-              <div className="text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-100">{serviceName}</h1>
-                <p className="text-gray-400 mt-2 max-w-2xl">{serviceDescription || 'Service description not available'}</p>
+                <div ref={mapRef} className="w-full h-96 rounded-lg shadow-inner mb-4 bg-gray-800" />
+                {!mapLoaded && <div className="text-center text-gray-400">Loading map...</div>}
               </div>
             </div>
-            <div ref={mapRef} className="w-full h-80 rounded-lg shadow-inner mb-4" />
-            {!mapLoaded && <div className="text-center text-gray-400">Loading map...</div>}
           </div>
-        </div>
-      
-        <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
-        {workers.length === 0 ? (
-          <div className="text-center text-gray-400 bg-gray-900 p-8 rounded-xl shadow-md">No workers available for this service in your area.</div>
-        ) : (
-          <div className="space-y-6">
-            {sortedWorkers.map((worker) => (
-              <div key={worker._id} className="bg-gray-900 shadow-lg rounded-xl overflow-hidden transition duration-300 hover:bg-gray-800">
-                <div className="p-6 flex flex-col md:flex-row items-center justify-between">
-                  <div className="flex items-center mb-4 md:mb-0">
-                    <img
-                      src={worker.profilePic || '/avathar.jpeg'}
-                      alt="Profile"
-                      className="h-24 w-24 object-cover rounded-full border-4 border-gray-700 shadow-lg mr-6"
-                    />
-                    <div>
-                      <h3 className="text-2xl font-semibold mb-2 text-gray-100">{worker.name}</h3>
-                      <p className="text-gray-400 mb-2">Distance: <span className='text-gray-200 font-bold'> {worker.distance?.toFixed(2)} km</span></p>
-                      <p className="text-gray-400">Rate Per Hour: <span className='text-gray-200 font-bold'>{worker.hourlyRate || "Not Specified"}</span></p>
+
+          {/* Right side: Worker List */}
+          <div className="lg:w-1/2">
+            <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
+            {workers.length === 0 ? (
+              <div className="text-center text-gray-400 bg-black p-8 rounded-xl shadow-md">No workers available for this service in your area.</div>
+            ) : (
+              <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-4">
+                {sortedWorkers.map((worker) => (
+                  <div key={worker._id} className="bg-black shadow-lg rounded-xl overflow-hidden transition duration-300 hover:bg-gray-800">
+                    <div className="p-6 flex flex-col sm:flex-row items-center justify-between">
+                      <div className="flex items-center mb-4 sm:mb-0">
+                        <img
+                          src={worker.profilePic || '/avathar.jpeg'}
+                          alt="Profile"
+                          className="h-20 w-20 object-cover rounded-full border-4 border-gray-700 shadow-lg mr-4"
+                        />
+                        <div>
+                          <h3 className="text-xl font-semibold mb-1 text-gray-100">{worker.name}</h3>
+                          <p className="text-gray-400 text-sm">Distance: <span className='text-gray-200 font-bold'>{worker.distance?.toFixed(2)} km</span></p>
+                          <p className="text-gray-400 text-sm">Rate: <span className='text-gray-200 font-bold'>${worker.hourlyRate || "N/A"}/hr</span></p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => navigate(`/worker-profile/${worker._id}`)}
+                          className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 text-sm"
+                        >
+                          View Profile
+                        </button>
+                        {worker.status === "Unavailable" ? (
+                          <p className="text-red-400 font-bold self-center text-sm">Unavailable</p>
+                        ) : (
+                          <button
+                            onClick={() => navigate(`/confirm-booking/${worker._id}`, {
+                              state: {
+                                workerName: worker.name,
+                                workerLocation: worker.location,
+                                workerRate: worker.hourlyRate,
+                                workerDistance: worker.distance,
+                                workerPic: worker.profilePic,
+                                workerId: worker._id,
+                                serviceName: serviceName,
+                                serviceImage: serviceImage,
+                              }
+                            })}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 text-sm"
+                          >
+                            Select Worker
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  {worker.status === "Unavailable" ? (
-                      <p className="text-red-400 font-bold">Status: Unavailable</p>
-                    ) : (
-                  <button
-                    onClick={() => navigate(`/confirm-booking/${worker._id}`, {
-                      state: {
-                        workerName: worker.name,
-                        workerLocation: worker.location,
-                        workerRate: worker.hourlyRate,
-                        workerDistance: worker.distance,
-                        workerPic: worker.profilePic,
-                        workerId: worker._id,
-                        serviceName: serviceName,
-                        serviceImage: serviceImage,
-                      }
-                    })}
-                    className="bg-gray-200 hover:bg-gray-600 text-black font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
-                  >
-                    Select Worker
-                  </button>
-                    )}
-                </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -64,6 +64,7 @@ const App = () => {
     <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
     <Route path='/booking-success' element={<BookingSuccessPage/>}/>
     <Route path='/cancel' element={<CancelPage/>}/>
+    
     <Route path="/worker/dashboard" element={ <WorkerDashboard />} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
