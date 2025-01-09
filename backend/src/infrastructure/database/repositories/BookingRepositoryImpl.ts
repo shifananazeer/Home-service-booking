@@ -87,6 +87,15 @@ export class BookingRepositoryImpl implements BookingRepository {
     
         return { bookings, total };
     }
+
+    async getBookingById (bookingId:string) : Promise<Booking| null> {
+        const details = await BookingModel.findOne({bookingId});
+        return details;
+    }
+
+    async updatePayment (bookingId:string , status:string) : Promise<void> {
+        await BookingModel.findOneAndUpdate({bookingId},{paymentStatus:status}, { new: true })
+    }
 }
 
 

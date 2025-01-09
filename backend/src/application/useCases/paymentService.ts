@@ -18,7 +18,8 @@ export class PaymentService {
         }
     }
 
-    async createCheckoutSession(amount: number): Promise<Stripe.Checkout.Session> {
+    async createCheckoutSession(amount:number , bookingId:string): Promise<Stripe.Checkout.Session> {
+       
         try {
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
@@ -33,8 +34,8 @@ export class PaymentService {
                     quantity: 1, // Adjust quantity if necessary
                 }],
                 mode: 'payment',
-               success_url: `http://localhost:5173/booking-success`, // Update with your success URL
-                cancel_url: 'https://localhost:5173/cancel', // Update with your cancel URL
+               success_url:  `http://localhost:5173/booking-success?bookingId=${bookingId}`, // Update with your success URL
+                cancel_url: 'http://localhost:5173/cancel', // Update with your cancel URL
             });
             return session;
         } catch (error: any) {

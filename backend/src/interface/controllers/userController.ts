@@ -459,14 +459,41 @@ class UserController  {
         }
     
         async createCheckoutSession(req: Request, res: Response) {
-            const { amount } = req.body; // Get amount from request body
+            const { amount , bookingId } = req.body; // Get amount from request body
     
             try {
-                const session = await paymentService.createCheckoutSession(amount);
+                const session = await paymentService.createCheckoutSession(amount , bookingId);
                 res.status(HttpStatus.OK).json({ url: session.url });
             } catch (error: any) {
                 console.error('Error creating checkout session:', error);
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create checkout session' });
+            }
+        }
+
+        async getBooking (req:Request , res:Response) {
+            const {bookingId} = req.params;
+            try{
+              const details = await bookingService.getBookingById(bookingId)
+              if (!details) {
+                 res.status(404).json({ message: 'Booking not found' });
+                 return
+              }
+              res.json(details);
+            }catch (error) {
+                console.error('Error fetch details', error);
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'error fetch booking details' });
+            }
+        }
+
+        async updatePaymentStatus (req:Request , res:Response) {
+            const {bookingId} = req.params;
+            const {status } = req.body
+            try{
+             const update = await bookingService.updateBookingById(bookingId , status)
+            }catch(error) {
+                console.error('Error updating payment', error);
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'error updating payment' });
+        
             }
         }
 }

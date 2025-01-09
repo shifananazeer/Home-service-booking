@@ -9,5 +9,7 @@ export interface BookingRepository {
     cancelUpdate(bookidId:string) :Promise<Booking|null>
     getTodaysBookingsByWorker(eorkrtId:string) :Promise<Booking[]|null>;
     getAllBookings(params: { page: number; limit: number; search: string }): Promise<{ bookings: Booking[]; total: number }>;
+    getBookingById (bookigId:string):Promise<Booking |null>
+    updatePayment (bookingId:string , status:string):Promise<void>
     
 }

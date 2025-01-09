@@ -95,6 +95,27 @@ export class BookingService {
                 throw new Error("Failed to fetch bookings");
             }
         }
+
+        public async getBookingById (bookingId:string) : Promise< Booking | null>{
+         try{
+          const bookingDetails = await this.bookingRepository.getBookingById(bookingId)
+          return bookingDetails;
+         }catch (error) {
+            console.error("Error fetching bookings:", error);
+            throw new Error("Failed to fetch bookings");
+         }
+        }
+
+
+        public async updateBookingById (bookingId:string , status:string) : Promise<void>{
+            try{
+             const bookingDetails = await this.bookingRepository.updatePayment(bookingId , status)
+          
+            }catch (error) {
+               console.error("Error fetching bookings:", error);
+               throw new Error("Failed to fetch bookings");
+            }
+           }
 }
 
 

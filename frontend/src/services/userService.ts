@@ -278,11 +278,13 @@ export const resetPasswordFromPassword = async ( newPassword: string): Promise<s
     
 
 
-export const createCheckoutSession = async (data:{amount:number}) => {
+export const createCheckoutSession = async (data:{amount:number;bookingId: string;} ) => {
+  const token = localStorage.getItem('accessToken');
   try{
-    const response = await axiosInstance.post('/auth/create-checkout-session',data ,{
+    const response = await axiosInstance.post('/auth/create-checkout-session',data, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
     },
     });
     return response.data;
@@ -291,3 +293,48 @@ export const createCheckoutSession = async (data:{amount:number}) => {
     throw error
   }
 }
+
+export const getBookingDetails = async (bookingId: string) => {
+  const token = localStorage.getItem('accessToken');
+  try {
+    const response = await axiosInstance.get(`/auth/get-booking-details/${bookingId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching booking details:', error);
+    throw new Error('Failed to fetch booking details. Please try again.');
+  }
+};
+
+
+export const updateBookingStatus = async (bookingId: string, status: string) => {
+  const token = localStorage.getItem('accessToken');
+  try {
+    const res = await axiosInstance.post(
+      `/auth/update-paymentStatus/${bookingId}`,
+      {
+        status,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data; // return the response data if needed
+  } catch (error:any) {
+    if (error.response && error.response.status === 401) {
+      // Handle unauthorized access (e.g., show a message, redirect to login, etc.)
+      console.error('Unauthorized access', error);
+    } else {
+      console.error('Error updating payment status', error);
+    }
+    throw error; // Re-throw the error for further handling if needed
+  }
+};
+
+
+

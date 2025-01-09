@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosInstance'; // Import your axiosInstance
-import { cancelBooking, fetchBookigs } from '../../services/userService';
+import axiosInstance from '../../utils/axiosInstance';
+import { cancelBooking, createCheckoutSession, fetchBookigs } from '../../services/userService';
 import Swal from 'sweetalert2';
-import { userRefreshAccessToken } from '../../utils/auth';
+import { Calendar, Clock, User, Briefcase, X } from 'lucide-react';
 
 interface Booking {
   _id: string;
+  bookingId:string;
   workerName: string;
   serviceName: string;
   date: string;
   slotId: string;
   serviceImage: string;
   workDescription: string;
-  paymentStatus: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+  paymentStatus: 'pending'| 'advance_paid'|  'paid'|'cancelled';
+  advancePayment?: number;
+  totalPayment?:number;
+  balancePayment?:number;
 }
 
 const BookingList: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-   const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(1);
-    const [limit, setLimit] = useState<number>(5); 
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(5);
   const navigate = useNavigate();
 
   const parseSlotId = (slotId: string) => {
@@ -30,6 +34,19 @@ const BookingList: React.FC = () => {
     return { day, startTime, endTime };
   };
 
+  const handleRetryPayment = async(amount:number , bookingId:string) => {
+    console.log("amount",amount)
+    const checkoutResponse = await createCheckoutSession({ 
+                        amount: amount * 100,
+                         bookingId                   
+  })
+  if (checkoutResponse.url) {
+                      // Redirect to the Stripe checkout page
+                      window.location.href = checkoutResponse.url;
+                  } else {
+                      Swal.fire('Error', 'Failed to create Stripe session', 'error');
+                  }
+}
   useEffect(() => {
     const loadBookings = async () => {
       const userId = localStorage.getItem('user_Id');
@@ -38,7 +55,7 @@ const BookingList: React.FC = () => {
         setIsLoading(false);
         return;
       }
-  
+
       try {
         const fetchedData = await fetchBookigs(userId, currentPage, limit);
         console.log("Fetched Bookings:", fetchedData);
@@ -56,7 +73,7 @@ const BookingList: React.FC = () => {
         setIsLoading(false);
       }
     };
-  
+
     loadBookings();
   }, [currentPage, limit]);
 
@@ -78,7 +95,7 @@ const BookingList: React.FC = () => {
         setBookings((prevBookings) =>
           prevBookings.map((booking) =>
             booking._id === bookingId
-              ? { ...booking, paymentStatus: 'Cancelled' }
+              ? { ...booking, paymentStatus: 'cancelled' }
               : booking
           )
         );
@@ -89,28 +106,6 @@ const BookingList: React.FC = () => {
       }
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline"> {error}</span>
-        </div>
-      </div>
-    );
-  }
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -124,107 +119,162 @@ const BookingList: React.FC = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="bg-white border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-3 py-8">
-      <h1 className="text-3xl font-bold mb-2">Your Bookings</h1>
+    <div className="container mx-auto px-4 py-8 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Your Bookings</h1>
       {bookings.length === 0 ? (
-        <p className="text-gray-600">You have no bookings at the moment.</p>
+        <p className="text-gray-600 text-center">You have no bookings at the moment.</p>
       ) : (
-        bookings.map((booking) => {
-          const { day, startTime, endTime } = parseSlotId(booking.slotId);
+        <div className="space-y-6">
+          {bookings.map((booking) => {
+            const { day, startTime, endTime } = parseSlotId(booking.slotId);
 
-          return (
-            <div
-              key={booking._id}
-              className="flex bg-gray-900 rounded-lg shadow-md overflow-hidden mb-3"
-              style={{ height: "150px" }}
-            >
-              {/* Left Section: Details */}
-              <div className="flex-1 p-2 overflow-hidden ">
-                <h2 className="text-xl text-white font-semibold mb-1 pl-3">{booking.serviceName}</h2>
-                <p className="text-white mb-2 pl-3 ">with {booking.workerName}</p>
-                <div className="mb-1">
-                  <p className="text-sm text-white pl-3">Date: {day}</p>
-                  <p className="text-sm text-white pl-3">
-                    Time: {startTime} - {endTime}
-                  </p>
-                </div>
-                <span
-                  className={`rounded-full text-xs font-semibold p-1 ${
-                    booking.paymentStatus === "Confirmed"
-                      ? "bg-green-200 text-green-800"
-                      : booking.paymentStatus === "Pending"
-                      ? "bg-yellow-200 text-yellow-800"
-                      : booking.paymentStatus === "Completed"
-                      ? "bg-blue-200 text-blue-800"
-                      : "bg-red-200 text-red-800"
-                  }`}
+            return (
+              <div
+                key={booking._id}
+                className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
+              >
+                <div className="flex flex-col md:flex-row">
+                  {/* Left Section: Image */}
+                  <div className="w-full md:w-1/4 p-4 flex items-center justify-center bg-gray-50">
+                    <img
+                      src={booking.serviceImage}
+                      alt={booking.serviceName}
+                      className="object-cover w-32 h-32 rounded-full border-4 border-white shadow"
+                    />
+                  </div>
+
+                  {/* Middle Section: Details */}
+                  <div className="w-full md:w-1/2 p-4">
+                    <h2 className="text-xl font-semibold mb-2 text-gray-800">{booking.serviceName}</h2>
+                    <p className="text-gray-600 mb-2 flex items-center">
+                      <User className="w-4 h-4 mr-2" /> {booking.workerName}
+                    </p>
+                    <div className="mb-2">
+                      <p className="text-sm text-gray-500 flex items-center">
+                        <Calendar className="w-4 h-4 mr-2" /> {day}
+                      </p>
+                      <p className="text-sm text-gray-500 flex items-center">
+                        <Clock className="w-4 h-4 mr-2" /> {startTime} - {endTime}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-2 flex items-center">
+                      <Briefcase className="w-4 h-4 mr-2" /> {booking.workDescription}
+                    </p>
+                    <p>advance{booking.advancePayment}</p>
+                  </div>
+
+                  {/* Right Section: Status and Actions */}
+                  <div className="w-full md:w-1/4 p-4 flex flex-col justify-between items-center bg-gray-50">
+                 <span
+                 className={`rounded-full text-xs font-semibold px-3 py-1 mb-4 ${
+                  booking.paymentStatus === 'advance_paid'
+                 ? "bg-green-200 text-green-800"
+                 : booking.paymentStatus === "pending"
+                 ? "bg-yellow-200 text-yellow-800"
+                   : booking.paymentStatus === "paid"
+                 ? "bg-blue-200 text-blue-800"
+                   : "bg-red-200 text-red-800"
+                 }`}
                 >
-                  {booking.paymentStatus}
-                </span>
-              </div>
+                 {booking.paymentStatus}
+                   </span>
 
-              {/* Second Section: Description */}
-              <div className="flex p-2 items-center justify-center">
-                <p className="text-sm text-white">Reason: {booking.workDescription}</p>
-              </div>
-
-              {/* Third Section: Service Image */}
-              <div className="w-1/3 flex items-center justify-center p-2">
-                <img
-                  src={booking.serviceImage}
-                  alt={booking.serviceName}
-                  className="object-cover w-20 h-20 rounded-lg"
-                />
-              </div>
-
-              {/* Right Section: Cancel Button */}
-              <div className="w-1/5 flex items-center justify-center">
-                {booking.paymentStatus !== "Cancelled" &&
-                  booking.paymentStatus !== "Completed" && (
-                    <button
-                      onClick={() => handleCancelBooking(booking._id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    >
-                      Cancel Booking
-                    </button>
-                  )}
-              </div>
-            </div>
-          );
-        })
-      )}
-       {bookings.length > 0 && (
-  <div className="mt-6 flex justify-between items-center">
-    <button 
-      onClick={handlePreviousPage} 
-      disabled={currentPage === 1}
-      className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+  {booking.paymentStatus === "pending" && (
+    <button
+   
+      onClick={() => handleRetryPayment(booking.advancePayment || 0 , booking.bookingId)}
+      className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center"
     >
-      Previous
-    </button>
-    <p className="text-gray-400">Page {currentPage} of {totalPages}</p>
-    <button 
-      onClick={handleNextPage} 
-      disabled={currentPage === totalPages}
-      className="text-blue-400 hover:text-blue-300 disabled:text-gray-600 disabled:cursor-not-allowed transition duration-150 ease-in-out"
-    >
-      Next
-    </button>
-  </div>
-)}
-
-        <p className="mt-4 text-center text-gray-400">
-          Total Bookings: {bookings.length}
-        </p>
-      <button
-        onClick={() => navigate("/services")}
-        className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-4 h-4 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
       >
-        Book New Service
-      </button>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 4v1m0 14v1m8-10h-1m-14 0H4m15.364-4.636l-.707.707M6.343 17.657l-.707.707m13.414 0l-.707-.707m-12.02 0l-.707-.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      Retry Payment
+    </button>
+  )}
+
+  {booking.paymentStatus !== "cancelled" && booking.paymentStatus !== "paid" && (
+    <button
+      onClick={() => handleCancelBooking(booking._id)}
+      className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 flex items-center"
+    >
+      <X className="w-4 h-4 mr-2" /> Cancel Booking
+    </button>
+  )}
+</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {bookings.length > 0 && (
+        <div className="mt-8 flex flex-col items-center">
+          <div className="flex justify-between items-center w-full max-w-md mb-4">
+            <button 
+              onClick={handlePreviousPage} 
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Previous
+            </button>
+            <p className="text-gray-600">Page {currentPage} of {totalPages}</p>
+            <button 
+              onClick={handleNextPage} 
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Next
+            </button>
+          </div>
+          <p className="text-gray-600 mb-6">
+            Total Bookings: {bookings.length}
+          </p>
+        </div>
+      )}
+
+      <div className="text-center mt-8">
+        <button
+          onClick={() => navigate("/services")}
+          className="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 text-lg font-semibold"
+        >
+          Book New Service
+        </button>
+      </div>
     </div>
   );
 };
 
 export default BookingList;
+

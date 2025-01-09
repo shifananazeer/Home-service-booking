@@ -2,7 +2,7 @@
 
 import cron from 'node-cron';
 import { deleteExpiredSlots } from './infrastructure/services/availabilityService';
-import { AvailabilityRepositoryImpl } from './infrastructure/database/repositories/AvailabilityRepositoryIml'; // Adjust this import according to your project structure
+import { AvailabilityRepositoryImpl } from './infrastructure/database/repositories/AvailabilityRepositoryIml'; 
 
 const availabilityRepository = new AvailabilityRepositoryImpl();
 cron.schedule('0 0 * * *', async () => {

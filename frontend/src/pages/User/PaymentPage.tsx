@@ -59,18 +59,20 @@ const PaymentPage: React.FC = () => {
                 const total = durationInHours * workerRate;
                 const platformFee = total * 0.1;
                 const advance = platformFee + (total * 0.2);
+                const finalAmount = total + platformFee; // Total amount with platform charge
+                const balance = finalAmount - advance; 
 
                 setTotalAmount(total);
                 setPlatformCharge(platformFee);
                 setAdvancePayment(advance);
-                setFinalAmount(total + platformFee);
-                setBalanceAmount(finalAmount-advance)
+                setFinalAmount(finalAmount);
+                setBalanceAmount(balance)
             };
 
             calculateAmount();
         }
     }, [bookingDetails, workerRate]);
-
+console.log("balance" , balanceAmount)
     const handleBookingSubmit = async () => {
         console.log("bbbb", bookingDetails);
         const newBooking = {
@@ -86,9 +88,12 @@ const PaymentPage: React.FC = () => {
             const response = await createBooking(newBooking);
             if (response.status === 201) {
                 Swal.fire('Success', 'Booking created successfully!', 'success');
-    
+              console.log("bookingId" , response.data.bookingId)
                 // Create a checkout session with Stripe
-                const checkoutResponse = await createCheckoutSession({ amount: advancePayment * 100 });
+                const checkoutResponse = await createCheckoutSession({ 
+                    amount: advancePayment * 100,
+                    bookingId: response.data.bookingId // Assuming the response contains the booking ID
+                });
                 if (checkoutResponse.url) {
                     // Redirect to the Stripe checkout page
                     window.location.href = checkoutResponse.url;
