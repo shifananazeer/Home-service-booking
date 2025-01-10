@@ -5,7 +5,7 @@ export interface MessageDocument extends Message{}
 
 const messageSchema = new Schema <MessageDocument> ({
     sender: { type: Schema.Types.ObjectId, required: true }, 
-    senderRole: { type: String, enum: ["user", "worker"], required: true },
+    senderModel: { type: String, enum: ["user", "worker"], required: true },
     text: { type: String, required: true },
     chatId: { type: Schema.Types.ObjectId, ref: "Chat", required: true },
   },

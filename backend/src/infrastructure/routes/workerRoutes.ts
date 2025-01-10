@@ -26,4 +26,7 @@ router.put('/updateLocation',authenticateWorker,authorizeRole(['worker']),worker
 router.get('/bookings/:workerId',authenticateWorker,authorizeRole(['worker']), workerController.allBookingsByworkerId);
 router.get('/:workerId',authenticateWorker ,authorizeRole(['worker']), workerController.getWorkerLocation)
 router.get('/today-booking/:workerId',authenticateWorker,authorizeRole(['worker']),workerController.todaysBooking)
+router.post('/chat', workerController.handleCreateOrfetchChat)
+router.post('/message', workerController.handleSendMessage);
+router.get('/messages/:chatId' , workerController.handleGetMessage)
 export default router;

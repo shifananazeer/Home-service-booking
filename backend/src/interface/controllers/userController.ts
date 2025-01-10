@@ -24,6 +24,7 @@ import { WorkerService } from "../../application/useCases/workerService";
 import { ServiceManagement } from "../../application/useCases/servicesManagement";
 import Stripe from "stripe";
 import { PaymentService } from "../../application/useCases/paymentService";
+import { ChatService } from "../../application/useCases/chatService";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -33,6 +34,7 @@ const bookingService = new BookingService();
 const serviceManagement = new ServiceManagement();
 const workerService = new WorkerService()
 const paymentService = new PaymentService()
+const chatService = new ChatService()
 class UserController  {
    async register (req: Request, res: Response) {
         console.log("body", req.body)
@@ -509,6 +511,35 @@ class UserController  {
                 console.error('Error retrieving worker profile:', error);
                     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR});
             }
+        }
+
+        async handleSendMessage (req:Request , res:Response) {
+            const { chatId, senderId, senderModel, text } = req.body;
+            try{
+                const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
+                res.status(200).json(message);
+            }catch (error) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });
+            }
+        }
+        async handleGetMessage (req:Request , res:Response) {
+            const { chatId } = req.params;
+            try{
+                const messages = await chatService.getMessages(chatId);
+                res.status(HttpStatus.OK).json(messages);
+            }catch (error) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error fetching messages", error });
+            }
+        }
+
+        async handleCreateOrfetchChat (req:Request , res:Response) {
+            const { userId, workerId } = req.body;
+            try {
+                const chat = await chatService.createOrFetchChat(userId, workerId);
+                res.status(HttpStatus.OK).json(chat);
+              } catch (error) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error creating or fetching chat", error });
+              }
         }
 }
 

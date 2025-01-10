@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export interface Message {
     sender:Types.ObjectId;
-    senderRole: string;
+    senderModel: string;
     text:string;
     chatId:Types.ObjectId;
     createdAt?: Date;

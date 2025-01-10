@@ -23,11 +23,13 @@ import { getAllServicesUseCase } from '../../application/useCases/getAllService'
 import { HttpStatus } from '../../utils/httpStatus';
 import { Messages } from '../../utils/message';
 import { refreshAccessToken } from '../../application/useCases/refreshAccessToken';
+import { ChatService } from '../../application/useCases/chatService';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
 const availabilityService = new AvailabilityService();
 const bookingService = new BookingService();
+const chatService = new ChatService()
 
 class WorkerController   {
  async signupWorker(req :Request , res: Response):Promise<void> {
@@ -505,6 +507,35 @@ class WorkerController   {
               return 
               }
             }
+
+              async handleSendMessage (req:Request , res:Response) {
+                        const { chatId, senderId, senderModel, text } = req.body;
+                        try{
+                            const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
+                            res.status(200).json(message);
+                        }catch (error) {
+                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });
+                        }
+                    }
+                    async handleGetMessage (req:Request , res:Response) {
+                        const { chatId } = req.params;
+                        try{
+                            const messages = await chatService.getMessages(chatId);
+                            res.status(HttpStatus.OK).json(messages);
+                        }catch (error) {
+                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error fetching messages", error });
+                        }
+                    }
+            
+                    async handleCreateOrfetchChat (req:Request , res:Response) {
+                        const { userId, workerId } = req.body;
+                        try {
+                            const chat = await chatService.createOrFetchChat(userId, workerId);
+                            res.status(HttpStatus.OK).json(chat);
+                          } catch (error) {
+                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error creating or fetching chat", error });
+                          }
+                    }
      
     }
 

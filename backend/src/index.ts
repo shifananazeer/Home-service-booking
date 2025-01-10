@@ -8,12 +8,14 @@ import cors from 'cors'
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser'
 import './sheduler'
-
+import { setupSocket } from './infrastructure/sockets/chatSocket';
+import http from 'http';
 
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 
 app.use(morgan('dev'));
 app.use(express.json()); 
@@ -27,7 +29,7 @@ app.use(cors({
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
+const io = setupSocket(server);
 
 app.use('/api/auth', userRoutes);
 
