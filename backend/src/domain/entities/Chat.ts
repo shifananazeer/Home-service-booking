@@ -7,5 +7,6 @@ export interface Participant {
 
 export interface Chat {
     participants: Types.ObjectId[]; 
-    createdAt: Date; 
+    createdAt?: Date;
+    updatedAt?: Date;
 }

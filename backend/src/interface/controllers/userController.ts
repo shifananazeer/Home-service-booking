@@ -496,6 +496,20 @@ class UserController  {
         
             }
         }
+
+        async getWorkerProfile (req:Request , res:Response) {
+            const {workerId} = req.params;
+            try{
+              const workerDetails = await workerService.getWorker(workerId)
+              const address = await addressService.userAddress(workerId)
+              console.log("kjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+              console.log("address" , address  , "worker" , workerDetails)
+              res.status(HttpStatus.OK).json({address , workerDetails})
+            }catch(error) {
+                console.error('Error retrieving worker profile:', error);
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: Messages.INTERNAL_SERVER_ERROR});
+            }
+        }
 }
 
 

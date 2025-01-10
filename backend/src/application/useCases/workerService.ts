@@ -137,6 +137,11 @@ export class WorkerService {
       throw new Error("Failed to retrieve worker");
     }
   }
+//   public async getWorkerProfile (workerId :string)  {
+//      const workers = this.workerRepository.getWorkerById(workerId)
+//      console.log("wwwwww",workers)
+//      const address = 
+//   }
 }
 
 

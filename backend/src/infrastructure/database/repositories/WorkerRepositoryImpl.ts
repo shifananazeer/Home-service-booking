@@ -48,7 +48,7 @@ export class WorkerRepositoryImpl implements WorkerRepository {
     }
 
     async getWorkerById(workerId: string): Promise<Worker | null> {
-        const worker = await WorkerModel.findOne({ workerId });
+        const worker = await WorkerModel.findById( workerId );
         return worker ? worker.toObject() as Worker : null;
     }
 
@@ -59,4 +59,5 @@ export class WorkerRepositoryImpl implements WorkerRepository {
         .skip(skip).limit(limit);
         return workers;
     }
+
 }

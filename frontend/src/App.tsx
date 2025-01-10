@@ -31,6 +31,7 @@ import BookingList from "./pages/User/bookingList";
 import WorkerBookings from "./components/worker/bookings";
 import BookingSuccessPage from "./pages/User/Success";
 import CancelPage from "./pages/User/Cancel";
+import WorkerProfilePage from "./pages/User/WorkerProfileView";
 
 
 
@@ -64,6 +65,7 @@ const App = () => {
     <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
     <Route path='/booking-success' element={<BookingSuccessPage/>}/>
     <Route path='/cancel' element={<CancelPage/>}/>
+    <Route path='/view-worker/profile'element={<WorkerProfilePage/>}/>
     
     <Route path="/worker/dashboard" element={ <WorkerDashboard />} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>

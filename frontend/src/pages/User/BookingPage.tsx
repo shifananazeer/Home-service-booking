@@ -289,9 +289,10 @@ const BookingPage: React.FC = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
-                          onClick={() => navigate(`/worker-profile/${worker._id}`)}
+                        
+                          onClick={() => navigate(`/view-worker/profile?workerId=${worker._id}`)}
                           className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 text-sm"
-                        >
+                        >id{worker._id}
                           View Profile
                         </button>
                         {worker.status === "Unavailable" ? (

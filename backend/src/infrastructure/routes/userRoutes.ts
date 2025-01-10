@@ -33,4 +33,5 @@ router.post ('/create-checkout-session', authenticateUser,userController.createC
 router.post('/create-payment', authenticateUser,userController.createPayment)
 router.get('/get-booking-details/:bookingId' , authenticateUser, userController.getBooking)
 router.post('/update-paymentStatus/:bookingId' ,authenticateUser, userController.updatePaymentStatus)
+router.get('/worker-profile/:workerId' , authenticateUser , userController.getWorkerProfile)
 export default router;

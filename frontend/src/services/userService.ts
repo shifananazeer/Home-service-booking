@@ -336,5 +336,19 @@ export const updateBookingStatus = async (bookingId: string, status: string) => 
   }
 };
 
+export const fetchWorkerProfile = async(workerId:string) => {
+  const token = localStorage.getItem('accessToken');
+  try{
+    const response = await axiosInstance.get(`/auth/worker-profile/${workerId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    console.log("respo" , response)
+    return response.data
+  }catch (error) {
+    console.log("error feting worker profile")
+  }
+}
 
 
