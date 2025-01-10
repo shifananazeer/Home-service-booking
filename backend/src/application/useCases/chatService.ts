@@ -15,6 +15,7 @@ export class ChatService {
 
       async createOrFetchChat(userId: string, workerId: string) {
         let chat = await this.chatRepository.findChatByParticipants(userId, workerId);
+        console.log("chat", chat)
     
         if (!chat) {
           chat = await this.chatRepository.createChat(userId, workerId);
@@ -23,7 +24,7 @@ export class ChatService {
         return chat;
       }
     
-      async sendMessage(chatId: string, senderId: string, senderModel: "User" | "Worker", text: string) {
+      async sendMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string) {
         const message = await this.messageRepository.createMessage(chatId, senderId, senderModel, text);
         return message;
       }

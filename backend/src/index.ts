@@ -17,11 +17,6 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-app.use(morgan('dev'));
-app.use(express.json()); 
-app.use(express.urlencoded());
-app.use(cookieParser());
-
 //cors middleware to connect frontend
 app.use(cors({
   origin: 'http://localhost:5173', 
@@ -29,6 +24,15 @@ app.use(cors({
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+
+app.use(morgan('dev'));
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
+
 const io = setupSocket(server);
 
 app.use('/api/auth', userRoutes);
@@ -43,7 +47,7 @@ app.use('/api/admin',adminRoutes)
 // Database connection
 mongoose.connect(process.env.MONGODB_URI as string)
   .then(() => {
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log(`Server running on port ${process.env.PORT}`);
     });
   })

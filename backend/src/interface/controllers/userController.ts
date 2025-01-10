@@ -7,6 +7,7 @@ import { sendResetLink } from "../../application/useCases/passwordResent";
 import { resetPassword } from "../../application/useCases/passwordResent";
 import { validateToken } from "../../application/useCases/passwordResent";
 import { v4 as uuidv4 } from 'uuid';
+import {getIo} from '../../infrastructure/sockets/chatSocket'
 import jwt from 'jsonwebtoken'
 import { refreshAccessToken } from "../../application/useCases/refreshAccessToken";
 import { uploadProfilePic } from "../../utils/s3Servise";
@@ -515,8 +516,13 @@ class UserController  {
 
         async handleSendMessage (req:Request , res:Response) {
             const { chatId, senderId, senderModel, text } = req.body;
+            if (!chatId || !senderId || !senderModel || !text) {
+                 res.status(HttpStatus.BAD_REQUEST).json({ message: "All fields are required." });
+            }
             try{
                 const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
+                const io = getIo();
+                io.to(chatId).emit('newMessage', message);
                 res.status(200).json(message);
             }catch (error) {
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });

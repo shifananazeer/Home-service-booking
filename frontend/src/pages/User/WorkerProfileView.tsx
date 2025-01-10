@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Phone, MessageCircle, Star, MapPin, Clock, DollarSign, Briefcase, Mail, Award, ThumbsUp, PenToolIcon as Tool } from 'lucide-react';
-import { fetchWorkerProfile } from '../../services/userService';
+import { fetchChat, fetchMessages, fetchWorkerProfile } from '../../services/userService';
+import ChatModal from '../../components/ChatModel';
 
 interface WorkerProfile {
   _id: string;
@@ -33,6 +34,10 @@ const WorkerProfilePage: React.FC = () => {
   const [worker, setWorker] = useState<WorkerProfile | null>(null);
   const [address, setAddress] = useState<Address | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const userId = localStorage.getItem('user_Id');
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const loadWorkerProfile = async () => {
@@ -51,6 +56,34 @@ const WorkerProfilePage: React.FC = () => {
 
     loadWorkerProfile();
   }, [workerId]);
+
+  const handleOpenChat = async(workerId:string) => {
+    try {
+      if (!userId) {
+        console.error('User ID is null');
+        return;
+      }
+      console.log('Fetching chat for user:', userId, 'and worker:', workerId);
+      const data = await fetchChat(userId, workerId);
+      
+      if (data) {
+        console.log('Chat response:', data);
+        setChatId(data._id); // Set the chat ID from the response
+        const fetchedMessages = await fetchMessages(data._id);
+        console.log("messages" , fetchedMessages)
+        setMessages(fetchedMessages);
+        setModalOpen(true); // Open the chat modal
+      } else {
+        console.error('No response from fetchChat');
+      }
+    } catch (error) {
+      console.error('Failed to fetch or create chat:', error);
+    }
+  };
+
+  const handleCloseChat = () => {
+    setModalOpen(false); // Close the chat modal
+  };
 
   if (loading) {
     return (
@@ -167,18 +200,26 @@ const WorkerProfilePage: React.FC = () => {
                 >
                   <Phone className="mr-2 w-5 h-5" /> Call Now
                 </button>
-                <button 
-                  onClick={() => navigate(`/chat/${worker._id}`)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+                <button
+                 onClick={() => handleOpenChat(worker._id)}
+                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
-                  <MessageCircle className="mr-2 w-5 h-5" /> Start Chat
-                </button>
+             <MessageCircle className="mr-2 w-5 h-5" /> Start Chat
+                 </button>
+                 <ChatModal
+                  isOpen={isModalOpen}
+                  onClose={handleCloseChat}
+                  chatId={chatId || ''} // Pass the chat ID
+                  userId={userId || ''} // Pass the user ID
+                  workerId={worker._id} // Pass the worker ID
+                  messages={messages} workerName={''}                  />
+                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+   
   );
 };
 

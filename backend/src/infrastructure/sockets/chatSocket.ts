@@ -1,8 +1,16 @@
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 
+let io: Server; // Declare the io variable at the top
+
 export const setupSocket = (httpServer: HttpServer) => {
-  const io = new Server(httpServer);
+  io = new Server(httpServer, {
+    cors: {
+      origin: 'http://localhost:5173',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+  });
 
   io.on('connection', (socket) => {
     console.log('A user connected');
@@ -13,8 +21,6 @@ export const setupSocket = (httpServer: HttpServer) => {
     });
 
     socket.on('sendMessage', (message) => {
-      // Here, you would save the message to the database
-      // Then emit the message to other users in the chat
       io.to(message.chatId).emit('newMessage', message);
     });
 
@@ -25,3 +31,6 @@ export const setupSocket = (httpServer: HttpServer) => {
 
   return io; // Return the io instance if needed for further use
 };
+
+// Export the io instance
+export const getIo = () => io; // Function to access io instance

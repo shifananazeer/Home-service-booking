@@ -351,4 +351,42 @@ export const fetchWorkerProfile = async(workerId:string) => {
   }
 }
 
+export const fetchChat = async (userId:string , workerId:string) => {
+  const token = localStorage.getItem('accessToken');
+  try{
+   const response = await axiosInstance.post('/auth/chat',{
+    userId ,
+    workerId
+   })
+   return response.data
+  }catch (error) {
+  console.log("error",error)
+  }
+}
 
+export const fetchMessages= async(chatId:string) => {
+  const token = localStorage.getItem('accessToken');
+  try{
+    const response = await axiosInstance.get(`/auth/messages/${chatId}`)
+    return response.data;
+  }catch (error) {
+    console.log("error",error)
+  }
+}
+interface MessageData {
+chatId:string;
+senderId:string;
+senderModel:string
+text:string;
+
+}
+
+export const  sendMessage = async (messageData :MessageData) => {
+  try{
+       const response = await axiosInstance.post('/auth/message' ,messageData)
+       console.log("message send" , response)
+       return response
+  }catch (error) {
+    console.log("error",error)
+  }
+}
