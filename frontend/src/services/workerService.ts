@@ -5,6 +5,7 @@ import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
 import { fetchServices } from "./adminService";
 import { Message } from "../components/ChatModel";
+import { Reaction } from "../components/worker/ChatList";
 
 
 
@@ -318,3 +319,25 @@ export const getWorkerLocation = async (workerId :string) => {
       throw error;
     }
   };
+
+  export const sendReaction = async (messageId: string, reactionData: Reaction) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try {
+        const response = await axiosInstance.post(
+            `/workers/reaction/${messageId}`,
+            { emoji: reactionData.emoji }, // Send the emoji as part of an object
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json' // Optional: Specify content type
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error sending reaction:", error); // Log the error for debugging
+        throw error; // Optional: Re-throw the error to handle it further up the chain if needed
+    }
+};
+
+  

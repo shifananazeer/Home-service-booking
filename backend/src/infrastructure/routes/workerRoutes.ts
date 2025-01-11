@@ -30,4 +30,5 @@ router.post('/chat', workerController.handleCreateOrfetchChat)
 router.post('/message',upload.single('media'), workerController.handleSendMessage);
 router.get('/messages/:chatId' , workerController.handleGetMessage)
 router.get('/chat/:workerId' , workerController.getMessages)
+router.post('/reaction/:messageId',authenticateWorker, workerController.addReaction)
 export default router;

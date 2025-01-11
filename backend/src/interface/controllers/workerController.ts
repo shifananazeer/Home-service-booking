@@ -579,7 +579,27 @@ class WorkerController   {
                             res.status(500).json({ message: 'Error fetching chats', error: error.message });
                         }
                     }
-     
+               async addReaction (req:Request , res:Response) {
+                console.log(req.body);
+                const { messageId } = req.params;
+                const { emoji } = req.body;
+                console.log("Message ID:", messageId, "Emoji:", emoji)
+              
+                const userModel: 'user' | 'worker' = 'worker';
+
+                if (!messageId || !emoji) {
+                    res.status(400).json({ error: "Message ID and emoji are required." });
+                    return;
+                  }
+                  try {
+                    console.log("Adding reaction:", { messageId, emoji });
+                    const reaction = await chatService.updateReaction(messageId, emoji, userModel);
+                    res.status(200).json(reaction);
+                } catch (error: any) {
+                    console.error("Error adding reaction:", error); // Log the full error
+                    res.status(500).json({ error: error.message });
+                }
+               }
     }
 
     export const workerController  = new WorkerController();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { fetchChats, fetchMessages, sendMessages } from "../../services/workerService";
+import { fetchChats, fetchMessages, sendMessages, sendReaction } from "../../services/workerService";
 import socket from '../../utils/socket';
 
 interface Chat {
@@ -10,15 +10,21 @@ interface Chat {
   };
 }
 
+export interface Reaction {
+  userModel: string;
+  emoji: string;
+}
+
 export interface Message {
   _id?: string;
   senderId: string;
   senderModel: "user" | "worker";
   text?: string;
+  reactions?: Reaction[];
   mediaUrl?: string;
   chatId: string;
   timestamp?: string;
-  createdAt?:string;
+  createdAt?: string;
 }
 
 const ChatList: React.FC = () => {
@@ -118,6 +124,24 @@ const ChatList: React.FC = () => {
     }
   };
 
+  const addReaction = async (messageId: string, emoji: string) => {
+    try {
+      const reactionData = { emoji, userModel: 'worker' }; // Include userModel in the reaction data
+      const response = await sendReaction(messageId, reactionData);
+      console.log("Reaction added:", response);
+      // Update the local state to reflect the new reaction
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg._id === messageId 
+            ? { ...msg, reactions: [...(msg.reactions || []), reactionData] }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-1/3 bg-white overflow-y-auto border-r border-gray-200">
@@ -167,7 +191,7 @@ const ChatList: React.FC = () => {
                   }`}
                 >
                   <div
-                    className={`max-w-xs p-3 rounded-lg ${
+                    className={`max-w-xs p-3 rounded-lg relative group ${
                       message.senderModel === "worker"
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200 text-black"
@@ -178,11 +202,29 @@ const ChatList: React.FC = () => {
                       <img src={message.mediaUrl} alt="media" className="max-w-full mt-2 rounded" />
                     )}
                     <p className="text-xs mt-1 opacity-70">
-                      {new Date(message.createdAt || "").toLocaleTimeString([], {
-                    hour: 'numeric',
-                   minute: 'numeric',
-                       })}
+                      {new Date(message.createdAt || "").toLocaleTimeString([], { hour: "numeric", minute: "numeric" })}
                     </p>
+                    {message.reactions && message.reactions.length > 0 && (
+                      <div className="flex mt-1 space-x-1">
+                        {message.reactions.map((reaction, index) => (
+                          <span key={index} className="text-sm">{reaction.emoji}</span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 right-0 mb-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <button
+                        onClick={() => addReaction(message._id!, "👍")}
+                        className="ml-2 text-blue-500 hover:text-blue-700"
+                      >
+                        👍
+                      </button>
+                      <button
+                        onClick={() => addReaction(message._id!, "❤️")}
+                        className="ml-1 text-red-500 hover:text-red-700"
+                      >
+                        ❤️
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

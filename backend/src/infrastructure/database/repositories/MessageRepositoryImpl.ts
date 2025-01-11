@@ -1,3 +1,4 @@
+import { Reaction } from "../../../application/useCases/chatService";
 import { Message } from "../../../domain/entities/Message";
 import { messageRepository } from "../../../domain/repositories/messageRepository";
 import MessageModel from "../models/messageModel";
@@ -16,4 +17,20 @@ export class MessageRepositoryImpl implements messageRepository {
     async getMessagesByChatId(chatId: string): Promise<Message[]> {
       return MessageModel.find({ chatId }).sort({ createdAt: 1 }).exec();
     }
+    async addReaction (messageId:string , reaction: Reaction): Promise<Reaction> {
+      const message = await MessageModel.findById(messageId);
+      if (!message) {
+          throw new Error("Message not found.");
+      }
+  
+      if (!message.reactions) {
+          message.reactions = [];
+      }
+  
+      // Push the reaction to the reactions array
+      message.reactions.push(reaction);
+      await message.save();
+  
+      return reaction;
+}
   }

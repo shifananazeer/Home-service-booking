@@ -1,7 +1,12 @@
+import { Types } from "mongoose";
+import WorkerModel from "../../infrastructure/database/models/workerModel";
 import { ChatRepositoryImpl } from "../../infrastructure/database/repositories/ChatRepositoryImpl";
 import { MessageRepositoryImpl } from "../../infrastructure/database/repositories/MessageRepositoryImpl";
 
-
+export interface Reaction {
+  userModel:'user'|'worker';
+  emoji: string;
+}
 
 export class ChatService {
     private chatRepository : ChatRepositoryImpl;
@@ -39,6 +44,13 @@ export class ChatService {
         console.log('Fetching chats for worker:', workerId); // Add log here for debugging
     const chats = await this.chatRepository.getChatByWorkerId(workerId);
     return chats;
+      }
+
+      async updateReaction (messageId:string , emoji:string , userModel: 'worker'){
+      
+        const reaction: Reaction = { userModel, emoji };
+        return await this.messageRepository.addReaction(messageId, reaction);
+       
       }
     
 }
