@@ -4,6 +4,7 @@ import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
 import { fetchServices } from "./adminService";
+import { Message } from "../components/worker/ChatList";
 
 
 
@@ -276,3 +277,26 @@ export const getWorkerLocation = async (workerId :string) => {
     const response = await axiosInstance.post("/bookings/mark-as-completed", { bookingId });
     return response.data; 
   };
+
+  export const fetchChats = async (workerId:string) => {
+    const response = await axiosInstance.get(`/workers/chat/${workerId}`)
+    console.log("responsechat" , response)
+    return response.data;
+  }
+
+  export const fetchMessages = async (chatId:string) => {
+    const response = await axiosInstance.get(`/workers/messages/${chatId}`)
+    console.log("res", response)
+    return response.data;
+  }
+
+
+  export const sendMessages = async (messageData:Message) => {
+    try{
+        const response = await axiosInstance.post('/workers/message' ,messageData)
+        console.log("message send" , response)
+        return response
+   }catch (error) {
+     console.log("error",error)
+   }
+  }

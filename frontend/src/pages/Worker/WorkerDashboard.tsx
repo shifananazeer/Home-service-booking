@@ -9,6 +9,7 @@ import AvailabilityManagement from '../../components/worker/AvailabilityManageme
 import WorkerBookings from '../../components/worker/bookings'
 import WorkerTodayBookings from '../../components/worker/todaysBooking'
 import { refreshAccessToken } from '../../utils/auth'
+import ChatList from '../../components/worker/ChatList'
 
 const WorkerDashboard = () => {
 const navigate = useNavigate()
@@ -32,7 +33,8 @@ const navigate = useNavigate()
             return <WorkerBookings/>    
         case 'todaysBooking':
               return <WorkerTodayBookings/>
-        
+        case 'chats':
+            return <ChatList/>
         case "dashboard":
             return (
                 <>

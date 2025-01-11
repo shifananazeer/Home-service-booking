@@ -24,6 +24,7 @@ import { HttpStatus } from '../../utils/httpStatus';
 import { Messages } from '../../utils/message';
 import { refreshAccessToken } from '../../application/useCases/refreshAccessToken';
 import { ChatService } from '../../application/useCases/chatService';
+import { getIo } from '../../infrastructure/sockets/chatSocket';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
@@ -510,8 +511,13 @@ class WorkerController   {
 
               async handleSendMessage (req:Request , res:Response) {
                         const { chatId, senderId, senderModel, text } = req.body;
+                        if (!chatId || !senderId || !senderModel || !text) {
+                            res.status(HttpStatus.BAD_REQUEST).json({ message: "All fields are required." });
+                       }
                         try{
                             const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
+                            const io = getIo();
+                            io.to(chatId).emit('newMessage', message);
                             res.status(200).json(message);
                         }catch (error) {
                             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });
@@ -535,6 +541,25 @@ class WorkerController   {
                           } catch (error) {
                             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error creating or fetching chat", error });
                           }
+                    }
+
+                    async getMessages (req:Request , res:Response) {
+                        console.log('getMessages called'); // Check if the function is hit
+                        const workerId = req.params.workerId;
+                    
+                        try {
+                            const chats = await chatService.getChatForWorker(workerId);
+                            console.log('Chats for workerId:', workerId, '->', chats);
+                    
+                            if (chats.length === 0) {
+                                 res.status(404).json({ message: 'No chats found for this worker.' });
+                            }
+                    
+                            res.status(200).json(chats);
+                        } catch (error: any) {
+                            console.error('Error fetching chats:', error); // Log error for debugging
+                            res.status(500).json({ message: 'Error fetching chats', error: error.message });
+                        }
                     }
      
     }

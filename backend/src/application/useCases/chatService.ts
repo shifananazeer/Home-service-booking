@@ -33,5 +33,11 @@ export class ChatService {
         const messages = await this.messageRepository.getMessagesByChatId(chatId);
         return messages;
       }
+
+      async getChatForWorker(workerId:string) {
+        console.log('Fetching chats for worker:', workerId); // Add log here for debugging
+    const chats = await this.chatRepository.getChatByWorkerId(workerId);
+    return chats;
+      }
     
 }
