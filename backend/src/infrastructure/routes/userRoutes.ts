@@ -35,7 +35,7 @@ router.get('/get-booking-details/:bookingId' , authenticateUser, userController.
 router.post('/update-paymentStatus/:bookingId' ,authenticateUser, userController.updatePaymentStatus)
 router.get('/worker-profile/:workerId' , authenticateUser , userController.getWorkerProfile)
 router.post("/chat", userController.handleCreateOrfetchChat);
-router.post("/message", userController.handleSendMessage);
+router.post("/message",upload.single('media'),  userController.handleSendMessage);
 router.get("/messages/:chatId", userController.handleGetMessage);
 
 export default router;

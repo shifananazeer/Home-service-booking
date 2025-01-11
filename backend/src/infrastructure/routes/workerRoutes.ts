@@ -27,7 +27,7 @@ router.get('/bookings/:workerId',authenticateWorker,authorizeRole(['worker']), w
 router.get('/:workerId',authenticateWorker ,authorizeRole(['worker']), workerController.getWorkerLocation)
 router.get('/today-booking/:workerId',authenticateWorker,authorizeRole(['worker']),workerController.todaysBooking)
 router.post('/chat', workerController.handleCreateOrfetchChat)
-router.post('/message', workerController.handleSendMessage);
+router.post('/message',upload.single('media'), workerController.handleSendMessage);
 router.get('/messages/:chatId' , workerController.handleGetMessage)
 router.get('/chat/:workerId' , workerController.getMessages)
 export default router;

@@ -24,8 +24,9 @@ export class ChatService {
         return chat;
       }
     
-      async sendMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string) {
-        const message = await this.messageRepository.createMessage(chatId, senderId, senderModel, text);
+      async sendMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string ,mediaUrl?: string) {
+        
+        const message = await this.messageRepository.createMessage(chatId, senderId, senderModel, text , mediaUrl);
         return message;
       }
     

@@ -26,6 +26,7 @@ import { ServiceManagement } from "../../application/useCases/servicesManagement
 import Stripe from "stripe";
 import { PaymentService } from "../../application/useCases/paymentService";
 import { ChatService } from "../../application/useCases/chatService";
+import { uploadChatImage } from "../../utils/uploadChatImage";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -515,12 +516,25 @@ class UserController  {
         }
 
         async handleSendMessage (req:Request , res:Response) {
+            console.log("body", req.file)
+            console.log("body", req.body)
             const { chatId, senderId, senderModel, text } = req.body;
             if (!chatId || !senderId || !senderModel || !text) {
                  res.status(HttpStatus.BAD_REQUEST).json({ message: "All fields are required." });
             }
+
+              let mediaUrl: string | undefined;
+                        
+                            // Upload the image if it exists
+                            if (req.file) {
+                                try {
+                                    mediaUrl = await uploadChatImage(req.file);
+                                } catch (error) {
+                                     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error uploading image.", error });
+                                }
+                            }
             try{
-                const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
+                const message = await chatService.sendMessage(chatId, senderId, senderModel, text , mediaUrl);
                 const io = getIo();
                 io.to(chatId).emit('newMessage', message);
                 res.status(200).json(message);

@@ -4,7 +4,8 @@ import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
 import { fetchServices } from "./adminService";
-import { Message } from "../components/worker/ChatList";
+import { Message } from "../components/ChatModel";
+
 
 
 
@@ -291,12 +292,29 @@ export const getWorkerLocation = async (workerId :string) => {
   }
 
 
-  export const sendMessages = async (messageData:Message) => {
-    try{
-        const response = await axiosInstance.post('/workers/message' ,messageData)
-        console.log("message send" , response)
-        return response
-   }catch (error) {
-     console.log("error",error)
-   }
-  }
+  export const sendMessages = async (messageData: Message, mediaFile: File | null) => {
+    try {
+      const formData = new FormData();
+      formData.append("senderId", messageData.senderId);
+      formData.append("senderModel", messageData.senderModel);
+      formData.append("chatId", messageData.chatId);
+      if (messageData.text) {
+        formData.append("text", messageData.text);
+      }
+      if (mediaFile) {
+        formData.append("media", mediaFile);
+      }
+      console.log("formdata" , formData)
+  
+      const response = await axiosInstance.post('/workers/message', formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Message sent", response);
+      return response;
+    } catch (error) {
+      console.error("Error sending message:", error);
+      throw error;
+    }
+  };

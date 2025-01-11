@@ -3,9 +3,9 @@ import { messageRepository } from "../../../domain/repositories/messageRepositor
 import MessageModel from "../models/messageModel";
 
 export class MessageRepositoryImpl implements messageRepository {
-    async createMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string): Promise<Message> {
+    async createMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string , mediaUrl?:string): Promise<Message> {
       try {
-        const message = new MessageModel({ chatId, sender: senderId, senderModel, text });
+        const message = new MessageModel({ chatId, senderId: senderId, senderModel, text , mediaUrl });
         return await message.save(); // Ensure save is awaited
     } catch (error) {
         console.error("Error creating message:", error);

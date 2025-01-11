@@ -377,13 +377,33 @@ interface MessageData {
 chatId:string;
 senderId:string;
 senderModel:string
-text:string;
+text?:string;
+mediaUrl?:string
 
 }
 
-export const  sendMessage = async (messageData :MessageData) => {
+export const  sendMessage = async (messageData :MessageData , mediaFile:File| null) => {
   try{
-       const response = await axiosInstance.post('/auth/message' ,messageData)
+
+    const formData = new FormData();
+    formData.append("senderId", messageData.senderId);
+    formData.append("senderModel", messageData.senderModel);
+    formData.append("chatId", messageData.chatId);
+    if (messageData.text) {
+      formData.append("text", messageData.text);
+    }
+    if (mediaFile) {
+      formData.append("media", mediaFile);
+    }
+    console.log("formdata" , formData)
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+  }
+       const response = await axiosInstance.post('/auth/message' ,formData ,{
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+       })
        console.log("message send" , response)
        return response
   }catch (error) {

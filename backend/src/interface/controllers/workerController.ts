@@ -25,6 +25,7 @@ import { Messages } from '../../utils/message';
 import { refreshAccessToken } from '../../application/useCases/refreshAccessToken';
 import { ChatService } from '../../application/useCases/chatService';
 import { getIo } from '../../infrastructure/sockets/chatSocket';
+import { uploadChatImage } from '../../utils/uploadChatImage';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
@@ -509,20 +510,37 @@ class WorkerController   {
               }
             }
 
-              async handleSendMessage (req:Request , res:Response) {
-                        const { chatId, senderId, senderModel, text } = req.body;
-                        if (!chatId || !senderId || !senderModel || !text) {
-                            res.status(HttpStatus.BAD_REQUEST).json({ message: "All fields are required." });
-                       }
-                        try{
-                            const message = await chatService.sendMessage(chatId, senderId, senderModel, text);
-                            const io = getIo();
-                            io.to(chatId).emit('newMessage', message);
-                            res.status(200).json(message);
-                        }catch (error) {
-                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });
-                        }
+            async handleSendMessage(req: Request, res: Response) {
+                console.log("body", req.file);
+                const { chatId, senderId, senderModel, text } = req.body;
+            
+                if (!chatId || !senderId || !senderModel || !text) {
+                    res.status(HttpStatus.BAD_REQUEST).json({ message: "All fields are required." });
+                }
+            
+                let mediaUrl: string | undefined;
+            
+                // Upload the image if it exists
+                if (req.file) {
+                    try {
+                        mediaUrl = await uploadChatImage(req.file);
+                    } catch (error) {
+                         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error uploading image.", error });
                     }
+                }
+            
+                try {
+                    // Pass mediaUrl to the sendMessage method
+                    const message = await chatService.sendMessage(chatId, senderId, senderModel, text, mediaUrl);
+                    
+                    const io = getIo();
+                    io.to(chatId).emit('newMessage', message);
+                    
+                    res.status(200).json(message);
+                } catch (error) {
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error });
+                }
+            }
                     async handleGetMessage (req:Request , res:Response) {
                         const { chatId } = req.params;
                         try{
