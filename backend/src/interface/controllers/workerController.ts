@@ -585,7 +585,7 @@ class WorkerController   {
                 const { emoji } = req.body;
                 console.log("Message ID:", messageId, "Emoji:", emoji)
               
-                const userModel: 'user' | 'worker' = 'worker';
+                const userModel= 'worker';
 
                 if (!messageId || !emoji) {
                     res.status(400).json({ error: "Message ID and emoji are required." });

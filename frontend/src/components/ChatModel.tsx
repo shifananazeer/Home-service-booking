@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import socket from '../utils/socket';
-import { sendMessage } from '../services/userService';
+import { sendMessage, sendReaction } from '../services/userService';
 import { MessageCircle, Send, X, ImageIcon } from 'lucide-react';
 
 export interface Message {
@@ -9,10 +9,16 @@ export interface Message {
   senderId: string;
   senderModel: 'user' | 'worker';
   text?: string;
+  reactions?: Reaction[];
   mediaUrl?: string; 
   timestamp?: string;
-  updatedAt?:string
-  createdAt?:string;
+  updatedAt?: string;
+  createdAt?: string;
+}
+
+export interface Reaction {
+  userModel: string;
+  emoji: string;
 }
 
 interface ChatModalProps {
@@ -68,7 +74,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
   }, [chatId]);
 
   const handleSendMessage = async () => {
-    // Check if text and mediaFile are empty
+    if (text.trim() === '' && !mediaFile) return;
 
     const messageData: Message = {
       chatId,
@@ -76,13 +82,12 @@ const ChatModal: React.FC<ChatModalProps> = ({
       senderModel: 'user',
       timestamp: new Date().toISOString(),
     };
+
     if (text.trim() !== '') {
       messageData.text = text.trim();
     }
-  
 
     try {
-      // Send the message along with the media file
       await sendMessage(messageData, mediaFile);
       setText('');
       setMediaFile(null);
@@ -117,11 +122,28 @@ const ChatModal: React.FC<ChatModalProps> = ({
     return message.senderModel === 'user';
   };
 
+  const addReaction = async (messageId: string, emoji: string) => {
+    try {
+      const reactionData = { emoji, userModel: 'user' };
+      const response = await sendReaction(messageId, reactionData);
+      console.log("Reaction added:", response);
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg._id === messageId 
+            ? { ...msg, reactions: [...(msg.reactions || []), reactionData] }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-lg mx-4">
         {/* Header */}
         <div className="bg-gray-800 px-4 py-3 flex items-center justify-between rounded-t-lg">
           <div className="flex items-center">
@@ -146,7 +168,8 @@ const ChatModal: React.FC<ChatModalProps> = ({
                 className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
               >
                 <div
-                  className={`max-w-[70%] px-4 py-2 rounded-2xl
+                  className={`
+                    max-w-[70%] px-4 py-2 rounded-2xl relative group
                     ${isUser ? 
                       'bg-blue-600 text-white rounded-br-none' : 
                       'bg-gray-700 text-white rounded-bl-none'
@@ -166,12 +189,33 @@ const ChatModal: React.FC<ChatModalProps> = ({
                   <p className="break-words">{message.text}</p>
                   {message.updatedAt && (
                     <p className={`text-xs mt-1 ${isUser ? 'text-blue-200' : 'text-gray-400'}`}>
-                     {new Date(message.updatedAt).toLocaleTimeString([], {
-                    hour: 'numeric',
-                   minute: 'numeric',
-                       })}
+                      {new Date(message.updatedAt).toLocaleTimeString([], {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                      })}
                     </p>
                   )}
+                  {message.reactions && message.reactions.length > 0 && (
+                    <div className="flex mt-1 space-x-1">
+                      {message.reactions.map((reaction, index) => (
+                        <span key={index} className="text-sm">{reaction.emoji}</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 right-0 mb-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button
+                      onClick={() => addReaction(message._id!, "👍")}
+                      className="ml-2 text-blue-500 hover:text-blue-700"
+                    >
+                      👍
+                    </button>
+                    <button
+                      onClick={() => addReaction(message._id!, "❤️")}
+                      className="ml-1 text-red-500 hover:text-red-700"
+                    >
+                      ❤️
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -218,6 +262,24 @@ const ChatModal: React.FC<ChatModalProps> = ({
               className="hidden"
             />
           </div>
+          {mediaPreview && (
+            <div className="mt-2 relative inline-block">
+              <img
+                src={mediaPreview}
+                alt="Media Preview"
+                className="max-w-xs max-h-32 rounded"
+              />
+              <button
+                onClick={() => {
+                  setMediaFile(null);
+                  setMediaPreview(null);
+                }}
+                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -225,3 +287,4 @@ const ChatModal: React.FC<ChatModalProps> = ({
 };
 
 export default ChatModal;
+

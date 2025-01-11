@@ -46,7 +46,7 @@ export class ChatService {
     return chats;
       }
 
-      async updateReaction (messageId:string , emoji:string , userModel: 'worker'){
+      async updateReaction (messageId:string , emoji:string , userModel: 'user' | 'worker'){
       
         const reaction: Reaction = { userModel, emoji };
         return await this.messageRepository.addReaction(messageId, reaction);

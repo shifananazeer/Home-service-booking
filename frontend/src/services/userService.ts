@@ -4,6 +4,7 @@ import errorHandler from "../utils/errorHandler";
 import axios from "axios";
 import { Address } from "../interfaces/addressInterface";
 import { Booking } from "../interfaces/bookingInterface";
+import { Reaction } from "../components/ChatModel";
 
 
 
@@ -408,5 +409,25 @@ export const  sendMessage = async (messageData :MessageData , mediaFile:File| nu
        return response
   }catch (error) {
     console.log("error",error)
+  }
+}
+
+export const sendReaction = async (messageId: string, reactionData: Reaction) => {
+  const token = localStorage.getItem('accessToken');
+  try {
+      const response = await axiosInstance.post(
+          `/auth/reaction/${messageId}`,
+          { emoji: reactionData.emoji }, // Send the emoji as part of an object
+          {
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json' // Optional: Specify content type
+              }
+          }
+      );
+      return response.data;
+  } catch (error) {
+      console.error("Error sending reaction:", error); // Log the error for debugging
+      throw error; // Optional: Re-throw the error to handle it further up the chain if needed
   }
 }
