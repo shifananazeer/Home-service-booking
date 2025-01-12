@@ -25,6 +25,8 @@ export interface Message {
   chatId: string;
   timestamp?: string;
   createdAt?: string;
+  isSeen?: boolean;
+  seenBy?: string;
 }
 
 const ChatList: React.FC = () => {
@@ -37,6 +39,8 @@ const ChatList: React.FC = () => {
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onlineUsers = new Set<string>(); 
 
   useEffect(() => {
     const loadChats = async () => {
@@ -60,12 +64,40 @@ const ChatList: React.FC = () => {
     try {
       const messages = await fetchMessages(chatId);
       setMessages(messages);
+      
+      const unseenMessageIds = messages
+      .filter((msg: Message) => msg.senderModel !== "worker" && !msg.isSeen)
+      .map((msg: Message) => msg._id);
+
+      if (unseenMessageIds.length > 0) {
+        socket.emit("markAsSeen", { unseenMessageIds, chatId });
+      }
+    
       socket.emit('joinChat', chatId);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
   };
 
+  useEffect(() => {
+    const handleSeenStatusUpdate = (unseenMessageIds: (string | undefined)[]) => {
+      // Update the local state to mark messages as seen
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          unseenMessageIds.includes(msg._id) ? { ...msg, isSeen: true } : msg
+        )
+      );
+    };
+  
+    // Listen for seen status updates
+    socket.on('seenStatusUpdated', handleSeenStatusUpdate);
+  
+    return () => {
+      // Cleanup the listener on unmount
+      socket.off('seenStatusUpdated', handleSeenStatusUpdate);
+    };
+  }, [socket]);
+  
   const sendMessage = async () => {
     if (!selectedChat) {
       console.error("No chat selected");
@@ -142,6 +174,9 @@ const ChatList: React.FC = () => {
     }
   };
 
+
+  
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-1/3 bg-white overflow-y-auto border-r border-gray-200">
@@ -204,6 +239,11 @@ const ChatList: React.FC = () => {
                     <p className="text-xs mt-1 opacity-70">
                       {new Date(message.createdAt || "").toLocaleTimeString([], { hour: "numeric", minute: "numeric" })}
                     </p>
+                      {/* Display 'Seen' indicator only for user messages */}
+        {message.senderModel === 'worker' && message.isSeen && (
+          <p className="text-xs mt-1 text-blue-200">Seen</p>
+        )}
+            
                     {message.reactions && message.reactions.length > 0 && (
                       <div className="flex mt-1 space-x-1">
                         {message.reactions.map((reaction, index) => (
@@ -211,6 +251,7 @@ const ChatList: React.FC = () => {
                         ))}
                       </div>
                     )}
+                
                     <div className="absolute bottom-0 right-0 mb-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         onClick={() => addReaction(message._id!, "👍")}
@@ -218,13 +259,16 @@ const ChatList: React.FC = () => {
                       >
                         👍
                       </button>
+                     
                       <button
                         onClick={() => addReaction(message._id!, "❤️")}
                         className="ml-1 text-red-500 hover:text-red-700"
                       >
                         ❤️
                       </button>
+                    
                     </div>
+                     
                   </div>
                 </div>
               ))}

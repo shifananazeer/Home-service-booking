@@ -72,6 +72,7 @@ const WorkerProfilePage: React.FC = () => {
         const fetchedMessages = await fetchMessages(data._id);
         console.log("messages" , fetchedMessages)
         setMessages(fetchedMessages);
+        
         setModalOpen(true); // Open the chat modal
       } else {
         console.error('No response from fetchChat');

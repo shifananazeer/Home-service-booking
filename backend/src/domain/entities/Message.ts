@@ -6,6 +6,8 @@ export interface Message {
     text:string;
     chatId:Types.ObjectId;
     reactions?: Reaction[];
+    isSeen:boolean;
+    seenBy:string;
     mediaUrl?: string; 
     createdAt?: Date;
   updatedAt?: Date;

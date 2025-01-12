@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import socket from '../utils/socket';
 import { sendMessage, sendReaction } from '../services/userService';
 import { MessageCircle, Send, X, ImageIcon } from 'lucide-react';
@@ -11,6 +11,8 @@ export interface Message {
   text?: string;
   reactions?: Reaction[];
   mediaUrl?: string; 
+  isSeen?: boolean;
+  seenBy?: string;
   timestamp?: string;
   updatedAt?: string;
   createdAt?: string;
@@ -51,18 +53,42 @@ const ChatModal: React.FC<ChatModalProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const markMessagesAsSeen = useCallback((unseenMessages: Message[]) => {
+    const unseenMessageIds = unseenMessages
+      .filter(msg => msg.senderModel !== 'user' && !msg.isSeen)
+      .map(msg => msg._id!);
+  
+    if (unseenMessageIds.length > 0) {
+      // Emit to the server to mark messages as seen
+      socket.emit('markAsSeen', { unseenMessageIds, chatId });
+  
+      // Update local state for seen messages
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          unseenMessageIds.includes(msg._id!) ? { ...msg, isSeen: true } : msg
+        )
+      );
+    }
+  }, [chatId]);
+
   useEffect(() => {
     if (isOpen) {
       setMessages(initialMessages);
       setTimeout(scrollToBottom, 100);
       socket.emit('joinChat', chatId);
+      markMessagesAsSeen(initialMessages);
+    
+    
     }
-  }, [isOpen, initialMessages, chatId]);
+  }, [isOpen, initialMessages, chatId , markMessagesAsSeen]);
 
   useEffect(() => {
     const handleNewMessage = (message: Message) => {
       setMessages(prev => [...prev, message]);
       setTimeout(scrollToBottom, 100);
+      if (message.senderModel !== 'user') {
+        markMessagesAsSeen([message]);
+      }
     };
 
     socket.on('newMessage', handleNewMessage);
@@ -97,6 +123,24 @@ const ChatModal: React.FC<ChatModalProps> = ({
       console.error('Failed to send message:', error);
     }
   };
+
+
+  useEffect(() => {
+    const handleSeenStatusUpdate = (seenMessageIds: string[]) => {
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          seenMessageIds.includes(msg._id!) ? { ...msg, isSeen: true } : msg
+        )
+      );
+    };
+  
+    socket.on('seenStatusUpdated', handleSeenStatusUpdate);
+    
+    return () => {
+      socket.off('seenStatusUpdated', handleSeenStatusUpdate);
+    };
+  }, []);
+  
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -142,8 +186,8 @@ const ChatModal: React.FC<ChatModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-lg mx-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl mx-4">
         {/* Header */}
         <div className="bg-gray-800 px-4 py-3 flex items-center justify-between rounded-t-lg">
           <div className="flex items-center">
@@ -186,6 +230,11 @@ const ChatModal: React.FC<ChatModalProps> = ({
                       className="max-w-full h-auto rounded-lg mb-2"
                     />
                   )}
+                 
+        {/* Display 'Seen' indicator only for user messages */}
+        {isUser && message.isSeen && (
+          <p className="text-xs mt-1 text-blue-200">Seen</p>
+        )}
                   <p className="break-words">{message.text}</p>
                   {message.updatedAt && (
                     <p className={`text-xs mt-1 ${isUser ? 'text-blue-200' : 'text-gray-400'}`}>
@@ -225,14 +274,20 @@ const ChatModal: React.FC<ChatModalProps> = ({
 
         {/* Input Area */}
         <div className="p-4 bg-gray-800 border-t border-gray-700 rounded-b-lg">
-          <div className="flex items-center mb-2">
+          <div className="flex items-center">
+            <button
+              onClick={triggerFileInput}
+              className="bg-gray-700 hover:bg-gray-600 text-white p-2 rounded-l-lg flex items-center justify-center transition-colors"
+            >
+              <ImageIcon className="w-5 h-5" />
+            </button>
             <input
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="flex-grow bg-gray-700 text-white rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-grow bg-gray-700 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={handleSendMessage}
@@ -241,27 +296,13 @@ const ChatModal: React.FC<ChatModalProps> = ({
               <Send className="w-5 h-5" />
             </button>
           </div>
-          <div className="flex items-center">
-            <button
-              onClick={triggerFileInput}
-              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-center transition-colors mr-2"
-            >
-              <ImageIcon className="w-5 h-5 mr-2" />
-              {mediaFile ? 'Image selected' : 'Add Image'}
-            </button>
-            {mediaFile && (
-              <span className="text-sm text-gray-400 truncate flex-grow">
-                {mediaFile.name}
-              </span>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
           {mediaPreview && (
             <div className="mt-2 relative inline-block">
               <img
