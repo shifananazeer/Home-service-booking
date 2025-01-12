@@ -156,23 +156,36 @@ const ChatList: React.FC = () => {
     }
   };
 
-  const addReaction = async (messageId: string, emoji: string) => {
-    try {
-      const reactionData = { emoji, userModel: 'worker' }; // Include userModel in the reaction data
-      const response = await sendReaction(messageId, reactionData);
-      console.log("Reaction added:", response);
-      // Update the local state to reflect the new reaction
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
+  const addReaction = (messageId: string, emoji: string) => {
+    const reactionData = { emoji, userModel: 'worker' }; // Use the connected user's ID
+  
+    // Emit the addReaction event to the server
+    socket.emit('addReaction', { messageId, emoji });
+  
+   
+  };
+
+
+  useEffect(() => {
+    // Listen for reaction updates from the server
+    socket.on('reactionUpdated', (data) => {
+      const { messageId, emoji, reactionData } = data;
+
+      // Update the messages state to reflect the new reaction
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
           msg._id === messageId 
             ? { ...msg, reactions: [...(msg.reactions || []), reactionData] }
             : msg
         )
       );
-    } catch (error) {
-      console.error("Error adding reaction:", error);
-    }
-  };
+    });
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      socket.off('reactionUpdated');
+    };
+  }, []); // Empty dependency array to set up the listener only once
 
 
   

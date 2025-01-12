@@ -31,8 +31,8 @@ enum SocketEvents {
   NEW_MESSAGE = 'newMessage',
   MESSAGE_SEEN = 'messageSeen',
   SEEN_STATUS_UPDATED = 'seenStatusUpdated',
-  ADD_REACTION = 'addReaction', // New event for adding reactions
-  REACTION_UPDATED = 'reactionUpdated', // New event for updating reaction
+  ADD_REACTION = 'addReaction',
+  REACTION_UPDATED = 'reactionUpdated', 
 }
 
 // Global variables
@@ -81,17 +81,38 @@ export const setupSocket = (httpServer: HttpServer) => {
         if (results.modifiedCount > 0) {
           io.to(chatId).emit(SocketEvents.SEEN_STATUS_UPDATED, unseenMessageIds);
           console.log(`[Socket.IO] Updated seen status for messages in chat: ${chatId}`);
-          
         }
       } catch (error) {
         console.error('Error marking messages as seen:', error);
-        // Handle the error appropriately
       }
-    })
+    });
 
+    // Handle adding a reaction
+    socket.on(SocketEvents.ADD_REACTION, async (payload: { messageId: string; emoji: string }) => {
+      const { messageId, emoji } = payload;
+      const reactionData = { emoji, userModel: socket.userId }; // Use the connected user ID
 
-    
-    
+      try {
+        // Update the message in the database
+        await MessageModel.findByIdAndUpdate(messageId, { $push: { reactions: reactionData } });
+
+        // Retrieve the updated message to get the chatId
+        const updatedMessage = await MessageModel.findById(messageId);
+        if (!updatedMessage) {
+          console.error('Message not found for ID:', messageId);
+          return; // Exit if the message does not exist
+        }
+
+        // Get chatId from the updated message
+        const chatId = updatedMessage.chatId.toString(); 
+
+        // Emit the reaction update to the chat room
+        io.to(chatId).emit(SocketEvents.REACTION_UPDATED, { messageId, emoji, reactionData });
+        console.log(`[Socket.IO] Broadcasted reaction for message ${messageId}`);
+      } catch (error) {
+        console.error('Error broadcasting reaction:', error);
+      }
+    });
 
     // Handle disconnection
     socket.on(SocketEvents.DISCONNECT, () => {
