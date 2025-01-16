@@ -383,7 +383,7 @@ mediaUrl?:string
 
 }
 
-export const  sendMessage = async (messageData :MessageData , mediaFile:File| null) => {
+export const  sendingMessage = async (messageData :MessageData , mediaFile:File| null) => {
   try{
 
     const formData = new FormData();
@@ -431,3 +431,26 @@ export const sendReaction = async (messageId: string, reactionData: Reaction) =>
       throw error; // Optional: Re-throw the error to handle it further up the chain if needed
   }
 }
+
+export const fetchChats = async (userId:string) => {
+  const response = await axiosInstance.get(`/auth/chat/${userId}`)
+  console.log("responsechat" , response)
+  return response.data;
+}
+
+export const fetchUnreadMessags = async (userId:string) => {
+  const token = localStorage.getItem('accessToken');
+   try{
+      const unreadCount = await axiosInstance.get(`/auth/unread-messages/${userId}` ,{
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+      })
+      return unreadCount.data;
+   }catch (error) {
+
+   }
+  }
+
+ 

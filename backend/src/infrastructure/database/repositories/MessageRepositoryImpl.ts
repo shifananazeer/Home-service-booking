@@ -52,4 +52,22 @@ async countUnreadMessages(chatIds: string[]) {
       }
   ]);
 }
+async countUnreadMessagesforUser(chatIds: string[]) {
+    const objectIds = chatIds.map(id => new mongoose.Types.ObjectId(id)); 
+    return await MessageModel.aggregate([
+        { 
+            $match: { 
+                isSeen: false,
+                senderModel: "worker",
+                chatId: { $in: objectIds }  // Ensure chatIds is not empty
+            } 
+        },
+        { 
+            $group: { 
+                _id: "$chatId", 
+                count: { $sum: 1 } 
+            } 
+        }
+    ]);
+  }
   }

@@ -583,6 +583,35 @@ class UserController  {
                             res.status(500).json({ error: error.message });
                         }
                        }
+                           async getMessages (req:Request , res:Response) {
+                                               console.log('getMessages called'); // Check if the function is hit
+                                               const userId = req.params.userId;
+                                           
+                                               try {
+                                                   const chats = await chatService.getChatForUser(userId);
+                                                   console.log('Chats for workerId:', userId, '->', chats);
+                                           
+                                                   if (chats.length === 0) {
+                                                        res.status(404).json({ message: 'No chats found for this worker.' });
+                                                   }
+                                                 console.log("chats........." , chats)
+                                                   res.status(200).json(chats);
+                                               } catch (error: any) {
+                                                   console.error('Error fetching chats:', error); // Log error for debugging
+                                                   res.status(500).json({ message: 'Error fetching chats', error: error.message });
+                                               }
+                                           }
+                                             async getUnreadNotification (req:Request , res:Response) {
+                                                           const { userId } = req.params
+                                                           console.log("userId" , userId)
+                                                           try{
+                                                             const unreadMessage = await chatService.getUnreadMessageUser(userId);
+                                                             console.log("unread" , unreadMessage)
+                                                             res.status(200).json(unreadMessage);
+                                                           }catch(error) {
+                                           
+                                                           }
+                                                          }
 }
 
 

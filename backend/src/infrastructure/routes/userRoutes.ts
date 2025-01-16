@@ -38,4 +38,6 @@ router.post("/chat", userController.handleCreateOrfetchChat);
 router.post("/message",upload.single('media'),  userController.handleSendMessage);
 router.get("/messages/:chatId", userController.handleGetMessage);
 router.post('/reaction/:messageId' , authenticateUser ,userController.addReaction)
+router.get('/chat/:userId' , userController.getMessages)
+router.get("/unread-messages/:userId" ,authenticateUser , userController.getUnreadNotification)
 export default router;

@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { fetchChats, fetchMessages, fetchUnreadMessags, sendMessages, sendReaction } from "../../services/workerService";
+
 import socket from '../../utils/socket';
+import { fetchChats, fetchMessages, fetchUnreadMessags, sendingMessage } from "../../services/userService";
 
 interface Chat {
   _id: string;
   userInfo: {
-    firstName: string;
+    name: string;
     profilePic: string;
   };
 }
@@ -29,8 +30,8 @@ export interface Message {
   seenBy?: string;
 }
 
-const ChatList: React.FC = () => {
-  const workerId = localStorage.getItem("workerId");
+const MessageList: React.FC = () => {
+  const userId = localStorage.getItem("user_Id");
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -46,14 +47,14 @@ const ChatList: React.FC = () => {
 
   useEffect(() => {
     const loadChats = async () => {
-      if (!workerId || workerId.length !== 24) {
-        console.error("Invalid Worker ID:", workerId);
+      if (!userId || userId.length !== 24) {
+        console.error("Invalid User ID:", userId);
         return;
       }
 
       try {
-        const chats: Chat[] = await fetchChats(workerId);
-        const unreadMessages = await fetchUnreadMessags(workerId);
+        const chats: Chat[] = await fetchChats(userId);
+        const unreadMessages = await fetchUnreadMessags(userId);
         const counts = unreadMessages.reduce((acc: { [x: string]: any; }, { _id: chatId, count }: any) => {
           acc[chatId] = count; // Use count directly from the fetched data
           return acc;
@@ -67,7 +68,7 @@ const ChatList: React.FC = () => {
     };
 
     loadChats();
-  }, [workerId]);
+  }, [userId]);
 
   
 
@@ -77,7 +78,7 @@ const ChatList: React.FC = () => {
       setMessages(messages);
       
       const unseenMessageIds = messages
-      .filter((msg: Message) => msg.senderModel !== "worker" && !msg.isSeen)
+      .filter((msg: Message) => msg.senderModel !== "user" && !msg.isSeen)
       .map((msg: Message) => msg._id);
 
       if (unseenMessageIds.length > 0) {
@@ -116,7 +117,7 @@ const ChatList: React.FC = () => {
     }
   
     const messageData: Message = {
-      senderId: workerId || "",
+      senderId: userId || "",
       senderModel: "worker",
       chatId: selectedChat._id,
       timestamp: new Date().toISOString(),
@@ -127,7 +128,7 @@ const ChatList: React.FC = () => {
     }
   
     try {
-      await sendMessages(messageData, mediaFile);
+      await sendingMessage(messageData, mediaFile);
       setText('');
       setMediaFile(null);
       setMediaPreview(null);
@@ -168,7 +169,7 @@ const ChatList: React.FC = () => {
   };
 
   const addReaction = (messageId: string, emoji: string) => {
-    const reactionData = { emoji, userModel: 'worker' }; // Use the connected user's ID
+    const reactionData = { emoji, userModel: 'user' }; // Use the connected user's ID
   
     // Emit the addReaction event to the server
     socket.emit('addReaction', { messageId, emoji });
@@ -225,12 +226,12 @@ const ChatList: React.FC = () => {
             >
               <img
                 src={chat.userInfo?.profilePic || "/default-profile.png"}
-                alt={`${chat.userInfo?.firstName || "User"}'s Profile`}
+                alt={`${chat.userInfo?.name || "User"}'s Profile`}
                 className="w-12 h-12 rounded-full mr-3 object-cover"
               />
               <div>
                 <div className="font-semibold">
-                  {chat.userInfo?.firstName || "Unknown User"}
+                  {chat.userInfo?.name || "Unknown User"}
                 </div>
                 <div className="text-sm text-gray-500">
                   {unreadCounts[chat._id] > 0 
@@ -248,7 +249,7 @@ const ChatList: React.FC = () => {
           <>
             <div className="bg-white p-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold">
-                {selectedChat.userInfo?.firstName || "Unknown User"}
+                {selectedChat.userInfo?.name || "Unknown User"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
@@ -256,12 +257,12 @@ const ChatList: React.FC = () => {
                 <div
                   key={message._id}
                   className={`mb-4 flex ${
-                    message.senderModel === "worker" ? "justify-end" : "justify-start"
+                    message.senderModel === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
                     className={`max-w-xs p-3 rounded-lg relative group ${
-                      message.senderModel === "worker"
+                      message.senderModel === "user"
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200 text-black"
                     }`}
@@ -367,5 +368,5 @@ const ChatList: React.FC = () => {
   );
 };
 
-export default ChatList;
+export default MessageList;
 

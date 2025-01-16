@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import socket from '../utils/socket';
-import { sendMessage, sendReaction } from '../services/userService';
+import { sendingMessage, sendReaction } from '../services/userService';
 import { MessageCircle, Send, X, ImageIcon } from 'lucide-react';
 
 export interface Message {
@@ -115,7 +115,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
     }
 
     try {
-      await sendMessage(messageData, mediaFile);
+      await sendingMessage(messageData, mediaFile);
       setText('');
       setMediaFile(null);
       setMediaPreview(null);
