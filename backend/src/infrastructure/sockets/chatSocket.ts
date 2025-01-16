@@ -33,6 +33,7 @@ enum SocketEvents {
   SEEN_STATUS_UPDATED = 'seenStatusUpdated',
   ADD_REACTION = 'addReaction',
   REACTION_UPDATED = 'reactionUpdated', 
+  NEW_MESSAGE_NOTIFICATION = 'newMessageNotification'
 }
 
 // Global variables
@@ -68,6 +69,13 @@ export const setupSocket = (httpServer: HttpServer) => {
     socket.on(SocketEvents.SEND_MESSAGE, (message: Message) => {
       console.log(`[Socket.IO] New message sent to chat ${message.chatId}`);
       io.to(message.chatId).emit(SocketEvents.NEW_MESSAGE, message);
+      const notification = {
+        chatId: message.chatId,
+        senderId: message.senderId,
+        content: message.content,
+      };
+      io.to(message.chatId).emit(SocketEvents.NEW_MESSAGE_NOTIFICATION, notification);
+      console.log(`[Socket.IO] New message notification emitted for chat: ${message.chatId}`);
     });
 
     // Handle marking messages as seen

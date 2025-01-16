@@ -67,4 +67,9 @@ export class ChatRepositoryImpl implements chatRepository {
       console.log('Chats with user info:', chats);
       return chats;
   }
+  async chatByWorkerId(workerId: string) {
+    return await ChatModel.find({ 
+        participants: { $elemMatch: { participantId: workerId } } 
+    }).select('_id');
+}
 }

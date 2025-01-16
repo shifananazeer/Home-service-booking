@@ -600,6 +600,17 @@ class WorkerController   {
                     res.status(500).json({ error: error.message });
                 }
                }
+               async getUnreadNotification (req:Request , res:Response) {
+                const { workerId } = req.params
+                console.log("worId" , workerId)
+                try{
+                  const unreadMessage = await chatService.getUnreadMessage(workerId);
+                  console.log("unread" , unreadMessage)
+                  res.status(200).json(unreadMessage);
+                }catch(error) {
+
+                }
+               }
     }
 
     export const workerController  = new WorkerController();

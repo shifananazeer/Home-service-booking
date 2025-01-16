@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Reaction } from "../../../application/useCases/chatService";
 import { Message } from "../../../domain/entities/Message";
 import { messageRepository } from "../../../domain/repositories/messageRepository";
@@ -32,5 +33,23 @@ export class MessageRepositoryImpl implements messageRepository {
       await message.save();
   
       return reaction;
+}
+async countUnreadMessages(chatIds: string[]) {
+  const objectIds = chatIds.map(id => new mongoose.Types.ObjectId(id)); 
+  return await MessageModel.aggregate([
+      { 
+          $match: { 
+              isSeen: false,
+              senderModel: "user",
+              chatId: { $in: objectIds }  // Ensure chatIds is not empty
+          } 
+      },
+      { 
+          $group: { 
+              _id: "$chatId", 
+              count: { $sum: 1 } 
+          } 
+      }
+  ]);
 }
   }

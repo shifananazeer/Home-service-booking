@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { fetchChats, fetchMessages, sendMessages, sendReaction } from "../../services/workerService";
+import { fetchChats, fetchMessages, fetchUnreadMessags, sendMessages, sendReaction } from "../../services/workerService";
 import socket from '../../utils/socket';
 
 interface Chat {
@@ -37,9 +37,11 @@ const ChatList: React.FC = () => {
   const [text, setText] = useState<string>('');
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  
+  
   const onlineUsers = new Set<string>(); 
 
   useEffect(() => {
@@ -51,6 +53,13 @@ const ChatList: React.FC = () => {
 
       try {
         const chats: Chat[] = await fetchChats(workerId);
+        const unreadMessages = await fetchUnreadMessags(workerId);
+        const counts = unreadMessages.reduce((acc: { [x: string]: any; }, { _id: chatId, count }: any) => {
+          acc[chatId] = count; // Use count directly from the fetched data
+          return acc;
+      }, {});
+      setUnreadCounts(counts);
+        
         setChats(chats);
       } catch (error) {
         console.error("Error fetching chats:", error);
@@ -204,7 +213,13 @@ const ChatList: React.FC = () => {
               onClick={() => {
                 setSelectedChat(chat);
                 loadMessages(chat._id);
+                 // Clear the unread count for the selected chat
+            setUnreadCounts((prevCounts) => ({
+              ...prevCounts,
+              [chat._id]: 0, // Set count to 0 for the selected chat
+            }));
               }}
+              
             >
               <img
                 src={chat.userInfo?.profilePic || "/default-profile.png"}
@@ -215,7 +230,11 @@ const ChatList: React.FC = () => {
                 <div className="font-semibold">
                   {chat.userInfo?.firstName || "Unknown User"}
                 </div>
-                <div className="text-sm text-gray-500">1 Unread Message</div>
+                <div className="text-sm text-gray-500">
+                  {unreadCounts[chat._id] > 0 
+                    ? `${unreadCounts[chat._id]} Unread Message${unreadCounts[chat._id] > 1 ? 's' : ''}` 
+                    : 'No Unread Messages'}
+                </div>
               </div>
             </div>
           ))}

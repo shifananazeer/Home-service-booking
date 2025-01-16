@@ -48,6 +48,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

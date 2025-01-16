@@ -31,4 +31,5 @@ router.post('/message',upload.single('media'), workerController.handleSendMessag
 router.get('/messages/:chatId' , workerController.handleGetMessage)
 router.get('/chat/:workerId' , workerController.getMessages)
 router.post('/reaction/:messageId',authenticateWorker, workerController.addReaction)
+router.get("/unread-messages/:workerId" ,authenticateWorker , workerController.getUnreadNotification)
 export default router;

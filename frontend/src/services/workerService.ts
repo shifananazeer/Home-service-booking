@@ -318,7 +318,7 @@ export const getWorkerLocation = async (workerId :string) => {
       console.error("Error sending message:", error);
       throw error;
     }
-  };
+};
 
   export const sendReaction = async (messageId: string, reactionData: Reaction) => {
     const token = localStorage.getItem('worker_accessToken');
@@ -339,5 +339,21 @@ export const getWorkerLocation = async (workerId :string) => {
         throw error; // Optional: Re-throw the error to handle it further up the chain if needed
     }
 };
+
+    export const fetchUnreadMessags = async (workerId:string) => {
+        const token = localStorage.getItem('worker_accessToken');
+         try{
+            const unreadCount = await axiosInstance.get(`/workers/unread-messages/${workerId}` ,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                  },
+            })
+            return unreadCount.data;
+         }catch (error) {
+
+         }
+    }
+
 
   

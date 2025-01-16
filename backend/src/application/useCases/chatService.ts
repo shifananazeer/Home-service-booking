@@ -52,5 +52,19 @@ export class ChatService {
         return await this.messageRepository.addReaction(messageId, reaction);
        
       }
+
+      async getUnreadMessage (workerId:string) {
+        
+        const chats = await this.chatRepository.chatByWorkerId(workerId);
+        console.log("Chats for worker:", chats);
+        const chatIds: string[] = chats.map(chat => chat._id.toString()); 
+        console.log("Chat IDs:", chatIds);
+
+        // Step 2: Count unread messages for the chat IDs
+        const unreadMessageCounts = await this.messageRepository.countUnreadMessages(chatIds);
+        console.log("Unread message counts:", unreadMessageCounts);
+
+        return unreadMessageCounts; // Return the unread
+      }
     
 }
