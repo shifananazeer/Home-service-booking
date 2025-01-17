@@ -33,7 +33,7 @@ app.use(cookieParser());
 
 
 
-const io = setupSocket(server);
+const io = setupSocket(server );
 
 app.use('/api/auth', userRoutes);
 

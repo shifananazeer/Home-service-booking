@@ -33,6 +33,9 @@ import BookingSuccessPage from "./pages/User/Success";
 import CancelPage from "./pages/User/Cancel";
 import WorkerProfilePage from "./pages/User/WorkerProfileView";
 import MessageList from "./pages/User/Messages";
+import VideoCallPage from "./pages/User/VideoCall";
+import WorkerVideoCallPage from "./pages/Worker/WorkerVedioCall";
+import { NotificationProvider } from "./NotificationContext";
 
 
 
@@ -68,14 +71,16 @@ const App = () => {
     <Route path='/cancel' element={<CancelPage/>}/>
     <Route path='/view-worker/profile'element={<WorkerProfilePage/>}/>
     <Route path="/user/messages" element={<MessageList/>}/>
+    <Route path="/videoCall/:workerId" element={<VideoCallPage/>}/>
     
-    <Route path="/worker/dashboard" element={ <WorkerDashboard />} />
+    <Route path="/worker/dashboard" element={<NotificationProvider> <WorkerDashboard /></NotificationProvider>} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
     <Route path="/worker/login" element={<WorkerLogin/>}/>
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
     <Route path="/worker/bookings" element= {<WorkerBookings/>}/>
+    <Route path="/worker/videocall"element={<WorkerVideoCallPage/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
 
     

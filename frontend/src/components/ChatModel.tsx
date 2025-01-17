@@ -76,7 +76,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
     if (isOpen) {
       setMessages(initialMessages);
       setTimeout(scrollToBottom, 100);
-      socket.emit('joinChat', chatId);
+      socket.emit('joinChat', {chatId});
       markMessagesAsSeen(initialMessages);
     
     

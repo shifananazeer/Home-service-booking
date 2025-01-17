@@ -70,4 +70,8 @@ export class UserRepositoryImpl implements UserRepository {
         .skip(skip).limit(limit);
         return users;
     }
+    async getNameById(userId: string): Promise<string> { 
+        const user = await UserModel.findById(userId, 'firstName');
+        return user?.firstName || ''; // Return an empty string if user or firstName is undefined
+    }
 }

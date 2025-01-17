@@ -38,6 +38,7 @@ export const createSocketConnectionForVideo = (io: Server, socket: Socket) => {
     });
     socket.on("offer",async ({ roomId,caller,offer }: OfferPayload) => {
         console.log(caller)
+        console.log("offer listen server")
         console.log("roomId" , roomId)
         const userName=await userService.getName(caller)
         

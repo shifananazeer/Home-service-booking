@@ -1,6 +1,9 @@
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import MessageModel from '../database/models/messageModel';
+import UserModel from '../database/models/userModels';
+import WorkerModel from '../database/models/workerModel';
+import { createSocketConnectionForVideo } from './videoCallSocket';
 
 // Extend the Socket interface to include userId
 declare module 'socket.io' {
@@ -36,8 +39,8 @@ enum SocketEvents {
 }
 
 // Global variables
-let io: Server; // Declare the io variable
-const onlineUsers = new Set<string>(); // Track online users
+let io: Server; 
+const onlineUsers: Record<string, boolean> = {}; 
 
 export const setupSocket = (httpServer: HttpServer) => {
   io = new Server(httpServer, {
@@ -50,27 +53,35 @@ export const setupSocket = (httpServer: HttpServer) => {
 
   io.on(SocketEvents.CONNECT, (socket) => {
     console.log('[Socket.IO] A user connected.');
-
-    // Handle user joining
-    socket.on(SocketEvents.JOIN, (userId: string) => {
-      onlineUsers.add(userId);
-      socket.userId = userId;
-      console.log(`[Socket.IO] User ${userId} is online.`);
+    createSocketConnectionForVideo(io, socket);
+    socket.on(SocketEvents.JOIN, async(userId: string) => {
+      onlineUsers[userId] = true;
+  io.emit('userOnline', { userId, isOnline: true }); 
+  console.log("added online" ,userId)
+  console.log("Current online users:", Object.keys(onlineUsers));
+    
     });
 
-    // Handle user joining a chat
-    socket.on(SocketEvents.JOIN_CHAT, (chatId: string) => {
+   
+    socket.on(SocketEvents.JOIN_CHAT, ({ chatId }) => {
       socket.join(chatId);
-      console.log(`[Socket.IO] User joined chat: ${chatId}`);
+      console.log(`[Socket.IO] User joined chat: ${chatId} `);
+      
     });
 
-    // Handle message sending
+    socket.on('leaveChat', ({ chatId }) => {
+      console.log(`Socket ${socket.id} left chat: ${chatId}`);
+      socket.leave(chatId);
+    });
+  
+
+    
     socket.on(SocketEvents.SEND_MESSAGE, (message: Message) => {
       console.log(`[Socket.IO] New message sent to chat ${message.chatId}`);
       io.to(message.chatId).emit(SocketEvents.NEW_MESSAGE, message);
     });
 
-    // Handle marking messages as seen
+   
     socket.on(SocketEvents.MARK_AS_SEEN, async (payload: any) => {
       try {
         const { unseenMessageIds, chatId } = payload;
@@ -87,26 +98,20 @@ export const setupSocket = (httpServer: HttpServer) => {
       }
     });
 
-    // Handle adding a reaction
+   
     socket.on(SocketEvents.ADD_REACTION, async (payload: { messageId: string; emoji: string }) => {
       const { messageId, emoji } = payload;
       const reactionData = { emoji, userModel: socket.userId }; // Use the connected user ID
 
       try {
-        // Update the message in the database
         await MessageModel.findByIdAndUpdate(messageId, { $push: { reactions: reactionData } });
-
-        // Retrieve the updated message to get the chatId
         const updatedMessage = await MessageModel.findById(messageId);
         if (!updatedMessage) {
           console.error('Message not found for ID:', messageId);
-          return; // Exit if the message does not exist
+          return; 
         }
-
-        // Get chatId from the updated message
         const chatId = updatedMessage.chatId.toString(); 
 
-        // Emit the reaction update to the chat room
         io.to(chatId).emit(SocketEvents.REACTION_UPDATED, { messageId, emoji, reactionData });
         console.log(`[Socket.IO] Broadcasted reaction for message ${messageId}`);
       } catch (error) {
@@ -114,18 +119,17 @@ export const setupSocket = (httpServer: HttpServer) => {
       }
     });
 
-    // Handle disconnection
-    socket.on(SocketEvents.DISCONNECT, () => {
-      if (socket.userId) {
-        onlineUsers.delete(socket.userId);
-        console.log(`[Socket.IO] User ${socket.userId} disconnected.`);
-      } else {
-        console.log('[Socket.IO] A user disconnected without a user ID.');
+  
+    socket.on(SocketEvents.DISCONNECT, async () => {
+      const userId = socket.userId; 
+      if (userId) {
+        delete onlineUsers[userId];
+        io.emit('userOffline', { userId, isOnline: false });
       }
     });
   });
 
-  return io; // Return the io instance
+  return io; 
 };
 
 // Export the io instance for use elsewhere

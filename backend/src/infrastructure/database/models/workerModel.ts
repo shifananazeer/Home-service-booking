@@ -23,6 +23,7 @@ const workerSchema = new Schema<WorkerDocument>({
     latitude: { type: Number },
     longitude: { type: Number },
     locationName: { type: String },
+    isOnline:{type:Boolean , default:false},
 });
 
 const WorkerModel = mongoose.model<WorkerDocument>('Worker', workerSchema);

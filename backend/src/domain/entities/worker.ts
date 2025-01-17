@@ -16,6 +16,7 @@ export interface Worker {
     latitude?: number; 
     longitude?: number; 
     locationName?: string; 
+    isOnline:boolean;
 }
 
 

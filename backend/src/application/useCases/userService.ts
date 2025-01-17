@@ -98,4 +98,12 @@ export class UserService {
           throw new Error('Database error');
         }
       }
+      async getName(userId:string) {
+        try {
+          return await this.userRepository.getNameById(userId);
+        } catch (error) {
+          console.error("Error in UserService.getName:", error);
+          throw new Error("Failed to fetch user name");
+        }
+      }
 }

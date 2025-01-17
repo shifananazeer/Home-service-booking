@@ -5,6 +5,7 @@ import socket from '../../utils/socket';
 interface Chat {
   _id: string;
   userInfo: {
+    _id: string;
     firstName: string;
     profilePic: string;
   };
@@ -40,9 +41,41 @@ const ChatList: React.FC = () => {
   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  
-  const onlineUsers = new Set<string>(); 
+  const [onlineUsers, setOnlineUsers] = useState(new Set<string>());
+
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log("Successfully connected to the server!");
+      socket.emit('join', workerId);
+    };
+     
+    const handleUserOnline = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
+      console.log("User Online Event Received:", userId, isOnline);
+      setOnlineUsers(prev => {
+        const newSet = new Set(prev);
+        if (isOnline) {
+          newSet.add(userId);
+        } else {
+          newSet.delete(userId);
+        }
+        return newSet;
+      });
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('userOnline', handleUserOnline);
+    socket.on('userOffline', ({ userId }) => handleUserOnline({ userId, isOnline: false }));
+
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('userOnline', handleUserOnline);
+      socket.off('userOffline');
+    };
+  }, [workerId]);
 
   useEffect(() => {
     const loadChats = async () => {
@@ -55,11 +88,10 @@ const ChatList: React.FC = () => {
         const chats: Chat[] = await fetchChats(workerId);
         const unreadMessages = await fetchUnreadMessags(workerId);
         const counts = unreadMessages.reduce((acc: { [x: string]: any; }, { _id: chatId, count }: any) => {
-          acc[chatId] = count; // Use count directly from the fetched data
+          acc[chatId] = count;
           return acc;
-      }, {});
-      setUnreadCounts(counts);
-        
+        }, {});
+        setUnreadCounts(counts);
         setChats(chats);
       } catch (error) {
         console.error("Error fetching chats:", error);
@@ -69,22 +101,24 @@ const ChatList: React.FC = () => {
     loadChats();
   }, [workerId]);
 
-  
-
   const loadMessages = async (chatId: string) => {
+    if (selectedChat) {
+      socket.emit('leaveChat', { chatId: selectedChat._id });
+    }
+
     try {
       const messages = await fetchMessages(chatId);
       setMessages(messages);
       
       const unseenMessageIds = messages
-      .filter((msg: Message) => msg.senderModel !== "worker" && !msg.isSeen)
-      .map((msg: Message) => msg._id);
+        .filter((msg: Message) => msg.senderModel !== "worker" && !msg.isSeen)
+        .map((msg: Message) => msg._id);
 
       if (unseenMessageIds.length > 0) {
         socket.emit("markAsSeen", { unseenMessageIds, chatId });
       }
     
-      socket.emit('joinChat', chatId);
+      socket.emit('joinChat', { chatId });
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
@@ -92,7 +126,6 @@ const ChatList: React.FC = () => {
 
   useEffect(() => {
     const handleSeenStatusUpdate = (unseenMessageIds: (string | undefined)[]) => {
-      // Update the local state to mark messages as seen
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           unseenMessageIds.includes(msg._id) ? { ...msg, isSeen: true } : msg
@@ -100,15 +133,13 @@ const ChatList: React.FC = () => {
       );
     };
   
-    // Listen for seen status updates
     socket.on('seenStatusUpdated', handleSeenStatusUpdate);
   
     return () => {
-      // Cleanup the listener on unmount
       socket.off('seenStatusUpdated', handleSeenStatusUpdate);
     };
-  }, [socket]);
-  
+  }, []);
+
   const sendMessage = async () => {
     if (!selectedChat) {
       console.error("No chat selected");
@@ -168,21 +199,12 @@ const ChatList: React.FC = () => {
   };
 
   const addReaction = (messageId: string, emoji: string) => {
-    const reactionData = { emoji, userModel: 'worker' }; // Use the connected user's ID
-  
-    // Emit the addReaction event to the server
     socket.emit('addReaction', { messageId, emoji });
-  
-   
   };
 
-
   useEffect(() => {
-    // Listen for reaction updates from the server
     socket.on('reactionUpdated', (data) => {
       const { messageId, emoji, reactionData } = data;
-
-      // Update the messages state to reflect the new reaction
       setMessages(prevMessages =>
         prevMessages.map(msg =>
           msg._id === messageId 
@@ -192,20 +214,18 @@ const ChatList: React.FC = () => {
       );
     });
 
-    // Cleanup the event listener when the component unmounts
     return () => {
       socket.off('reactionUpdated');
     };
-  }, []); // Empty dependency array to set up the listener only once
-
-
-  
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-1/3 bg-white overflow-y-auto border-r border-gray-200">
+        <div className="p-4 sticky top-0 bg-white z-10 border-b border-gray-200">
+          <h2 className="text-2xl font-bold">Chats</h2>
+        </div>
         <div className="p-4">
-          <h2 className="text-2xl font-bold mb-4">Chats</h2>
           {chats.map((chat) => (
             <div
               key={chat._id}
@@ -215,22 +235,30 @@ const ChatList: React.FC = () => {
               onClick={() => {
                 setSelectedChat(chat);
                 loadMessages(chat._id);
-                 // Clear the unread count for the selected chat
-            setUnreadCounts((prevCounts) => ({
-              ...prevCounts,
-              [chat._id]: 0, // Set count to 0 for the selected chat
-            }));
+                setUnreadCounts((prevCounts) => ({
+                  ...prevCounts,
+                  [chat._id]: 0,
+                }));
               }}
-              
             >
-              <img
-                src={chat.userInfo?.profilePic || "/default-profile.png"}
-                alt={`${chat.userInfo?.firstName || "User"}'s Profile`}
-                className="w-12 h-12 rounded-full mr-3 object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={chat.userInfo?.profilePic || "/default-profile.png"}
+                  alt={`${chat.userInfo?.firstName || "User"}'s Profile`}
+                  className="w-12 h-12 rounded-full mr-3 object-cover"
+                />
+                <span 
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ${
+                    onlineUsers.has(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                  }`}
+                ></span>
+              </div>
               <div>
                 <div className="font-semibold">
                   {chat.userInfo?.firstName || "Unknown User"}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {onlineUsers.has(chat.userInfo._id) ? 'Online' : 'Offline'}
                 </div>
                 <div className="text-sm text-gray-500">
                   {unreadCounts[chat._id] > 0 
@@ -246,10 +274,20 @@ const ChatList: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {selectedChat ? (
           <>
-            <div className="bg-white p-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold">
-                {selectedChat.userInfo?.firstName || "Unknown User"}
-              </h2>
+            <div className="bg-white p-4 border-b border-gray-200 sticky top-0 z-10">
+              <div className="flex items-center">
+                <h2 className="text-xl font-semibold mr-2">
+                  {selectedChat.userInfo?.firstName || "Unknown User"}
+                </h2>
+                <span 
+                  className={`inline-block w-3 h-3 rounded-full ${
+                    onlineUsers.has(selectedChat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                  }`}
+                ></span>
+                <span className="ml-2 text-sm text-gray-500">
+                  {onlineUsers.has(selectedChat.userInfo._id) ? 'Online' : 'Offline'}
+                </span>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {messages.map((message) => (
@@ -268,16 +306,14 @@ const ChatList: React.FC = () => {
                   >
                     {message.text && <p>{message.text}</p>}
                     {message.mediaUrl && (
-                      <img src={message.mediaUrl} alt="media" className="max-w-full mt-2 rounded" />
+                      <img src={message.mediaUrl || "/placeholder.svg"} alt="media" className="max-w-full mt-2 rounded" />
                     )}
                     <p className="text-xs mt-1 opacity-70">
                       {new Date(message.createdAt || "").toLocaleTimeString([], { hour: "numeric", minute: "numeric" })}
                     </p>
-                      {/* Display 'Seen' indicator only for user messages */}
-        {message.senderModel === 'worker' && message.isSeen && (
-          <p className="text-xs mt-1 text-blue-200">Seen</p>
-        )}
-            
+                    {message.senderModel === 'worker' && message.isSeen && (
+                      <p className="text-xs mt-1 text-blue-200">Seen</p>
+                    )}
                     {message.reactions && message.reactions.length > 0 && (
                       <div className="flex mt-1 space-x-1">
                         {message.reactions.map((reaction, index) => (
@@ -285,7 +321,6 @@ const ChatList: React.FC = () => {
                         ))}
                       </div>
                     )}
-                
                     <div className="absolute bottom-0 right-0 mb-2 mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         onClick={() => addReaction(message._id!, "👍")}
@@ -293,22 +328,19 @@ const ChatList: React.FC = () => {
                       >
                         👍
                       </button>
-                     
                       <button
                         onClick={() => addReaction(message._id!, "❤️")}
                         className="ml-1 text-red-500 hover:text-red-700"
                       >
                         ❤️
                       </button>
-                    
                     </div>
-                     
                   </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
-            <div className="bg-white p-4 border-t border-gray-200">
+            <div className="bg-white p-4 border-t border-gray-200 sticky bottom-0 z-10">
               <div className="flex items-center">
                 <input
                   type="text"
@@ -340,7 +372,7 @@ const ChatList: React.FC = () => {
               {mediaPreview && (
                 <div className="mt-2 relative inline-block">
                   <img
-                    src={mediaPreview}
+                    src={mediaPreview || "/placeholder.svg"}
                     alt="Media Preview"
                     className="max-w-xs max-h-32 rounded"
                   />

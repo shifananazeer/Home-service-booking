@@ -9,17 +9,22 @@ import AvailabilityManagement from '../../components/worker/AvailabilityManageme
 import WorkerBookings from '../../components/worker/bookings'
 import WorkerTodayBookings from '../../components/worker/todaysBooking'
 import { refreshAccessToken } from '../../utils/auth'
+
+import socket from '../../utils/socket'
 import ChatList from '../../components/worker/ChatList'
+
 
 const WorkerDashboard = () => {
 const navigate = useNavigate()
-
+const workerId = localStorage.getItem('workerId')
      useEffect(()=> {
             const accessToken = localStorage.getItem('worker_accessToken')
             if(!accessToken) {
                 navigate('/worker/login')
             }
-        })
+        },[])
+
+       
     
     
    const [currentComponent, setCurrentComponent] = useState("dashboard"); 

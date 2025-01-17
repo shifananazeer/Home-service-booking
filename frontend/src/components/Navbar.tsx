@@ -1,17 +1,39 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
 import { FaSignOutAlt, FaUser, FaUserTie } from 'react-icons/fa'; 
+import socket from '../utils/socket'
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const userData = useAppSelector((state) => state.user.userData)
   const token = localStorage.getItem('accessToken')
-  const userId = localStorage.getItem('user_Id')
+  const userIds = localStorage.getItem('user_Id')
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if(token && userIds) {
+    // Emit the JOIN event after the socket connection is established
+    const userId = userIds; // Replace with the actual user ID
+    socket.emit('join', userId);
+
+    // Listen for online status updates
+    socket.on('userOnline', (data) => {
+      console.log(`worker ${data.userId} is online.`);
+    });
+
+    socket.on('userOffline', (data) => {
+      console.log(`worker ${data.userId} is offline.`);
+    });
+
+    return () => {
+      socket.disconnect(); // Cleanup on unmount
+    };
+  }
+  }, []);
 
   const handleLoginClick = () => {
     navigate('/login')
@@ -77,7 +99,7 @@ const Navbar: React.FC = () => {
             Register as a Worker 
           </button>
 
-          {!token && !userId ? (
+          {!token && !userIds ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLoginClick}

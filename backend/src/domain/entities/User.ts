@@ -17,5 +17,6 @@ export interface User {
     longitude?: number;
     locationName?: string;
     googleId?: string;
-    profilePic?:string
+    profilePic?:string;
+    isOnline:boolean;
 }

@@ -4,16 +4,20 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { loginSuccess, loginFailure, loginStart } from '../../features/user/userSlice.'; 
 import { loginUser } from '../../services/userService';
+import socket from '../../utils/socket';
 
 const Login = () => {
+
     const dispatch = useDispatch(); 
     const navigate = useNavigate();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const token = localStorage.getItem('accessToken')
+    const userId = localStorage.getItem('user_Id');
     useEffect(()=> {
         if(token) {
+          
       navigate('/')
         }
     } ,[token , navigate])
@@ -41,8 +45,11 @@ const Login = () => {
                 refreshToken: refreshToken,
                 accessToken: accessToken
             };
+            
     
-         
+            socket.emit('join', userId, 'user');
+            console.log('Emitting join event with:', { userId, userType: 'user' });
+            
             toast.success('Login Successful');
             console.log('Dispatching loginSuccess:', userData);
              dispatch(loginSuccess(userData));

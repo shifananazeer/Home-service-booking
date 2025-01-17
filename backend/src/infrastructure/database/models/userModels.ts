@@ -16,6 +16,7 @@ const UserSchema = new Schema<UserDocument>({
     profilePic: { type: String },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
+    isOnline:{type:Boolean , default:false},
     latitude: { type: Number },
     longitude: { type: Number },
     locationName: { type: String },
