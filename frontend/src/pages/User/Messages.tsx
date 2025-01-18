@@ -227,6 +227,9 @@ const MessageList: React.FC = () => {
   const handleVideoCall = ( id:string) => {
     navigate(`/videocall/${id}`); // Replace with your actual route for the video call page
   };
+  const handleAudioCall =(id:string) => {
+    navigate(`/audioCall/${id}`)
+  }
 
 
   return (
@@ -435,7 +438,7 @@ const MessageList: React.FC = () => {
                 Video Call
               </button>
               <button
-                onClick={() => alert('Audio Call')}
+                 onClick={()=>handleAudioCall(selectedChat?.userInfo._id||"")}
                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition-all"
               >
                 Audio Call

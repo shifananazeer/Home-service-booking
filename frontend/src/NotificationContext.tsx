@@ -1,54 +1,61 @@
-// NotificationContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
+import socket from "./utils/socket";
 
-const NotificationContext = createContext<any>(null);
+interface NotificationContextType {
+  callModel: boolean;
+  caller: string;
+  callType: string;
+  acceptCall: () => void;
+  declineCall: () => void;
+}
 
-export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
+const NotificationContext = createContext<NotificationContextType | null>(null);
+
+export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [callModel, setCallModel] = useState(false);
   const [caller, setCaller] = useState("");
   const [callType, setCallType] = useState("");
   const [joinedRoomId, setJoinedRoomId] = useState("");
-  const workerId = localStorage.getItem('workerId')
-  const roomId = workerId
-  const socket: Socket = io("http://localhost:3000"); // Update with your server URL
-  const navigate = useNavigate()
+  const workerId = localStorage.getItem('workerId');
+  const roomId = workerId || "";
+  const navigate = useNavigate();
+
   useEffect(() => {
+    console.log("Worker ID:", workerId); // Add this log
     socket.emit("join-room", roomId);
-    console.log("joined in room " , roomId)
-    socket.on("offerNotification", ({ roomId, userName, caller, callType }) => {
+    console.log("Joined room:", roomId);
+
+    socket.on("offerNotification", ({ roomId, userName, caller, callType, offer }) => {
       console.log("Received offerNotification", { roomId, userName, caller, callType });
-      console.log("Caller:", caller, "Worker ID:", workerId);
-      if (caller === workerId) {
+      // The worker should receive the call, so we check if the roomId matches
+      if (roomId === workerId) {
         setJoinedRoomId(roomId);
         setCallType(callType);
         setCaller(userName);
         setCallModel(true);
+        console.log("Call model set to true"); // Add this log
       }
     });
 
     return () => {
-      socket.off("join-room");
       socket.off("offerNotification");
     };
-  }, []);
+  }, [workerId]);
 
   const acceptCall = () => {
     if (callType === "Video") {
-      // Navigate to video call page
-       navigate("/worker/videocall", { state: { caller } });
+      navigate("/worker/videocall", { state: { caller } });
     } else if (callType === "Audio") {
-      // Navigate to audio call page
-      // navigate("/turf/customer-chat/chat/audio-call", { state: { caller } });
+      // Navigate to audio call page when implemented
+      navigate('/worker/audioCall' ,{state:{caller}})
     }
-    console.log("Call Accepted");
-    setCallModel(false); // Close the call model after accepting
+    setCallModel(false);
   };
 
   const declineCall = () => {
-    socket.emit("leave-room-decline", roomId);
-    setCallModel(false); // Close the call model after declining
+    socket.emit("leave-room-decline", joinedRoomId);
+    setCallModel(false);
   };
 
   return (
@@ -79,5 +86,10 @@ export const NotificationProvider = ({ children }: { children: React.ReactNode }
 };
 
 export const useNotification = () => {
-  return useContext(NotificationContext);
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error("useNotification must be used within a NotificationProvider");
+  }
+  return context;
 };
+

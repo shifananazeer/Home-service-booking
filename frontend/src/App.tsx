@@ -36,6 +36,9 @@ import MessageList from "./pages/User/Messages";
 import VideoCallPage from "./pages/User/VideoCall";
 import WorkerVideoCallPage from "./pages/Worker/WorkerVedioCall";
 import { NotificationProvider } from "./NotificationContext";
+import VideoCall from "./pages/User/Vedio";
+import AudioCall from "./pages/User/AudioCall";
+import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
 
 
 
@@ -72,6 +75,7 @@ const App = () => {
     <Route path='/view-worker/profile'element={<WorkerProfilePage/>}/>
     <Route path="/user/messages" element={<MessageList/>}/>
     <Route path="/videoCall/:workerId" element={<VideoCallPage/>}/>
+    <Route path='/audioCall/:workerId' element={<AudioCall/>}/>
     
     <Route path="/worker/dashboard" element={<NotificationProvider> <WorkerDashboard /></NotificationProvider>} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
@@ -81,6 +85,7 @@ const App = () => {
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
     <Route path="/worker/bookings" element= {<WorkerBookings/>}/>
     <Route path="/worker/videocall"element={<WorkerVideoCallPage/>}/>
+    <Route path="/worker/audioCall" element={<WorkerAudioCall/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
 
     
@@ -110,6 +115,8 @@ const ConditionalNavbar = () => {
     "/worker/forgotPassword",
     "/admin/dashboard",
     "/admin/login",
+    '/worker/videocall',
+    '/worker/audioCall'
     
   ];
 

@@ -4,6 +4,7 @@ import MessageModel from '../database/models/messageModel';
 import UserModel from '../database/models/userModels';
 import WorkerModel from '../database/models/workerModel';
 import { createSocketConnectionForVideo } from './videoCallSocket';
+import { createSocketConnectionForAudio } from './audioCallSocket';
 
 // Extend the Socket interface to include userId
 declare module 'socket.io' {
@@ -54,6 +55,7 @@ export const setupSocket = (httpServer: HttpServer) => {
   io.on(SocketEvents.CONNECT, (socket) => {
     console.log('[Socket.IO] A user connected.');
     createSocketConnectionForVideo(io, socket);
+    createSocketConnectionForAudio(io, socket);
     socket.on(SocketEvents.JOIN, async(userId: string) => {
       onlineUsers[userId] = true;
   io.emit('userOnline', { userId, isOnline: true }); 
