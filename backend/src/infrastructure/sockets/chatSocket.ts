@@ -41,8 +41,7 @@ enum SocketEvents {
 
 // Global variables
 let io: Server; 
-const onlineUsers: Record<string, boolean> = {}; 
-
+const onlineUsers = new Map();
 export const setupSocket = (httpServer: HttpServer) => {
   io = new Server(httpServer, {
     cors: {
@@ -57,10 +56,9 @@ export const setupSocket = (httpServer: HttpServer) => {
     createSocketConnectionForVideo(io, socket);
     createSocketConnectionForAudio(io, socket);
     socket.on(SocketEvents.JOIN, async(userId: string) => {
-      onlineUsers[userId] = true;
-  io.emit('userOnline', { userId, isOnline: true }); 
-  console.log("added online" ,userId)
-  console.log("Current online users:", Object.keys(onlineUsers));
+      onlineUsers.set(userId, socket.id);
+    console.log(`${userId} is now online.`);
+    io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
     
     });
 
@@ -71,6 +69,10 @@ export const setupSocket = (httpServer: HttpServer) => {
       
     });
 
+    socket.on("getOnlineUsers", () => {
+      const onlineUsersList = Array.from(onlineUsers.keys()); // Get all online user IDs
+      socket.emit("onlineUsersList", onlineUsersList); // Send the list back to the requesting client
+  });
     socket.on('leaveChat', ({ chatId }) => {
       console.log(`Socket ${socket.id} left chat: ${chatId}`);
       socket.leave(chatId);
@@ -123,10 +125,15 @@ export const setupSocket = (httpServer: HttpServer) => {
 
   
     socket.on(SocketEvents.DISCONNECT, async () => {
-      const userId = socket.userId; 
-      if (userId) {
-        delete onlineUsers[userId];
-        io.emit('userOffline', { userId, isOnline: false });
+      for (const [userId, id] of onlineUsers.entries()) {
+        if (id === socket.id) {
+          onlineUsers.delete(userId);
+          console.log(`${userId} is now offline.`);
+          
+          // Notify other users about the updated status
+          io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
+          break;
+        }
       }
     });
   });

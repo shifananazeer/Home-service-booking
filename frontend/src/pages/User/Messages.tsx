@@ -44,7 +44,7 @@ const MessageList: React.FC = () => {
   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [onlineUsers, setOnlineUsers] = useState(new Set<string>());
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate()
   useEffect(() => {
@@ -54,33 +54,25 @@ const MessageList: React.FC = () => {
     };
   
 
-    const handleUserOnline = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
-      console.log("User Online Event Received:", userId, isOnline);
-      setOnlineUsers(prev => {
-        const newSet = new Set(prev);
-        if (isOnline) {
-          newSet.add(userId);
-        } else {
-          newSet.delete(userId);
-        }
-        return newSet;
-      });
-    };
+    const handleOnlineUsersList = (onlineUsers: any) => {
+      console.log("Online users:", onlineUsers); // Log the list of online users
+      setOnlineUsers(onlineUsers);
+  };
+
 
     socket.on('connect', handleConnect);
-    socket.on('userOnline', handleUserOnline);
-    socket.on('userOffline', ({ userId }) => handleUserOnline({ userId, isOnline: false }));
+    socket.emit("getOnlineUsers");
+    socket.on("onlineUsersList", handleOnlineUsersList);
+   
 
     if (socket.connected) {
       handleConnect();
     }
 
     return () => {
-      socket.off('connect', handleConnect);
-      socket.off('userOnline', handleUserOnline);
-      socket.off('userOffline');
-     
-    };
+      socket.off('connect', handleConnect); // Remove 'connect' listener
+      socket.off("onlineUsersList", handleOnlineUsersList); // Remove 'onlineUsersList' listener
+  };
   }, [userId]);
 
   useEffect(() => {
@@ -263,7 +255,7 @@ const MessageList: React.FC = () => {
                 />
                 <span 
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ${
-                    onlineUsers.has(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                    onlineUsers.includes(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
                   }`}
                 ></span>
               </div>
@@ -273,7 +265,7 @@ const MessageList: React.FC = () => {
       {chat.userInfo?.name || "Unknown User"}
     </div>
     <div className="text-sm text-gray-500">
-      {onlineUsers.has(chat.userInfo._id) ? 'Online' : ''}
+      {onlineUsers.includes(chat.userInfo._id) ? 'Online' : 'Offline'}
     </div>
     <div className="text-sm text-gray-500">
       {unreadCounts[chat._id] > 0 
@@ -311,11 +303,11 @@ const MessageList: React.FC = () => {
                 </h2>
                 <span 
                   className={`inline-block w-3 h-3 rounded-full ${
-                    onlineUsers.has(selectedChat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                    onlineUsers.includes(selectedChat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
                   }`}
                 ></span>
                 <span className="ml-2 text-sm text-gray-500">
-                  {onlineUsers.has(selectedChat.userInfo._id) ? 'Online' : 'Offline'}
+                  {onlineUsers.includes(selectedChat.userInfo._id) ? 'Online' : 'Offline'}
                 </span>
               </div>
             </div>

@@ -145,7 +145,7 @@ const VideoCallPage: React.FC = () => {
   },[])
 
   const cancel = () => {
-    navigate(`/user/message`, {
+    navigate(`/user/messages`, {
       state: { videoCallConnection: true }
     });
     socket.emit("leave-room", roomId);

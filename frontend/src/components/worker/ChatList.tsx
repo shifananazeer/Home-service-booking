@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { fetchChats, fetchMessages, fetchUnreadMessags, sendMessages, sendReaction } from "../../services/workerService";
 import socket from '../../utils/socket';
+import { Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Chat {
   _id: string;
@@ -41,41 +43,42 @@ const ChatList: React.FC = () => {
   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [onlineUsers, setOnlineUsers] = useState(new Set<string>());
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleConnect = () => {
-      console.log("Successfully connected to the server!");
-      socket.emit('join', workerId);
-    };
-     
-    const handleUserOnline = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
-      console.log("User Online Event Received:", userId, isOnline);
-      setOnlineUsers(prev => {
-        const newSet = new Set(prev);
-        if (isOnline) {
-          newSet.add(userId);
-        } else {
-          newSet.delete(userId);
-        }
-        return newSet;
-      });
+        console.log("Successfully connected to the server!");
+        socket.emit('join', workerId); // Emit the 'join' event when connected
     };
 
+    const handleOnlineUsersList = (onlineUsers: any) => {
+        console.log("Online users:", onlineUsers); // Log the list of online users
+        setOnlineUsers(onlineUsers);
+    };
+
+    // Attach the 'connect' listener
     socket.on('connect', handleConnect);
-    socket.on('userOnline', handleUserOnline);
-    socket.on('userOffline', ({ userId }) => handleUserOnline({ userId, isOnline: false }));
 
+    // Fetch the list of online users
+    socket.emit("getOnlineUsers");
+
+    // Listen for the online users list
+    socket.on("onlineUsersList", handleOnlineUsersList);
+
+    // Call the handleConnect immediately if already connected
     if (socket.connected) {
-      handleConnect();
+        handleConnect();
     }
 
+    // Cleanup function to remove listeners
     return () => {
-      socket.off('connect', handleConnect);
-      socket.off('userOnline', handleUserOnline);
-      socket.off('userOffline');
+        socket.off('connect', handleConnect); // Remove 'connect' listener
+        socket.off("onlineUsersList", handleOnlineUsersList); // Remove 'onlineUsersList' listener
     };
-  }, [workerId]);
+}, [workerId]); // Dependency array includes workerId
+
 
   useEffect(() => {
     const loadChats = async () => {
@@ -219,6 +222,18 @@ const ChatList: React.FC = () => {
     };
   }, []);
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+  
+
+  const handleVideoCall = ( id:string) => {
+    navigate(`/worker/videocall`); // Replace with your actual route for the video call page
+  };
+  const handleAudioCall =(id:string) => {
+    navigate(`/worker/audioCall`)
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-1/3 bg-white overflow-y-auto border-r border-gray-200">
@@ -249,7 +264,7 @@ const ChatList: React.FC = () => {
                 />
                 <span 
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ${
-                    onlineUsers.has(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                    onlineUsers.includes(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
                   }`}
                 ></span>
               </div>
@@ -258,7 +273,7 @@ const ChatList: React.FC = () => {
                   {chat.userInfo?.firstName || "Unknown User"}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {onlineUsers.has(chat.userInfo._id) ? 'Online' : 'Offline'}
+                  {onlineUsers.includes(chat.userInfo._id) ? 'Online' : 'Offline'}
                 </div>
                 <div className="text-sm text-gray-500">
                   {unreadCounts[chat._id] > 0 
@@ -266,6 +281,16 @@ const ChatList: React.FC = () => {
                     : 'No Unread Messages'}
                 </div>
               </div>
+              <div className='justify-between ml-20'>
+  <button 
+    onClick={toggleModal}
+    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-105"
+    style={{ fontSize: '0.9rem' }} // Reduce font size slightly
+  >
+    <Phone className="text-white mr-1" size={16} /> {/* Decreased icon size */}
+    Call
+  </button>
+  </div>
             </div>
           ))}
         </div>
@@ -281,11 +306,11 @@ const ChatList: React.FC = () => {
                 </h2>
                 <span 
                   className={`inline-block w-3 h-3 rounded-full ${
-                    onlineUsers.has(selectedChat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
+                    onlineUsers.includes(selectedChat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
                   }`}
                 ></span>
                 <span className="ml-2 text-sm text-gray-500">
-                  {onlineUsers.has(selectedChat.userInfo._id) ? 'Online' : 'Offline'}
+                  {onlineUsers.includes(selectedChat.userInfo._id) ? 'Online' : 'Offline'}
                 </span>
               </div>
             </div>
@@ -395,6 +420,34 @@ const ChatList: React.FC = () => {
           </div>
         )}
       </div>
+           {/* Modal */}
+           {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Choose Call Type</h3>
+            <div className="flex flex-col space-y-4">
+              <button
+                   onClick={()=>handleVideoCall(selectedChat?.userInfo._id||"")}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-all"
+              >
+                Video Call
+              </button>
+              <button
+                 onClick={()=>handleAudioCall(selectedChat?.userInfo._id||"")}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition-all"
+              >
+                Audio Call
+              </button>
+            </div>
+            <button
+              onClick={toggleModal}
+              className="mt-4 text-gray-500 hover:text-gray-700 text-sm underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
