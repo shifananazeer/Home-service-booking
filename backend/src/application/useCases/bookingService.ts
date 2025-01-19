@@ -125,6 +125,11 @@ export class BookingService {
             const result = await this.bookingRepository.fetchBookigsByUserId(userId)
             return result ;
            }
+
+           public async getBalance (bookingId:string) {
+            const result = await this.bookingRepository.findBalanceAmount(bookingId) 
+            return result;
+           }
 }
 
 

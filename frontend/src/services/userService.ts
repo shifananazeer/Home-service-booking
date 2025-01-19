@@ -456,7 +456,11 @@ export const fetchUnreadMessags = async (userId:string) => {
   export const getWorkersIds = async(userId:string) => {
     const token = localStorage.getItem('accessToken');
     try{
-        const response = await axiosInstance.get(`/auth/get-workers/${userId}`)
+        const response = await axiosInstance.get(`/auth/get-workers/${userId}`,{
+          headers:{
+            'Authorization': `Bearer ${token}`,
+          }
+        })
         return response;
     }catch (error) {
        console.log(error)
@@ -466,9 +470,15 @@ export const fetchUnreadMessags = async (userId:string) => {
   export const getBalanceAmount = async(bookingId:string) => {
     const token = localStorage.getItem('accessToken');
     try{
-       const balanceAmount = await axiosInstance.get(`/auth/balanceAmount/${bookingId}`)
+       const response = await axiosInstance.get(`/auth/balanceAmount/${bookingId}` ,{
+        headers:{
+          'Authorization': `Bearer ${token}`,
+        }
+       })
+       console.log("balance" , response)
+       return response;
     }catch(error) {
-
+   console.log(error)
     }
   }
 

@@ -633,6 +633,17 @@ class UserController  {
                 }
 
 }
+    async getBalanceAmount (req:Request , res:Response) {
+        const {bookingId} = req.params;
+        console.log("bookingId" , bookingId)
+        try{
+          const  balance = await bookingService.getBalance(bookingId)
+          console.log("balance" , balance)
+          res.status(HttpStatus.OK).json(balance)
+        }catch(error) {
+
+        }
+    }
 }
 
 

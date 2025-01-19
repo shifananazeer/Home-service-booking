@@ -40,5 +40,6 @@ router.get("/messages/:chatId", userController.handleGetMessage);
 router.post('/reaction/:messageId' , authenticateUser ,userController.addReaction)
 router.get('/chat/:userId' , userController.getMessages)
 router.get("/unread-messages/:userId" ,authenticateUser , userController.getUnreadNotification)
-router.get('/get-workers/:userId'  , userController.getWorkersByUserId)
+router.get('/get-workers/:userId'  ,authenticateUser, userController.getWorkersByUserId)
+router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBalanceAmount)
 export default router;

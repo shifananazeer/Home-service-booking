@@ -31,6 +31,7 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Modal visibility state
     const [currentNotification, setCurrentNotification] = useState<string>(''); // Current notification message
+    const [currentBookingId , setCurrentBookingId] = useState<string>('')
 
     // Function to join notification room
     const joinNotificationRoom = (workerId: string) => {
@@ -67,6 +68,7 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
         socket.on('receive-notification', (notification: Notification) => {
             console.log("receive notification")
             setCurrentNotification(notification.message); // Set the current notification message
+            setCurrentBookingId(notification.bookingId)
             setIsModalOpen(true); // Open the modal
             console.log('New notification received:', notification);
         });
@@ -87,7 +89,7 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
         <NotificationContextUser.Provider value={{ workerIds }}>
             {children}
             {isModalOpen && (
-                <NotificationModal message={currentNotification} onClose={handleCloseModal} />
+                <NotificationModal message={currentNotification} onClose={handleCloseModal} bookingId={currentBookingId} />
             )}
         </NotificationContextUser.Provider>
     );
