@@ -25,7 +25,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     console.log("Worker ID:", workerId); // Add this log
     socket.emit("join-room", roomId);
     console.log("Joined room:", roomId);
-
+   
     socket.on("offerNotification", ({ roomId, userName, caller, callType, offer }) => {
       console.log("Received offerNotification", { roomId, userName, caller, callType });
       // The worker should receive the call, so we check if the roomId matches

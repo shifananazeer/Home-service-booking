@@ -276,7 +276,12 @@ export const getWorkerLocation = async (workerId :string) => {
 
 
   export const markBookingAsCompleted = async (bookingId: string) => {
-    const response = await axiosInstance.post("/bookings/mark-as-completed", { bookingId });
+    const token = localStorage.getItem('worker_accessToken');
+    const response = await axiosInstance.post("/workers/bookings/mark-as-completed", { bookingId } ,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        }   
+    });
     return response.data; 
   };
 

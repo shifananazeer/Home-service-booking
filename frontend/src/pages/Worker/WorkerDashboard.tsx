@@ -52,7 +52,7 @@ const workerId = localStorage.getItem('workerId')
     }
 };
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen ">
     {/* Admin Navbar */}
     <WorkerNavbar />
 

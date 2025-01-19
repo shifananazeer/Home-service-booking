@@ -9,4 +9,5 @@ export interface WorkerRepository {
      findWorkersBySkill (skill : string):Promise<Worker []|[]>;
      getWorkerById(workerId:string) :Promise<Worker | null>;
      findAllWorkers(skip: number, limit: number, search: string):Promise<Worker[]|null>
+     getWorkerIdsByNames (workerNames:Set<string>):Promise<string[]>
 }

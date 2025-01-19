@@ -584,34 +584,55 @@ class UserController  {
                         }
                        }
                            async getMessages (req:Request , res:Response) {
-                                               console.log('getMessages called'); // Check if the function is hit
-                                               const userId = req.params.userId;
+                          console.log('getMessages called'); // Check if the function is hit
+                          const userId = req.params.userId;
                                            
-                                               try {
-                                                   const chats = await chatService.getChatForUser(userId);
-                                                   console.log('Chats for workerId:', userId, '->', chats);
+                         try {
+                           const chats = await chatService.getChatForUser(userId);
+                               console.log('Chats for workerId:', userId, '->', chats);
                                            
-                                                   if (chats.length === 0) {
-                                                        res.status(404).json({ message: 'No chats found for this worker.' });
-                                                   }
-                                                 console.log("chats........." , chats)
-                                                   res.status(200).json(chats);
-                                               } catch (error: any) {
-                                                   console.error('Error fetching chats:', error); // Log error for debugging
-                                                   res.status(500).json({ message: 'Error fetching chats', error: error.message });
-                                               }
-                                           }
-                                             async getUnreadNotification (req:Request , res:Response) {
-                                                           const { userId } = req.params
-                                                           console.log("userId" , userId)
-                                                           try{
-                                                             const unreadMessage = await chatService.getUnreadMessageUser(userId);
-                                                             console.log("unread" , unreadMessage)
-                                                             res.status(200).json(unreadMessage);
-                                                           }catch(error) {
+                               if (chats.length === 0) {
+                                res.status(404).json({ message: 'No chats found for this worker.' });
+                                       }
+                             console.log("chats........." , chats)
+                              res.status(200).json(chats);
+                               } catch (error: any) {
+                               console.error('Error fetching chats:', error); // Log error for debugging
+                               res.status(500).json({ message: 'Error fetching chats', error: error.message });
+                               }
+                               }
+                             async getUnreadNotification (req:Request , res:Response) {
+                                const { userId } = req.params
+                                   console.log("userId" , userId)
+                                       try{
+                                         const unreadMessage = await chatService.getUnreadMessageUser(userId);
+                                        console.log("unread" , unreadMessage)
+                                     res.status(200).json(unreadMessage);
+                                 }catch(error) {
                                            
-                                                           }
-                                                          }
+                                }
+                           }
+
+                    async getWorkersByUserId (req:Request , res:Response) {
+                        const { userId } = req.params; 
+                        console.log("userId" , userId)
+                        try{
+                      const  bookings = await bookingService.getBookingByUserId(userId)
+                      if (Array.isArray(bookings) && bookings.length > 0) {
+                        const workerNames = new Set(bookings.map((booking) => booking.workerName));
+                        console.log('Worker Names:', Array.from(workerNames));
+                    
+                      const workerIds = await workerService.getWorkerIds(workerNames)
+                      res.status(200).json({ workerIds }); 
+                    }else{
+                        res.status(404).json({ message: 'No bookings found for this user.' });
+                    }
+                }catch (error:any) {
+                    console.error('Error getting workers by user ID:', error);
+                    res.status(500).json({ message: 'Failed to get workers', error: error.message });
+                }
+
+}
 }
 
 

@@ -116,6 +116,15 @@ export class BookingService {
                throw new Error("Failed to fetch bookings");
             }
            }
+           public async workeStatusUpdate (bookingId:string) {
+            const result = await this.bookingRepository.markBookingAsCompleted(bookingId);
+            return result;
+           }
+
+           public async getBookingByUserId(userId:string) {
+            const result = await this.bookingRepository.fetchBookigsByUserId(userId)
+            return result ;
+           }
 }
 
 

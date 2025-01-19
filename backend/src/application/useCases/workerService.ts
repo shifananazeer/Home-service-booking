@@ -142,6 +142,11 @@ export class WorkerService {
 //      console.log("wwwwww",workers)
 //      const address = 
 //   }
+
+public async getWorkerIds(workerNames: Set<string>): Promise<string[]> {
+    const workerIds =  await this.workerRepository.getWorkerIdsByNames(workerNames);
+    return workerIds;
+}
 }
 
 

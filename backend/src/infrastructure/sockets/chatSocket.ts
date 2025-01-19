@@ -5,6 +5,7 @@ import UserModel from '../database/models/userModels';
 import WorkerModel from '../database/models/workerModel';
 import { createSocketConnectionForVideo } from './videoCallSocket';
 import { createSocketConnectionForAudio } from './audioCallSocket';
+import { createSocketConnectionForNotification } from './notificationSocket';
 
 // Extend the Socket interface to include userId
 declare module 'socket.io' {
@@ -12,6 +13,7 @@ declare module 'socket.io' {
     userId?: string; // Add userId property
   }
 }
+
 
 // Declare types for events
 interface Message {
@@ -21,7 +23,8 @@ interface Message {
 }
 
 interface MarkAsSeenPayload {
-  messageIds: string[];
+  unseenMessageIds: string[]; // Assuming these are strings, adjust if needed
+  chatId: string;
 }
 
 // Event names as enums for consistency
@@ -55,10 +58,11 @@ export const setupSocket = (httpServer: HttpServer) => {
     console.log('[Socket.IO] A user connected.');
     createSocketConnectionForVideo(io, socket);
     createSocketConnectionForAudio(io, socket);
+    createSocketConnectionForNotification(io,socket);
     socket.on(SocketEvents.JOIN, async(userId: string) => {
       onlineUsers.set(userId, socket.id);
-    console.log(`${userId} is now online.`);
-    io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
+      io.emit('onlineUsersList', Array.from(onlineUsers.keys())); // Emit updated list
+        console.log(`${userId} is now online.`);
     
     });
 
@@ -86,7 +90,7 @@ export const setupSocket = (httpServer: HttpServer) => {
     });
 
    
-    socket.on(SocketEvents.MARK_AS_SEEN, async (payload: any) => {
+    socket.on(SocketEvents.MARK_AS_SEEN, async (payload:  MarkAsSeenPayload) => {
       try {
         const { unseenMessageIds, chatId } = payload;
         const results = await MessageModel.updateMany(

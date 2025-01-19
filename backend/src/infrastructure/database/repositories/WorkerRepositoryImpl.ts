@@ -59,5 +59,14 @@ export class WorkerRepositoryImpl implements WorkerRepository {
         .skip(skip).limit(limit);
         return workers;
     }
+    async getWorkerIdsByNames(workerNames: Set<string>): Promise<string[]> {
+        try {
+            const workers = await WorkerModel.find({ name: { $in: Array.from(workerNames) } });
+            return workers.map(worker => worker._id.toString()); // Extract and return worker IDs
+        } catch (error) {
+            console.error('Error fetching worker IDs:', error);
+            return []; // Return an empty array in case of an error
+        }
+    }
 
 }

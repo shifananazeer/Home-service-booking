@@ -26,12 +26,14 @@ import { refreshAccessToken } from '../../application/useCases/refreshAccessToke
 import { ChatService } from '../../application/useCases/chatService';
 import { getIo } from '../../infrastructure/sockets/chatSocket';
 import { uploadChatImage } from '../../utils/uploadChatImage';
+import { NotificationService } from '../../application/useCases/notificationService';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
 const availabilityService = new AvailabilityService();
 const bookingService = new BookingService();
 const chatService = new ChatService()
+const notificationService = new NotificationService()
 
 class WorkerController   {
  async signupWorker(req :Request , res: Response):Promise<void> {
@@ -609,6 +611,30 @@ class WorkerController   {
                   res.status(200).json(unreadMessage);
                 }catch(error) {
 
+                }
+               }
+
+               async updateWorkStatus (req:Request , res:Response):Promise<void> {
+                const { bookingId } = req.body;
+                try{
+                    const updateStatus = await bookingService.workeStatusUpdate(bookingId)
+                    console.log("updateWorkStatus:" , updateStatus)
+                    if (!updateStatus?.userId) {
+                        throw new Error("userId is required to create a notification");
+                    }
+                    const notificationData={
+                        userId: typeof updateStatus?.userId === "string" ? updateStatus.userId : updateStatus?.userId.toString(),
+                        userType: 'user' as 'user' | 'worker',
+                       message:'The worker marked your task as completed.'
+                    
+
+                    }
+                    const notification = await notificationService.saveNotification(notificationData)
+                    res.status(HttpStatus.OK).json({ message: "Work status updated and notification sent." });
+                }catch(error:any) {
+                    console.error('Error marking booking as completed:', error);
+                     res.status(500).json({ message: 'Failed to mark booking as completed', error: error.message });
+                     return
                 }
                }
     }

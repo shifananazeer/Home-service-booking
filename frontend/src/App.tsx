@@ -39,6 +39,7 @@ import { NotificationProvider } from "./NotificationContext";
 import VideoCall from "./pages/User/Vedio";
 import AudioCall from "./pages/User/AudioCall";
 import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
+import { NotificationProviderUser } from "./NotificationContextForUser";
 
 
 
@@ -56,7 +57,7 @@ const App = () => {
       {/* <Toaster position="top-right" reverseOrder={false} />  */}
 
     <Routes>
-      <Route path="/" element={<HomePage/>}/>
+      <Route path="/" element={<NotificationProviderUser><HomePage/></NotificationProviderUser>}/>
       <Route path="/services" element={<ServicesPage/>}/>
       <Route path="/book/:serviceId" element={<BookingPage />} />
       <Route path="/payment" element={<PaymentPage/>}/>

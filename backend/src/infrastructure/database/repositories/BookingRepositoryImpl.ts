@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Booking } from "../../../domain/entities/Booking";
 import { BookingRepository } from "../../../domain/repositories/bookingRepository";
 import BookingModel from "../models/bookingModel";
@@ -95,6 +96,30 @@ export class BookingRepositoryImpl implements BookingRepository {
 
     async updatePayment (bookingId:string , status:string) : Promise<void> {
         await BookingModel.findOneAndUpdate({bookingId},{paymentStatus:status}, { new: true })
+    }
+
+    async markBookingAsCompleted (bookingId:string) :Promise<Booking| null> {
+        try {
+            const booking = await BookingModel.findByIdAndUpdate(
+                bookingId,
+                { workStatus: 'completed' }, // Assuming there's a status field
+                { new: true } // Return the updated document
+            );
+            return booking;
+        } catch (error) {
+            console.error('Error in BookingRepository:', error);
+            throw error; // Propagate the error to be handled in the service
+        }
+    }
+
+    async fetchBookigsByUserId(userId:string) : Promise <Booking[]> {
+        try{
+          const bookings = await BookingModel.find({ userId: new mongoose.Types.ObjectId(userId) })
+          return bookings;
+        }catch(error) {
+           console.log("error fetching bookings")
+         return [];
+        }
     }
 }
 
