@@ -1,128 +1,165 @@
-import React, { useEffect, useState } from 'react';
-import moment from 'moment';
-import axiosInstance from '../../utils/axiosInstance';
-import { getAllNotificationByUserId, getBooking } from '../../services/userService';
+import type React from "react";
+import { useEffect, useState } from "react";
+import moment from "moment";
+import { createCheckoutSession, getAllNotificationByUserId, getBalanceAmount, getBooking } from "../../services/userService";
+import Swal from "sweetalert2";
 
-interface Notification {
-    _id: string;
-    message: string;
-    timestamp: string;
-    bookingId: string; // Ensure notification has a bookingId field
+export interface Notification {
+  _id: string;
+  message: string;
+  timestamp: string;
+  bookingId: string;
+  booking?: {
+    paymentStatus: string;
+    totalPayment: number;
+    advancePayment: number;
+    balancePayment: number;
+    workStatus: string;
+    serviceName: string;
+    bookingId: string;
+  } | undefined;
 }
 
-interface Booking {
-    id: string;
-    status: string;
-    balancePaid: boolean;
+export interface Booking {
+  workLocation: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
+  _id: string;
+  bookingId: string;
+  workerId: string;
+  userId: string;
+  date: string;
+  slotId: string;
+  workDescription: string;
+  workerName: string;
+  serviceImage: string;
+  serviceName: string;
+  paymentStatus: string;
+  workStatus: string;
+  advancePayment: number;
+  totalPayment: number;
+  balancePayment: number;
+  createdAt: string;
+  __v: number;
 }
 
 const NotificationPage: React.FC = () => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [bookings, setBookings] = useState<{ [key: string]: Booking }>({});
-    const [loading, setLoading] = useState<boolean>(true);
-    const userId = localStorage.getItem('user_Id');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const userId = localStorage.getItem("user_Id");
 
-    // Fetch notifications and trigger booking fetch
-    const fetchNotifications = async () => {
-        if (!userId) return;
-        try {
-            const data = await getAllNotificationByUserId(userId);
-            setNotifications(data.notifications);
-
-            // Trigger fetching bookings for notifications with bookingId
-            await fetchBookings(data.notifications);
-        } catch (error) {
-            console.error('Failed to fetch notifications:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fetch bookings by bookingId from notifications
-    const fetchBookings = async (notifications: Notification[]) => {
-        try {
-            // Filter notifications that have a bookingId and create promises to fetch bookings
-            const bookingPromises = notifications
-                .filter((notification) => notification.bookingId) // Only process notifications with bookingId
-                .map((notification) => getBooking(notification.bookingId));
-    
-            // Await all booking fetch promises
-            const bookingResponses = await Promise.all(bookingPromises);
-    
-            // Map bookings to their bookingId for easier lookup
-            const bookingsMap: { [key: string]: Booking } = {};
-            bookingResponses.forEach((response) => {
-                if (response && response.bookings) {
-                    bookingsMap[response.bookings.bookingId] = response.bookings; // Map using bookingId
-                } else {
-                    console.warn(`No booking found for bookingId: ${response.bookingId}`);
-                }
-            });
-    
-            // Update the state with the bookings map
-            setBookings(bookingsMap);
-            console.log("setboo", bookingsMap); // Log the actual bookingsMap
-        } catch (error) {
-            console.error('Failed to fetch bookings:', error);
-        }
-    };
-    
-
-    useEffect(() => {
-        fetchNotifications();
-    }, [userId]);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p className="text-gray-600 text-lg">Loading notifications...</p>
-            </div>
-        );
+  const fetchNotificationsAndBookings = async () => {
+    if (!userId) return;
+    try {
+      const data = await getAllNotificationByUserId(userId);
+      const notificationsWithBookings = await Promise.all(
+        data.notifications.map(async (notification: Notification) => {
+          if (notification.bookingId) {
+            try {
+              const bookingData = await getBooking(notification.bookingId);
+              return {
+                ...notification,
+                booking: bookingData.bookings,
+              };
+            } catch (error) {
+              console.error(`Failed to fetch booking for notification ${notification._id}:`, error);
+              return notification;
+            }
+          }
+          return notification;
+        }),
+      );
+      setNotifications(notificationsWithBookings);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const sortedNotifications = notifications.sort((a, b) => 
-        moment(b.timestamp).unix() - moment(a.timestamp).unix()
-    );
+  useEffect(() => {
+    fetchNotificationsAndBookings();
+  }, [userId]);
 
+  if (loading) {
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notifications</h2>
-            {sortedNotifications.length === 0 ? (
-                <p className="text-gray-600">No notifications to display.</p>
-            ) : (
-                <ul className="space-y-4">
-                    {sortedNotifications.map((notification) => {
-                        const booking = bookings[notification.bookingId]; // Fetch booking details for this notification
-                        return (
-                            <li
-                                key={notification._id}
-                                className="p-4 border rounded-lg shadow-sm bg-white hover:bg-gray-50"
-                            >
-                                <p className="text-gray-800">{notification.message}</p>
-                                <small className="text-gray-500">
-                                    {moment(notification.timestamp).fromNow()}
-                                </small>
-                                {booking && !booking.balancePaid && (
-                                    <button
-                                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                        onClick={() => handleContinuePayment(booking.id)}
-                                    >
-                                        Confirm and Continue Payment
-                                    </button>
-                                )}
-                            </li>
-                        );
-                    })}
-                </ul>
-            )}
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-600 text-lg">Loading notifications...</p>
+      </div>
     );
-};
+  }
 
-// Handle "Continue Payment" button click
-const handleContinuePayment = (bookingId: string) => {
+  const sortedNotifications = notifications.sort((a, b) => moment(b.timestamp).unix() - moment(a.timestamp).unix());
+
+  const handleContinuePayment = async (bookingId: any) => {
     console.log(`Continue payment for booking ID: ${bookingId}`);
-    // Add logic to redirect to payment or perform the necessary action
+    try {
+      const response = await getBalanceAmount(bookingId);
+      const balanceAmount = response?.data;
+
+      if (balanceAmount) {
+        const checkoutResponse = await createCheckoutSession({
+          amount: balanceAmount * 100,
+          bookingId: bookingId,
+          paymentType: 'balance',
+          successUrl: `http://localhost:5173/balancePayment-success?bookingId=${bookingId}`,
+        });
+
+        console.log("Checkout session created:", checkoutResponse);
+
+        if (checkoutResponse.url) {
+          window.location.href = checkoutResponse.url;
+        } else {
+          Swal.fire('Error', 'Failed to create Stripe session', 'error');
+        }
+      } else {
+        console.error("Balance amount is not available for the provided booking ID.");
+      }
+    } catch (error) {
+      console.error("Error in onConfirm function:", error);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Notifications</h2>
+      {sortedNotifications.length === 0 ? (
+        <p className="text-gray-600">No notifications to display.</p>
+      ) : (
+        <ul className="space-y-4">
+          {sortedNotifications.map((notification) => (
+            <li key={notification._id} className="p-4 border rounded-lg shadow-sm bg-white hover:bg-gray-50">
+              <p className="text-gray-800">{notification.message}</p>
+              <small className="text-gray-500">{moment(notification.timestamp).fromNow()}</small>
+              {notification.booking ? (
+                <>
+                  <p className="mt-2">Payment Status: {notification.booking.paymentStatus}</p>
+                  <p>Total Payment: ${notification.booking.totalPayment}</p>
+                  <p>Advance Payment: ${notification.booking.advancePayment}</p>
+                  <p>Balance Payment: ${notification.booking.balancePayment}</p>
+                  <p>Work Status: {notification.booking.workStatus}</p>
+                  <p>Service: {notification.booking.serviceName}</p>
+                  <p>Service: {notification.booking.bookingId}</p>
+                  {notification.booking.paymentStatus === "advance_paid" && notification.booking.bookingId && (
+                    <button
+                      className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      onClick={() => handleContinuePayment(notification.booking?.bookingId)} // Ensure bookingId is defined
+                    >
+                      Confirm and Continue Payment
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p className="mt-2">No booking details available</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default NotificationPage;

@@ -501,7 +501,11 @@ export const fetchUnreadMessags = async (userId:string) => {
   export const getBooking = async (bookingId:string) => {
     const token = localStorage.getItem('accessToken');
     try{
-     const response = await axiosInstance.get(`/auth/bookings/${bookingId}`)
+     const response = await axiosInstance.get(`/auth/bookings/${bookingId}` , {
+      headers:{
+        'Authorization': `Bearer ${token}`,
+      }
+     })
      console.log("booking respo" , response)
      return response.data
     }catch (error) {
