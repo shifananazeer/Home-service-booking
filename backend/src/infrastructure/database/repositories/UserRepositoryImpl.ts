@@ -74,4 +74,14 @@ export class UserRepositoryImpl implements UserRepository {
         const user = await UserModel.findById(userId, 'firstName');
         return user?.firstName || ''; 
     }
+
+    async updatePasswordByUserId (userId:string , hashedPassword:string): Promise<boolean> {
+        try {
+            const result = await UserModel.findByIdAndUpdate(userId, { password: hashedPassword });
+            return result ? true : false;
+          } catch (error) {
+            console.error('Error updating password:', error);
+            throw new Error('Database operation failed.');
+          }
+    }
 }

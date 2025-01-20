@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
-import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Video, VideoOff } from 'lucide-react';
 import socket from "../../utils/socket";
 
 
@@ -147,12 +147,12 @@ const WorkerVideoCallPage: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
+      <div className="bg-gradient-to-r from-gray-800 to-blue-800 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
         <button
           onClick={cancel}
           className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-red-700 transform hover:scale-105 transition-all duration-200 ease-in-out"
         >
-          End Call
+           <PhoneOff></PhoneOff>
         </button>
         <h2 className="text-3xl font-semibold text-white text-center mb-4">
           Video Call

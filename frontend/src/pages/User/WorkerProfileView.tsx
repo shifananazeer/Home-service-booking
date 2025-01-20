@@ -84,7 +84,7 @@ const WorkerProfilePage: React.FC = () => {
   };
 
   const handleCloseChat = () => {
-    setModalOpen(false); // Close the chat modal
+    setModalOpen(false); 
   };
 
 

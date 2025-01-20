@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import socket from "../../utils/socket";
 import { fetchWorkerById } from "../../services/userService";
-import { MicOff } from "lucide-react";
+import { Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
 
 const VideoCallPage: React.FC = () => {
   const { workerId } = useParams<{ workerId: string }>();
@@ -18,7 +18,7 @@ const VideoCallPage: React.FC = () => {
   const roomId = workerId || "";
   const userId = localStorage.getItem('user_Id');
   const [iceCandidates, setIceCandidates] = useState<RTCIceCandidateInit[]>([]);
-
+const [videoOff, setVideoOff] = useState(false);
   useEffect(() => {
     socket.emit("join-room", roomId);
     startCall();
@@ -119,6 +119,7 @@ const VideoCallPage: React.FC = () => {
     const videoTrack = window.currentStream?.getVideoTracks()[0];
     if (videoTrack) {
       videoTrack.enabled = !videoTrack.enabled; // Toggle the enabled state
+      setVideoOff(!videoTrack.enabled);
     }
   };
 
@@ -154,11 +155,11 @@ const VideoCallPage: React.FC = () => {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-        <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
+        <div className="bg-gradient-to-r from-gray-900 to-blue-800 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
           {/* Close Button */}
           <button
             onClick={cancel}
-            className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-red-700 transform hover:scale-105 transition-all duration-200 ease-in-out"
+            className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-full shadow-md hover:bg-red-700 transform hover:scale-105 transition-all duration-200 ease-in-out"
           >
             Cancel
           </button>
@@ -213,21 +214,21 @@ const VideoCallPage: React.FC = () => {
           <div className="flex justify-center items-center space-x-8">
             <button
               onClick={toggleMute}
-              className="bg-red-500 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform"
+              className="bg-gray-700 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
-              Mute
+              {muted ? <MicOff /> : <Mic />}
             </button>
             <button
               onClick={cancel}
               className="bg-red-600 text-white px-6 py-4 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
-              Cancel
+             <PhoneOff></PhoneOff>
             </button>
             <button
               onClick={toggleVideo}
-              className="bg-green-500 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform"
+              className="bg-gray-700 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform"
             >
-              Video Off
+             {videoOff ? <VideoOff /> : <Video />}
             </button>
           </div>
         </div>

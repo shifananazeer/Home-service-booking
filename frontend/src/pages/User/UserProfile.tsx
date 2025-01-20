@@ -6,6 +6,7 @@ import { UserProfileInterface } from '../../interfaces/userInterface';
 import { Address } from '../../interfaces/addressInterface';
 import ChangePasswordModal from './ChangePasswordModel';
 import { refreshAccessToken } from '../../utils/auth';
+import toast from 'react-hot-toast';
 
 export interface UserProfileResponse {
     user: UserProfileInterface;
@@ -53,11 +54,15 @@ const UserProfile = () => {
 
 
     const handlePasswordChange = async (newPassword: string) => {
+        const userId = localStorage.getItem('user_Id')
         try {
-          const response = await resetPasswordFromPassword(newPassword)
+            if(!userId) {
+                return null
+            }
+          const response = await resetPasswordFromPassword(newPassword , userId)
     
        
-          alert('Password updated successfully!');
+          toast.success('Password updated successfully!');
           handleCloseModal();
         } catch (error) {
           console.error('Failed to update password:', error);

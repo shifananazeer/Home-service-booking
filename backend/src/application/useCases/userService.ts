@@ -106,4 +106,13 @@ export class UserService {
           throw new Error("Failed to fetch user name");
         }
       }
+     async resetPasswordFromUser (userId:string , newPassword:string){
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const isUpdated = await this.userRepository.updatePasswordByUserId(userId, hashedPassword);
+        if (!isUpdated) {
+          throw new Error('Failed to update password.');
+        }
+        return 'Password reset successfully.';
+      }
+     
 }

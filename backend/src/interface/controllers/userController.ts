@@ -668,6 +668,21 @@ class UserController  {
          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages:Messages.INTERNAL_SERVER_ERROR , error})
         }
     }
+    async resetPasswordFromProfile (req:Request , res:Response) {
+        const { newPassword } = req.body;
+        const {userId} = req.params
+        console.log("userId from auth" , userId)
+        if (!newPassword || !userId) {
+            res.status(HttpStatus.BAD_REQUEST).json({ message: Messages.INVALID });
+            return;
+          }
+          try {
+            const message = await userService.resetPasswordFromUser(userId, newPassword);
+            res.status(HttpStatus.OK).json({ message });
+          } catch (error: any) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || Messages.INTERNAL_SERVER_ERROR });
+          }
+    }
 }
 
 

@@ -263,10 +263,11 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
 }
 
 
-export const resetPasswordFromPassword = async ( newPassword: string): Promise<string> => {
-  const token = localStorage.getItem('accessToken');
+export const resetPasswordFromPassword = async ( newPassword: string , userId:string): Promise<string> => {
+  const token = localStorage.getItem('accessToken')
+
   try {
-      const response = await axiosInstance.post('/auth/user/reset-password', { newPassword } ,{
+      const response = await axiosInstance.post(`/auth/user/reset-password/${userId}`, { newPassword } ,{
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -18,7 +18,7 @@ export const Messages = {
    ERRROR_FETCHING_MESSAGES:'error fetchingMessage',
    ERROR_IN_ADDING_REACTION:"error adding reaction",
     
-   
+   INVALID : 'invalid data',
     DATE_SLOT_REQUIRED: 'Date and slots are required',
     NO_SLOTS:"No slots available.",
     SLOT_UPDATED:'Slot updated successfully',

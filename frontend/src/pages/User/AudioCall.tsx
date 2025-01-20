@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
-import { Mic, MicOff } from "lucide-react";
+import { Mic, MicOff, PhoneOff } from "lucide-react";
 import { useSelector } from "react-redux";
 import { fetchWorkerById } from "../../services/userService";
 
@@ -169,7 +169,7 @@ const AudioCall = () => {
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-        <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
+        <div className="bg-gradient-to-r from-gray-800 to-blue-800 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
           {/* Close Button */}
           <button
             onClick={cancel} 
@@ -218,7 +218,7 @@ const AudioCall = () => {
               onClick={cancel} 
               className="bg-red-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-red-600 hover:scale-105 transition-all"
             >
-              Cancel
+             <PhoneOff></PhoneOff>
             </button>
           </div>
         </div>
