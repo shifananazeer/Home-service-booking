@@ -8,9 +8,9 @@ export class PaymentService {
     async createPaymentIntent(amount: number): Promise<Stripe.PaymentIntent> {
         try {
             const paymentIntent = await stripe.paymentIntents.create({
-                amount, // Amount in the smallest currency unit (e.g., cents)
+                amount,
                 currency: 'INR',
-                payment_method_types: ['card'], // Specify payment method types
+                payment_method_types: ['card'], 
             });
             return paymentIntent;
         } catch (error: any) {
@@ -27,15 +27,15 @@ export class PaymentService {
                     price_data: {
                         currency: 'inr',
                         product_data: {
-                            name: 'Booking Payment', // Customize as needed
+                            name: 'Booking Payment', 
                         },
-                        unit_amount: amount, // Amount in cents
+                        unit_amount: amount, 
                     },
-                    quantity: 1, // Adjust quantity if necessary
+                    quantity: 1, 
                 }],
                 mode: 'payment',
-               success_url:  successUrl, // Update with your success URL
-                cancel_url: 'http://localhost:5173/cancel', // Update with your cancel URL
+               success_url:  successUrl, 
+                cancel_url: 'http://localhost:5173/cancel', 
             });
             return session;
         } catch (error: any) {

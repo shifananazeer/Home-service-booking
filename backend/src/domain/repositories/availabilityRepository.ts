@@ -1,4 +1,4 @@
-// domain/repositories/availabilityRepository.ts
+
 
 import { Availability, AvailabilitySlot } from "../entities/Availability";
 

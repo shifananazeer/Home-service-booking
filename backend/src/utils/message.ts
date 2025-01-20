@@ -14,9 +14,10 @@ export const Messages = {
 
     BOOKING_RETRIVED:"Bookings retrieved successfully",
     FAILED_RETRIVED:"Failed to retrieve bookings",
-   
-   
-  
+
+   ERRROR_FETCHING_MESSAGES:'error fetchingMessage',
+   ERROR_IN_ADDING_REACTION:"error adding reaction",
+    
    
     DATE_SLOT_REQUIRED: 'Date and slots are required',
     NO_SLOTS:"No slots available.",
@@ -25,8 +26,8 @@ export const Messages = {
     WORKER_BY_SKILL: 'No workers found with this skill',
     FAIL_UPDATE_COORDINATES:"Failed to update coordinates in the database.",
     WORKERID_REQUIRED:'Worker ID is required',
-
-
+    FAILED_TO_GET_WORKERS:'failed to get workers',
+    FAILED_TO_CHANGE_STATUS:'failed to change status' ,
     OTP_VERIFIED:'OTP verified Successfully. You can Log in',
     OTP_SEND : "  OTP send to your email",
     ERROR_FETCHING:"Error in fetching",
@@ -53,6 +54,7 @@ export const Messages = {
     ERROR_CREATING:'Error in creation',
     CANCELLED_SUCCESSFULLY:'Cancelled successfully',
    ERROR_CANCELLING:"Something went wrong while cancelling the booking",
-   REQUIRED:'plesse fill all required feilds'
+   REQUIRED:'plesse fill all required feilds',
+   ERROR_UPLOAD:'error uploading image'
    
 }

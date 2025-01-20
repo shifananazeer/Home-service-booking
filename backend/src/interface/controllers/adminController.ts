@@ -196,5 +196,5 @@ class AdminController {
     }
 }
 
-// Export an instance of AdminController
+
 export const adminController = new AdminController();

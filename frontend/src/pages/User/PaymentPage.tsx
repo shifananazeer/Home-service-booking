@@ -91,10 +91,10 @@ console.log("balance" , balanceAmount)
               console.log("bookingId" , response.data.bookingId)
                 // Create a checkout session with Stripe
                 const checkoutResponse = await createCheckoutSession({
-                    amount: advancePayment * 100, // Advance payment in cents
-                    bookingId: response.data.bookingId, // Assuming the response contains the booking ID
-                    paymentType: 'advance', // Add the payment type as "advance"
-                    successUrl: `http://localhost:5173/booking-success?bookingId=${response.data.bookingId}`, // Dynamic success URL
+                    amount: advancePayment * 100,
+                    bookingId: response.data.bookingId, 
+                    paymentType: 'advance',
+                    successUrl: `http://localhost:5173/booking-success?bookingId=${response.data.bookingId}`, 
                 });
                 
                 if (checkoutResponse.url) {

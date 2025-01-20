@@ -14,16 +14,12 @@ export class WorkerService {
     public async registerWorker(workerData: Worker): Promise<Worker> {
         const existingWorker = await this.workerRepository.findByEmail(workerData.email);
         if (existingWorker) throw new Error('Email already exists');
-        
         if (workerData.password.length < 6) {
             throw new Error('Password must be at least 6 characters long.');
         }
-
         const hashedPassword = await bcrypt.hash(workerData.password, 10);
-        
         workerData.role = 'worker';
         workerData.password = hashedPassword;
-
         return this.workerRepository.createWorker(workerData);
     }
 
@@ -31,27 +27,21 @@ export class WorkerService {
     public async loginWorker(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; workerId: string }> {
         console.log("password", password);
         console.log("email", email);
-
         const user = await this.workerRepository.findByEmail(email);
         console.log("role....", user?.role);
-
         if (!user) throw new Error('Invalid Email Or Password');
-
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) throw new Error('Invalid Password');
-
         const accessToken = jwt.sign(
             { email: user.email, role: user.role },
             process.env.ACCESS_TOKEN_SECRET as string,
             { expiresIn: '15m' }
         );
-
         const refreshToken = jwt.sign(
             { email: user.email, role: user.role },
             process.env.REFRESH_TOKEN_SECRET as string,
             { expiresIn: '7d' }
         );
-
         return { accessToken, refreshToken, workerId: user._id.toString() };
     }
 
@@ -59,11 +49,9 @@ export class WorkerService {
         try {
             const worker = await this.workerRepository.findByEmail(email);
             console.log("wwwww", worker);
-
             if (!worker) {
                 throw new Error("Worker not found");
             }
-
             console.log("worker", worker);
             return worker;
         } catch (error: any) {
@@ -86,11 +74,9 @@ export class WorkerService {
         }
 
         const workers = await this.workerRepository.findWorkersBySkill(skill);
-
         if (workers.length === 0) {
             throw new Error('No workers found with this skill');
         }
-
         return workers;
     }
    
@@ -101,7 +87,6 @@ export class WorkerService {
             if (!worker) {
                 throw new Error('Worker not found');
             }
-
             const updatedWorker = await this.workerRepository.updateWorkerProfile(workerEmail, updates);
             console.log("Updated worker:", updatedWorker);
             return updatedWorker;
@@ -110,24 +95,25 @@ export class WorkerService {
             throw new Error('Database error');
         }
     }
+
     public async getWorkers(page: number, limit: number, search: string): Promise<Worker[] | null> {
         const skip = (page - 1) * limit;
         const workers = await this.workerRepository.findAllWorkers(skip, limit, search);
         return workers;
     }
+
     public async findWorkerById(workerId: string): Promise<Worker> {
     if (!workerId) {
       throw new Error('Worker ID is required');
     }
 
     const worker = await this.workerRepository.getWorkerById(workerId);
-
     if (!worker) {
       throw new Error('Worker not found');
     }
-
     return worker;
   }
+  
   public async getWorker(workerId: string): Promise<Worker | null> {
     try {
       const worker = await this.workerRepository.getWorkerById(workerId);

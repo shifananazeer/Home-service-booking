@@ -211,10 +211,9 @@ export const  deleteAvailability  =  async (slotId:string)=> {
     return response.data; 
 };
 
-export const fetchService = async () => {
-   
+export const fetchService = async () => { 
 const response = await axiosInstance.get('/workers/services',{
-   
+ 
 });
 if (!response) {
     throw new Error('Failed to fetch services');
@@ -225,7 +224,6 @@ return  response.data;
 export const updateCoordinates  = async(lat: number , lng:number, workerId:string) =>{
     const token = localStorage.getItem('worker_accessToken');
   const response = await axiosInstance.put('/workers/updateLocation',{
-    
         workerId,
         latitude: lat,
         longitude: lng,
@@ -286,13 +284,23 @@ export const getWorkerLocation = async (workerId :string) => {
   };
 
   export const fetchChats = async (workerId:string) => {
-    const response = await axiosInstance.get(`/workers/chat/${workerId}`)
+    const token = localStorage.getItem('worker_accessToken');
+    const response = await axiosInstance.get(`/workers/chat/${workerId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        }    
+    })
     console.log("responsechat" , response)
     return response.data;
   }
 
   export const fetchMessages = async (chatId:string) => {
-    const response = await axiosInstance.get(`/workers/messages/${chatId}`)
+    const token = localStorage.getItem('worker_accessToken');
+    const response = await axiosInstance.get(`/workers/messages/${chatId}`,{
+        headers : {
+            'Authorization':`Bearer ${token}`,
+        }   
+    })
     console.log("res", response)
     return response.data;
   }
@@ -330,18 +338,18 @@ export const getWorkerLocation = async (workerId :string) => {
     try {
         const response = await axiosInstance.post(
             `/workers/reaction/${messageId}`,
-            { emoji: reactionData.emoji }, // Send the emoji as part of an object
+            { emoji: reactionData.emoji }, 
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json' // Optional: Specify content type
+                    'Content-Type': 'application/json' 
                 }
             }
         );
         return response.data;
     } catch (error) {
-        console.error("Error sending reaction:", error); // Log the error for debugging
-        throw error; // Optional: Re-throw the error to handle it further up the chain if needed
+        console.error("Error sending reaction:", error); 
+        throw error; 
     }
 };
 

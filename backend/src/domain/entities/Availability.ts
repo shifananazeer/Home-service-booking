@@ -1,4 +1,4 @@
-// domain/entities/Availability.ts
+
 
 import { ObjectId } from "mongoose";
 

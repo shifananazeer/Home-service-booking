@@ -55,7 +55,7 @@ const MessageList: React.FC = () => {
   
 
     const handleOnlineUsersList = (onlineUsers: any) => {
-      console.log("Online users:", onlineUsers); // Log the list of online users
+      console.log("Online users:", onlineUsers);
       setOnlineUsers(onlineUsers);
   };
 
@@ -70,8 +70,8 @@ const MessageList: React.FC = () => {
     }
 
     return () => {
-      socket.off('connect', handleConnect); // Remove 'connect' listener
-      socket.off("onlineUsersList", handleOnlineUsersList); // Remove 'onlineUsersList' listener
+      socket.off('connect', handleConnect); 
+      socket.off("onlineUsersList", handleOnlineUsersList); 
   };
   }, [userId]);
 
@@ -217,7 +217,7 @@ const MessageList: React.FC = () => {
     setIsModalOpen(!isModalOpen);
   };
   const handleVideoCall = ( id:string) => {
-    navigate(`/videocall/${id}`); // Replace with your actual route for the video call page
+    navigate(`/videocall/${id}`); 
   };
   const handleAudioCall =(id:string) => {
     navigate(`/audioCall/${id}`)
@@ -277,9 +277,9 @@ const MessageList: React.FC = () => {
   <button 
     onClick={toggleModal}
     className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-105"
-    style={{ fontSize: '0.9rem' }} // Reduce font size slightly
+    style={{ fontSize: '0.9rem' }} 
   >
-    <Phone className="text-white mr-1" size={16} /> {/* Decreased icon size */}
+    <Phone className="text-white mr-1" size={16} /> 
     Call
   </button>
   </div>

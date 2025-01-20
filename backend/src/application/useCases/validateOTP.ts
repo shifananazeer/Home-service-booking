@@ -22,13 +22,10 @@ export const validateOtp = async (
         if (!otpEntry) {
             throw new Error("Invalid OTP");
         }
-
         if (otpEntry.expiresAt < new Date()) {
             throw new Error("OTP has expired");
         }
-
         await OTPModel.deleteOne({ _id: otpEntry._id });
-
         let userRole: string;
         let userId: string;
 
@@ -38,7 +35,6 @@ export const validateOtp = async (
             if (!user) {
                 throw new Error("User not found");
             }
-
             user.isVerified = true;
             await user.save();
 
@@ -67,10 +63,8 @@ export const validateOtp = async (
         if (!secretKey || !refreshSecretKey) {
             throw new Error("JWT secret keys are not defined");
         }
-
         const accessToken = jwt.sign({ email, role: userRole }, secretKey, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ email, role: userRole }, refreshSecretKey, { expiresIn: "7d" });
-
         return { valid: true, role: userRole, accessToken, refreshToken, userId };
     } catch (error: any) {
         throw new Error(error.message);

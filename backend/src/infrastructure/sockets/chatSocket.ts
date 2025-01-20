@@ -7,15 +7,12 @@ import { createSocketConnectionForVideo } from './videoCallSocket';
 import { createSocketConnectionForAudio } from './audioCallSocket';
 import { createSocketConnectionForNotification } from './notificationSocket';
 
-// Extend the Socket interface to include userId
 declare module 'socket.io' {
   interface Socket {
-    userId?: string; // Add userId property
+    userId?: string; 
   }
 }
 
-
-// Declare types for events
 interface Message {
   chatId: string;
   content: string;
@@ -23,11 +20,11 @@ interface Message {
 }
 
 interface MarkAsSeenPayload {
-  unseenMessageIds: string[]; // Assuming these are strings, adjust if needed
+  unseenMessageIds: string[]; 
   chatId: string;
 }
 
-// Event names as enums for consistency
+
 enum SocketEvents {
   CONNECT = 'connection',
   DISCONNECT = 'disconnect',
@@ -42,7 +39,7 @@ enum SocketEvents {
   REACTION_UPDATED = 'reactionUpdated', 
 }
 
-// Global variables
+
 let io: Server; 
 const onlineUsers = new Map();
 export const setupSocket = (httpServer: HttpServer) => {
@@ -74,22 +71,20 @@ export const setupSocket = (httpServer: HttpServer) => {
     });
 
     socket.on("getOnlineUsers", () => {
-      const onlineUsersList = Array.from(onlineUsers.keys()); // Get all online user IDs
-      socket.emit("onlineUsersList", onlineUsersList); // Send the list back to the requesting client
+      const onlineUsersList = Array.from(onlineUsers.keys()); 
+      socket.emit("onlineUsersList", onlineUsersList);
   });
+
     socket.on('leaveChat', ({ chatId }) => {
       console.log(`Socket ${socket.id} left chat: ${chatId}`);
       socket.leave(chatId);
     });
   
-
-    
     socket.on(SocketEvents.SEND_MESSAGE, (message: Message) => {
       console.log(`[Socket.IO] New message sent to chat ${message.chatId}`);
       io.to(message.chatId).emit(SocketEvents.NEW_MESSAGE, message);
     });
 
-   
     socket.on(SocketEvents.MARK_AS_SEEN, async (payload:  MarkAsSeenPayload) => {
       try {
         const { unseenMessageIds, chatId } = payload;
@@ -109,7 +104,7 @@ export const setupSocket = (httpServer: HttpServer) => {
    
     socket.on(SocketEvents.ADD_REACTION, async (payload: { messageId: string; emoji: string }) => {
       const { messageId, emoji } = payload;
-      const reactionData = { emoji, userModel: socket.userId }; // Use the connected user ID
+      const reactionData = { emoji, userModel: socket.userId }; 
 
       try {
         await MessageModel.findByIdAndUpdate(messageId, { $push: { reactions: reactionData } });
@@ -133,8 +128,6 @@ export const setupSocket = (httpServer: HttpServer) => {
         if (id === socket.id) {
           onlineUsers.delete(userId);
           console.log(`${userId} is now offline.`);
-          
-          // Notify other users about the updated status
           io.emit("updateOnlineUsers", Array.from(onlineUsers.keys()));
           break;
         }
@@ -145,5 +138,5 @@ export const setupSocket = (httpServer: HttpServer) => {
   return io; 
 };
 
-// Export the io instance for use elsewhere
+
 export const getIo = () => io;

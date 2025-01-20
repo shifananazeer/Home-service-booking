@@ -16,21 +16,17 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     if(token && userIds) {
-    // Emit the JOIN event after the socket connection is established
-    const userId = userIds; // Replace with the actual user ID
+    const userId = userIds; 
     socket.emit('join', userId);
-
-    // Listen for online status updates
     socket.on('userOnline', (data) => {
       console.log(`worker ${data.userId} is online.`);
     });
-
     socket.on('userOffline', (data) => {
       console.log(`worker ${data.userId} is offline.`);
     });
 
     return () => {
-      socket.disconnect(); // Cleanup on unmount
+      socket.disconnect(); 
     };
   }
   }, []);

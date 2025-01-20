@@ -58,18 +58,15 @@ export class AddressRepositoryImpl implements AddressRepository {
                         longitude: longitude
                     }
                 });
-    
-                const savedAddress = await newAddress.save(); // Save the new address
+                const savedAddress = await newAddress.save(); 
                 return {
                     ...this.mapAddressToResponse(savedAddress),
                     location: {
                         latitude: savedAddress.location.latitude,
                         longitude: savedAddress.location.longitude
                     }
-                } as Address; // Return the new address
+                } as Address; 
             }
-    
-            // Return the updated address without changing the structure
             return {
                 ...this.mapAddressToResponse(address),
                 location: {
@@ -95,7 +92,7 @@ export class AddressRepositoryImpl implements AddressRepository {
         };
     }
 
-    // Utility method to map the AddressModel to Address entity
+  
     private mapAddressToResponse(address: any): Address {
         return {
             id: address.id.toString(),

@@ -63,7 +63,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
       // Emit to the server to mark messages as seen
       socket.emit('markAsSeen', { unseenMessageIds, chatId });
   
-      // Update local state for seen messages
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           unseenMessageIds.includes(msg._id!) ? { ...msg, isSeen: true } : msg
@@ -168,21 +167,16 @@ const ChatModal: React.FC<ChatModalProps> = ({
   };
 
   const addReaction = (messageId: string, emoji: string) => {
-    const reactionData = { emoji, userModel: 'user' }; // Use the connected user's ID
-  
+    const reactionData = { emoji, userModel: 'user' }; 
     // Emit the addReaction event to the server
     socket.emit('addReaction', { messageId, emoji });
-  
-    // Update the local state to reflect the new reaction immediately
    
   };
 
   useEffect(() => {
-    // Listen for reaction updates from the server
+   
     socket.on('reactionUpdated', (data) => {
       const { messageId, emoji, reactionData } = data;
-
-      // Update the messages state to reflect the new reaction
       setMessages(prevMessages =>
         prevMessages.map(msg =>
           msg._id === messageId 
@@ -191,12 +185,10 @@ const ChatModal: React.FC<ChatModalProps> = ({
         )
       );
     });
-
-    // Cleanup the event listener when the component unmounts
     return () => {
       socket.off('reactionUpdated');
     };
-  }, []); // Empty dependency array to set up the listener only once
+  }, []);
 
 
   if (!isOpen) return null;
@@ -246,11 +238,9 @@ const ChatModal: React.FC<ChatModalProps> = ({
                       className="max-w-full h-auto rounded-lg mb-2"
                     />
                   )}
-                 
-        {/* Display 'Seen' indicator only for user messages */}
-        {isUser && message.isSeen && (
-          <p className="text-xs mt-1 text-blue-200">Seen</p>
-        )}
+                   {isUser && message.isSeen && (
+                    <p className="text-xs mt-1 text-blue-200">Seen</p>
+                   )}
                   <p className="break-words">{message.text}</p>
                   {message.updatedAt && (
                     <p className={`text-xs mt-1 ${isUser ? 'text-blue-200' : 'text-gray-400'}`}>

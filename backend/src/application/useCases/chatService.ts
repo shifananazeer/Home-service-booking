@@ -41,7 +41,7 @@ export class ChatService {
       }
 
       async getChatForWorker(workerId:string) {
-        console.log('Fetching chats for worker:', workerId); // Add log here for debugging
+        console.log('Fetching chats for worker:', workerId);
     const chats = await this.chatRepository.getChatByWorkerId(workerId);
     return chats;
       }
@@ -60,14 +60,14 @@ export class ChatService {
         const chatIds: string[] = chats.map(chat => chat._id.toString()); 
         console.log("Chat IDs:", chatIds);
 
-        // Step 2: Count unread messages for the chat IDs
+       
         const unreadMessageCounts = await this.messageRepository.countUnreadMessages(chatIds);
         console.log("Unread message counts:", unreadMessageCounts);
 
-        return unreadMessageCounts; // Return the unread
+        return unreadMessageCounts; 
       }
       async getChatForUser(userId:string) {
-        console.log('Fetching chats for user:', userId); // Add log here for debugging
+        console.log('Fetching chats for user:', userId); 
     const chats = await this.chatRepository.getChatByUserId(userId);
     return chats;
       }
@@ -78,11 +78,11 @@ export class ChatService {
         const chatIds: string[] = chats.map(chat => chat._id.toString()); 
         console.log("Chat IDs:", chatIds);
 
-        // Step 2: Count unread messages for the chat IDs
+     
         const unreadMessageCounts = await this.messageRepository.countUnreadMessagesforUser(chatIds);
         console.log("Unread message counts:", unreadMessageCounts);
 
-        return unreadMessageCounts; // Return the unread
+        return unreadMessageCounts; 
       }
     
 }

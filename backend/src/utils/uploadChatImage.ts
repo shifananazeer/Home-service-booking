@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 
-// Configure AWS S3
+
 const s3 = new AWS.S3({
     region: process.env.BACKET_REGION,
     accessKeyId: process.env.ACCESS_KEY,
@@ -11,7 +11,7 @@ const s3 = new AWS.S3({
 export const uploadChatImage = async (file: Express.Multer.File): Promise<string> => {
     const params = {
         Bucket: process.env.BACKET_NAME as string,
-        Key: `chat-image/${uuidv4()}_${file.originalname}`, // Changed 'key' to 'Key'
+        Key: `chat-image/${uuidv4()}_${file.originalname}`, 
         Body: file.buffer,
         ContentType: file.mimetype,
     };

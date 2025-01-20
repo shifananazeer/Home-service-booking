@@ -4,22 +4,11 @@ import {Booking} from  '../../domain/entities/Booking'
 import {BookingRepositoryImpl} from "../../infrastructure/database/repositories/BookingRepositoryImpl";
 import { AddressRepositoryImpl } from "../../infrastructure/database/repositories/AddressRepositoryIml";
 import { Address } from "../../domain/entities/Address";
+
+
 const addressRepository = new AddressRepositoryImpl();
 const workerRepository = new WorkerRepositoryImpl();
 const bookingRepository = new BookingRepositoryImpl();
-// export const workerServices = async (skill: string | undefined): Promise<Worker[]> => { 
-//     if (!skill) {
-//         throw new Error('Skill is required');
-//     }
-
-//     const workers = await workerRepository.findWorkersBySkill(skill);
-
-//     if (workers.length === 0) {
-//         throw new Error('No workers found with this skill');
-//     }
-
-//     return workers; 
-// };
 
 interface FetchAllBookingsParams {
     page: number;
@@ -29,15 +18,13 @@ interface FetchAllBookingsParams {
 
 export class BookingService {
     private bookingRepository: BookingRepositoryImpl;
-
     constructor() {
         this.bookingRepository = new BookingRepositoryImpl();
     }
 
     public async getBookingsByWorkerId(workerId: string, page: number, limit: number): Promise<{ bookings: Booking[]; total: number }> {
         const bookings = await this.bookingRepository.findBookingsByWorkerId(workerId, page, limit);
-        const totalBookings = await this.bookingRepository.countBookingsByWorkerId(workerId);
-        
+        const totalBookings = await this.bookingRepository.countBookingsByWorkerId(workerId); 
         return {
             bookings,
             total: totalBookings
@@ -48,9 +35,7 @@ export class BookingService {
         if (!workerId) {
             throw new Error('Worker ID is required');
         }
-
         const bookings = await this.bookingRepository.getTodaysBookingsByWorker(workerId);
-
         return bookings || [];
     }
 
@@ -64,7 +49,6 @@ export class BookingService {
         }
     }
 
-    // Get bookings by user ID with pagination
     public async getBookingsByUserId(userId: string, page: number, limit: number): Promise<{ bookings: Booking[]; total: number }> {
         try {
             const bookings = await this.bookingRepository.getBookingsForUser(userId, page, limit);
@@ -76,7 +60,6 @@ export class BookingService {
         }
     }
 
-    // Cancel a booking
     public async cancelBooking(bookingId: string): Promise<Booking | null> {
         try {
             const updatedBooking = await this.bookingRepository.cancelUpdate(bookingId);
@@ -86,6 +69,7 @@ export class BookingService {
             throw new Error("Failed to cancel booking");
         }
     }
+
      public async fetchAllBookings(params: FetchAllBookingsParams): Promise<{ bookings: Booking[]; total: number }> {
             const { page, limit, search } = params;
             try {
@@ -105,7 +89,6 @@ export class BookingService {
             throw new Error("Failed to fetch bookings");
          }
         }
-
 
         public async updateBookingById (bookingId:string , status:string) : Promise<void>{
             try{
@@ -151,7 +134,6 @@ interface AddressResponse {
         __v?: number;
     };
 }
-
 export const singleWorker = async (workerId:string) :Promise<AddressResponse>  => {
     const address: Address | null = await addressRepository.findAddressByWorkerId(workerId);
 
@@ -163,7 +145,6 @@ export const singleWorker = async (workerId:string) :Promise<AddressResponse>  =
     return {
         message: "Address retrieved successfully",
         address: {
-           
             userId: address.userId.toString(), 
             address: address.address,
             area: address.area,
@@ -174,12 +155,3 @@ export const singleWorker = async (workerId:string) :Promise<AddressResponse>  =
     }
 }
 
-// export const fetchTodaysBookings = async (workerId:string) : Promise<Booking[]|[]> => {
-//     if (!workerId) {
-//         throw new Error('Worker ID is required');
-//       }
-    
-//       const bookings = await bookingRepository.getTodaysBookingsByWorker(workerId);
-    
-//       return bookings||[];
-// }

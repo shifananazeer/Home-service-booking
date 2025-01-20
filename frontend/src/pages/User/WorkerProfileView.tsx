@@ -38,6 +38,7 @@ const WorkerProfilePage: React.FC = () => {
   const [chatId, setChatId] = useState<string | null>(null);
   const userId = localStorage.getItem('user_Id');
   const [messages, setMessages] = useState([]);
+  const [isCallModalOpen, setIsCallModalOpen] = useState(false);
 
   useEffect(() => {
     const loadWorkerProfile = async () => {
@@ -86,6 +87,17 @@ const WorkerProfilePage: React.FC = () => {
     setModalOpen(false); // Close the chat modal
   };
 
+
+  const toggleModal = () => {
+    setIsCallModalOpen(!isCallModalOpen);
+  };
+  const handleVideoCall = ( id:string) => {
+    navigate(`/videocall/${id}`); 
+  };
+  const handleAudioCall =(id:string) => {
+    navigate(`/audioCall/${id}`)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gray-900">
@@ -104,7 +116,6 @@ const WorkerProfilePage: React.FC = () => {
 
   return (
     <div className="min-h-screen relative bg-gray-900">
-      {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -196,7 +207,7 @@ const WorkerProfilePage: React.FC = () => {
               {/* Contact Buttons */}
               <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <button 
-                  onClick={() => window.location.href = `tel:${worker.phoneNumber}`}
+                    onClick={toggleModal}
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
                   <Phone className="mr-2 w-5 h-5" /> Call Now
@@ -210,15 +221,43 @@ const WorkerProfilePage: React.FC = () => {
                  <ChatModal
                   isOpen={isModalOpen}
                   onClose={handleCloseChat}
-                  chatId={chatId || ''} // Pass the chat ID
-                  userId={userId || ''} // Pass the user ID
-                  workerId={worker._id} // Pass the worker ID
+                  chatId={chatId || ''} 
+                  userId={userId || ''} 
+                  workerId={worker._id} 
                   messages={messages} workerName={''}                  />
                  </div>
               </div>
             </div>
           </div>
         </div>
+          {/* Modal */}
+       {isCallModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">Choose Call Type</h3>
+            <div className="flex flex-col space-y-4">
+              <button
+                   onClick={()=>handleVideoCall(worker._id||"")}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition-all"
+              >
+                Video Call
+              </button>
+              <button
+                 onClick={()=>handleAudioCall(worker._id||"")}
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition-all"
+              >
+                Audio Call
+              </button>
+            </div>
+            <button
+              onClick={toggleModal}
+              className="mt-4 text-gray-500 hover:text-gray-700 text-sm underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       </div>
    
   );

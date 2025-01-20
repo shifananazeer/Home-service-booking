@@ -172,7 +172,7 @@ const AudioCall = () => {
         <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 space-y-6 relative">
           {/* Close Button */}
           <button
-            onClick={cancel} // Replace with your cancel handler
+            onClick={cancel} 
             className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-red-700 transform hover:scale-105 transition-all duration-200 ease-in-out"
           >
             Cancel
@@ -185,7 +185,7 @@ const AudioCall = () => {
 
           {/* Dialing Info */}
           <div className="flex flex-col items-center space-y-4">
-            {/* Placeholder for recipient's avatar */}
+        
             <div className="w-24 h-24 bg-gray-200 rounded-full flex justify-center items-center overflow-hidden shadow-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +215,7 @@ const AudioCall = () => {
           {/* Call Controls */}
           <div className="flex justify-center items-center space-x-8">
             <button
-              onClick={cancel} // Replace with your cancel call handler
+              onClick={cancel} 
               className="bg-red-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-red-600 hover:scale-105 transition-all"
             >
               Cancel

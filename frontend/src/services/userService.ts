@@ -141,7 +141,7 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
   
 
   export const fetchWorkersByService = async (serviceName: string) => {
-    const token = localStorage.getItem('accessToken'); // Use the token for authorization
+    const token = localStorage.getItem('accessToken'); 
     try {
       const response = await axiosInstance.get(`/auth/workers?skill=${encodeURIComponent(serviceName)}`, {
         headers: {
@@ -150,7 +150,6 @@ export const fetchAddress = async (userId: string): Promise<Address> => {
       });
       console.log("fetched workers" , response.data.workers)
       return response.data.workers; 
-      // Adjust based on your API response structure
     } catch (error) {
       throw new Error('Failed to fetch workers');
     }
@@ -200,11 +199,11 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
 
     },
       headers: {
-        Authorization: `Bearer ${token}`, // Send the token in headers
+        Authorization: `Bearer ${token}`, 
       },
     });
     console.log("ppp", response)
-    return response.data; // Ensure only the data is returned
+    return response.data; 
   };
 
   export const fetchWorkerById = async (workerId:string) => {
@@ -214,7 +213,7 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
     }
     const response = await axiosInstance.get(`/auth/worker/${workerId}`,{
         headers: {
-            Authorization: `Bearer ${token}`, // Send the token in headers
+            Authorization: `Bearer ${token}`, 
           },
     })
     return response.data;
@@ -231,7 +230,6 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
   }
 
   export const fetchServices = async (page = 1, limit = 5, search = '') => {
-  
     try {
       const response = await axiosInstance.get('/auth/services', {
         params: {
@@ -241,8 +239,6 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
         },
        
       });
-  
-      // Return both services and totalServices
       const { services, totalServices } = response.data;
       return { services, totalServices };
     } catch (error:any) {
@@ -268,9 +264,13 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
 
 
 export const resetPasswordFromPassword = async ( newPassword: string): Promise<string> => {
-  const userId = localStorage.getItem('user_Id')
+  const token = localStorage.getItem('accessToken');
   try {
-      const response = await axiosInstance.post('/auth/user/reset-password', { newPassword });
+      const response = await axiosInstance.post('/auth/user/reset-password', { newPassword } ,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data.message;
   } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to reset password.');
@@ -325,15 +325,14 @@ export const updateBookingStatus = async (bookingId: string, status: string) => 
         },
       }
     );
-    return res.data; // return the response data if needed
+    return res.data; 
   } catch (error:any) {
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized access (e.g., show a message, redirect to login, etc.)
       console.error('Unauthorized access', error);
     } else {
       console.error('Error updating payment status', error);
     }
-    throw error; // Re-throw the error for further handling if needed
+    throw error;
   }
 };
 
@@ -417,23 +416,28 @@ export const sendReaction = async (messageId: string, reactionData: Reaction) =>
   try {
       const response = await axiosInstance.post(
           `/auth/reaction/${messageId}`,
-          { emoji: reactionData.emoji }, // Send the emoji as part of an object
+          { emoji: reactionData.emoji }, 
           {
               headers: {
                   'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json' // Optional: Specify content type
+                  'Content-Type': 'application/json' 
               }
           }
       );
       return response.data;
   } catch (error) {
-      console.error("Error sending reaction:", error); // Log the error for debugging
-      throw error; // Optional: Re-throw the error to handle it further up the chain if needed
+      console.error("Error sending reaction:", error); 
+      throw error;
   }
 }
 
 export const fetchChats = async (userId:string) => {
-  const response = await axiosInstance.get(`/auth/chat/${userId}`)
+  const token = localStorage.getItem('accessToken');
+  const response = await axiosInstance.get(`/auth/chat/${userId}`,{
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    }
+  })
   console.log("responsechat" , response)
   return response.data;
 }

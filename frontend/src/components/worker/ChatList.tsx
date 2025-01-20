@@ -285,10 +285,9 @@ const ChatList: React.FC = () => {
   <button 
     onClick={toggleModal}
     className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded-lg flex items-center justify-center transition-transform duration-300 transform hover:scale-105"
-    style={{ fontSize: '0.9rem' }} // Reduce font size slightly
+    style={{ fontSize: '0.9rem' }}
   >
-    <Phone className="text-white mr-1" size={16} /> {/* Decreased icon size */}
-    Call
+    <Phone className="text-white mr-1" size={16} /> 
   </button>
   </div>
             </div>

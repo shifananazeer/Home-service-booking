@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 export const refreshAccessToken = async (refreshToken: string , type : string): Promise<string> => {
     try {
-      // Verify the refresh token
+    
       const decoded = jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET as string

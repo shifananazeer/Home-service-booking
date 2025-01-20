@@ -2,9 +2,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 
 interface UserPayload {
-    sub: string; // User ID
+    sub: string;
     email: string;
-    role: string; // User role (e.g., 'admin', 'user')
+    role: string; 
 }
 
 export const verifyToken = (token: string): UserPayload => {

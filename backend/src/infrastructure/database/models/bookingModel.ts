@@ -22,11 +22,6 @@ const BookingSchema = new Schema<BookingDocument>({
 workerName:{type:String} ,
 serviceImage:{type:String},
 serviceName:{type:String},
-// paymentStatus: {type: String,
-//     enum: ['Pending', 'Completed','Confirmed', 'Cancelled'], 
-//     required: true,
-// },
-
 paymentStatus: {
   type: String,
   enum: ['pending', 'advance_paid', 'balance_paid' , 'cancelled'],

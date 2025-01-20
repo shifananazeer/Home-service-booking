@@ -36,7 +36,7 @@ export class ChatRepositoryImpl implements chatRepository {
         },
         {
           $lookup: {
-            from: 'users', // Assuming your user collection is named 'users'
+            from: 'users', 
             localField: 'participants.participantId',
             foreignField: '_id',
             as: 'userInfo',
@@ -45,7 +45,7 @@ export class ChatRepositoryImpl implements chatRepository {
         {
           $project: {
             _id: 1,
-            participants: 1, // Retain the entire participants array
+            participants: 1, 
             createdAt: 1,
             updatedAt: 1,
             userInfo: {
@@ -54,7 +54,7 @@ export class ChatRepositoryImpl implements chatRepository {
                 {
                   $cond: [
                     { $eq: ['$participants.role', 'user'] },
-                    0, // Pick the user participant info
+                    0, 
                     -1,
                   ],
                 },
@@ -79,7 +79,7 @@ export class ChatRepositoryImpl implements chatRepository {
       },
       {
         $lookup: {
-          from: 'workers', // Assuming your user collection is named 'users'
+          from: 'workers', 
           localField: 'participants.participantId',
           foreignField: '_id',
           as: 'workerInfo',
@@ -88,7 +88,7 @@ export class ChatRepositoryImpl implements chatRepository {
       {
         $project: {
           _id: 1,
-          participants: 1, // Retain the entire participants array
+          participants: 1, 
           createdAt: 1,
           updatedAt: 1,
           userInfo: {
@@ -97,7 +97,7 @@ export class ChatRepositoryImpl implements chatRepository {
               {
                 $cond: [
                   { $eq: ['$participants.role', 'worker'] },
-                  0, // Pick the user participant info
+                  0, 
                   -1,
                 ],
               },
@@ -110,6 +110,7 @@ export class ChatRepositoryImpl implements chatRepository {
     console.log('Chats with worker info:', chats);
     return chats;
 }
+
   async chatByWorkerId(workerId: string) {
     return await ChatModel.find({ 
         participants: { $elemMatch: { participantId: workerId } } 

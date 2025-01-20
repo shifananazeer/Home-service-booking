@@ -533,7 +533,7 @@ class UserController  {
                                 try {
                                     mediaUrl = await uploadChatImage(req.file);
                                 } catch (error) {
-                                     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error uploading image.", error });
+                                     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERROR_UPLOAD, error });
                                 }
                             }
             try{
@@ -551,7 +551,7 @@ class UserController  {
                 const messages = await chatService.getMessages(chatId);
                 res.status(HttpStatus.OK).json(messages);
             }catch (error) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error fetching messages", error });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERRROR_FETCHING_MESSAGES, error });
             }
         }
 
@@ -561,7 +561,7 @@ class UserController  {
                 const chat = await chatService.createOrFetchChat(userId, workerId);
                 res.status(HttpStatus.OK).json(chat);
               } catch (error) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Error creating or fetching chat", error });
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message:Messages.ERRROR_FETCHING_MESSAGES, error });
               }
         }
 
@@ -574,16 +574,16 @@ class UserController  {
                         const userModel= 'user';
         
                         if (!messageId || !emoji) {
-                            res.status(400).json({ error: "Message ID and emoji are required." });
+                            res.status(HttpStatus.BAD_REQUEST).json({ error: "Message ID and emoji are required." });
                             return;
                           }
                           try {
                             console.log("Adding reaction:", { messageId, emoji });
                             const reaction = await chatService.updateReaction(messageId, emoji, userModel);
-                            res.status(200).json(reaction);
+                            res.status(HttpStatus.OK).json(reaction);
                         } catch (error: any) {
-                            console.error("Error adding reaction:", error); // Log the full error
-                            res.status(500).json({ error: error.message });
+                            console.error("Error adding reaction:", error); 
+                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages: Messages.ERROR_IN_ADDING_REACTION , error});
                         }
                        }
                            async getMessages (req:Request , res:Response) {
@@ -595,13 +595,13 @@ class UserController  {
                                console.log('Chats for workerId:', userId, '->', chats);
                                            
                                if (chats.length === 0) {
-                                res.status(404).json({ message: 'No chats found for this worker.' });
+                                res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NOT_FOUNT  });
                                        }
                              console.log("chats........." , chats)
-                              res.status(200).json(chats);
+                              res.status(HttpStatus.OK).json(chats);
                                } catch (error: any) {
                                console.error('Error fetching chats:', error); // Log error for debugging
-                               res.status(500).json({ message: 'Error fetching chats', error: error.message });
+                               res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.NOT_FOUNT, error: error.message });
                                }
                                }
                              async getUnreadNotification (req:Request , res:Response) {
@@ -610,9 +610,9 @@ class UserController  {
                                        try{
                                          const unreadMessage = await chatService.getUnreadMessageUser(userId);
                                         console.log("unread" , unreadMessage)
-                                     res.status(200).json(unreadMessage);
+                                     res.status(HttpStatus.OK).json(unreadMessage);
                                  }catch(error) {
-                                           
+                                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.ERRROR_FETCHING_MESSAGES, error });         
                                 }
                            }
 
@@ -626,25 +626,25 @@ class UserController  {
                         console.log('Worker Names:', Array.from(workerNames));
                     
                       const workerIds = await workerService.getWorkerIds(workerNames)
-                      res.status(200).json({ workerIds }); 
+                      res.status(HttpStatus.OK).json({ workerIds }); 
                     }else{
-                        res.status(404).json({ message: 'No bookings found for this user.' });
+                        res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NOT_FOUNT  });
                     }
                 }catch (error:any) {
                     console.error('Error getting workers by user ID:', error);
-                    res.status(500).json({ message: 'Failed to get workers', error: error.message });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.FAILED_TO_GET_WORKERS, error: error.message });
                 }
 
-}
-    async getBalanceAmount (req:Request , res:Response) {
-        const {bookingId} = req.params;
-        console.log("bookingId" , bookingId)
-        try{
-          const  balance = await bookingService.getBalance(bookingId)
-          console.log("balance" , balance)
-          res.status(HttpStatus.OK).json(balance)
-        }catch(error) {
-
+             }
+          async getBalanceAmount (req:Request , res:Response) {
+            const {bookingId} = req.params;
+             console.log("bookingId" , bookingId)
+             try{
+              const  balance = await bookingService.getBalance(bookingId)
+              console.log("balance" , balance)
+              res.status(HttpStatus.OK).json(balance)
+           }catch(error) {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages:Messages.INTERNAL_SERVER_ERROR , error})
         }
     }
 
@@ -655,7 +655,7 @@ class UserController  {
        const notifications = await notificationService.fetchNotifications(userId)
        res.status(HttpStatus.OK).json({notifications})
       }catch (error) {
-
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages:Messages.INTERNAL_SERVER_ERROR , error})
       }
     }
     async fetchBookingsDetails (req:Request , res:Response){
@@ -665,7 +665,7 @@ class UserController  {
           const bookings = await bookingService.getBookings(bookingId)
           res.status(HttpStatus.OK).json({bookings})
         }catch (error) {
-
+         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages:Messages.INTERNAL_SERVER_ERROR , error})
         }
     }
 }

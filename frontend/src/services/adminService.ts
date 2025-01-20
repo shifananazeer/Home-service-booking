@@ -221,9 +221,9 @@ export const updateService = async (serviceId: string, formData:FormData) => {
                 'Authorization': `Bearer ${token}`, 
             },
         });
-        return response.data; // Ensure you're returning the full response data
+        return response.data; 
     } catch (error) {
         console.error('Error fetching bookings:', error);
-        throw error; // Rethrow to handle it in the component
+        throw error; 
     }
 };

@@ -14,6 +14,6 @@ export interface Message {
 }
 
 export interface Reaction {
-  userModel: "user" | "worker"; // Type of the user who reacted
-  emoji: string; // Emoji used for the reaction
+  userModel: "user" | "worker";
+  emoji: string; 
 }

@@ -572,13 +572,13 @@ class WorkerController   {
                             console.log('Chats for workerId:', workerId, '->', chats);
                     
                             if (chats.length === 0) {
-                                 res.status(404).json({ message: 'No chats found for this worker.' });
+                                 res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NOT_FOUNT });
                             }
                     
                             res.status(200).json(chats);
                         } catch (error: any) {
                             console.error('Error fetching chats:', error); // Log error for debugging
-                            res.status(500).json({ message: 'Error fetching chats', error: error.message });
+                            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error: error.message });
                         }
                     }
                async addReaction (req:Request , res:Response) {
@@ -590,7 +590,7 @@ class WorkerController   {
                 const userModel= 'worker';
 
                 if (!messageId || !emoji) {
-                    res.status(400).json({ error: "Message ID and emoji are required." });
+                    res.status(HttpStatus.BAD_REQUEST).json({ error: Messages.REQUIRED });
                     return;
                   }
                   try {
@@ -599,7 +599,7 @@ class WorkerController   {
                     res.status(200).json(reaction);
                 } catch (error: any) {
                     console.error("Error adding reaction:", error); // Log the full error
-                    res.status(500).json({ error: error.message });
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: error.message });
                 }
                }
                async getUnreadNotification (req:Request , res:Response) {
@@ -608,9 +608,9 @@ class WorkerController   {
                 try{
                   const unreadMessage = await chatService.getUnreadMessage(workerId);
                   console.log("unread" , unreadMessage)
-                  res.status(200).json(unreadMessage);
+                  res.status(HttpStatus.OK).json(unreadMessage);
                 }catch(error) {
-
+                  res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({messages:Messages.INTERNAL_SERVER_ERROR , error})
                 }
                }
 
@@ -633,7 +633,7 @@ class WorkerController   {
                     res.status(HttpStatus.OK).json({ message: "Work status updated and notification sent." });
                 }catch(error:any) {
                     console.error('Error marking booking as completed:', error);
-                     res.status(500).json({ message: 'Failed to mark booking as completed', error: error.message });
+                     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.FAILED_TO_CHANGE_STATUS, error: error.message });
                      return
                 }
                }

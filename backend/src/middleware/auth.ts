@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 export interface UserPayload {
     email: string;
-    role: string; // Role can be 'user', 'admin', etc.
+    role: string; 
     _id: string; 
 }
 const verifyToken = (token: string): UserPayload | null => {
@@ -35,7 +35,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
     next();
 };
 
-// Middleware for authenticating workers
+
 export const authenticateWorker = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;

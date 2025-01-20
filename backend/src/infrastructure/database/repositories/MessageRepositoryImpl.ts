@@ -8,10 +8,10 @@ export class MessageRepositoryImpl implements messageRepository {
     async createMessage(chatId: string, senderId: string, senderModel: "user" | "worker", text: string , mediaUrl?:string): Promise<Message> {
       try {
         const message = new MessageModel({ chatId, senderId: senderId, senderModel, text , mediaUrl });
-        return await message.save(); // Ensure save is awaited
+        return await message.save();
     } catch (error) {
         console.error("Error creating message:", error);
-        throw new Error("Failed to create message."); // Throw an error to be caught in the controller
+        throw new Error("Failed to create message."); 
     }
     }
   
@@ -23,17 +23,15 @@ export class MessageRepositoryImpl implements messageRepository {
       if (!message) {
           throw new Error("Message not found.");
       }
-  
       if (!message.reactions) {
           message.reactions = [];
       }
-  
-      // Push the reaction to the reactions array
       message.reactions.push(reaction);
       await message.save();
   
       return reaction;
 }
+
 async countUnreadMessages(chatIds: string[]) {
   const objectIds = chatIds.map(id => new mongoose.Types.ObjectId(id)); 
   return await MessageModel.aggregate([
@@ -41,7 +39,7 @@ async countUnreadMessages(chatIds: string[]) {
           $match: { 
               isSeen: false,
               senderModel: "user",
-              chatId: { $in: objectIds }  // Ensure chatIds is not empty
+              chatId: { $in: objectIds }  
           } 
       },
       { 
@@ -52,6 +50,7 @@ async countUnreadMessages(chatIds: string[]) {
       }
   ]);
 }
+
 async countUnreadMessagesforUser(chatIds: string[]) {
     const objectIds = chatIds.map(id => new mongoose.Types.ObjectId(id)); 
     return await MessageModel.aggregate([
@@ -59,7 +58,7 @@ async countUnreadMessagesforUser(chatIds: string[]) {
             $match: { 
                 isSeen: false,
                 senderModel: "worker",
-                chatId: { $in: objectIds }  // Ensure chatIds is not empty
+                chatId: { $in: objectIds }  
             } 
         },
         { 

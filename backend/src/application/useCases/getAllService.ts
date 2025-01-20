@@ -1,4 +1,4 @@
-// useCases/service/getAllServices.ts
+
 
 import { Service } from "../../domain/entities/Service";
 import { ServiceRepositoryImpl } from "../../infrastructure/database/repositories/ServiceRepositoryIml";

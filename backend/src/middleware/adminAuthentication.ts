@@ -1,14 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// Define the UserPayload interface
 export interface UserPayload {
     email: string;
-    role: string; // Should include 'admin' for admin access
+    role: string; 
     _id: string; 
 }
 
-// Extend the Express Request interface directly in this file
+
 declare global {
     namespace Express {
         interface Request {
@@ -17,7 +16,7 @@ declare global {
     }
 }
 
-// Middleware to authenticate admin users
+
 export const authenticateAdmin = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers['authorization'];
     console.log('Authorization Header:', authHeader); 
@@ -39,17 +38,17 @@ export const authenticateAdmin = (req: Request, res: Response, next: NextFunctio
 
         const userPayload = decoded as UserPayload;
 
-        // Check if the user has the admin role
+   
         if (userPayload.role !== 'admin') {
             console.error('Access denied: User is not an admin'); 
             res.status(403).json({ error: 'Access denied: Admins only' });
             return; 
         }
 
-        req.user = userPayload; // Attach the user payload to the request object
+        req.user = userPayload; 
         console.log('Authenticated Admin:', req.user);
         next();
     });
 };
 
-// Middleware to authorize user roles
+
