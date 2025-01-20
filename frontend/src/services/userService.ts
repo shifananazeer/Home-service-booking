@@ -279,7 +279,7 @@ export const resetPasswordFromPassword = async ( newPassword: string): Promise<s
     
 
 
-export const createCheckoutSession = async (data:{amount:number;bookingId: string;} ) => {
+export const createCheckoutSession = async (data:{amount:number;bookingId: string; paymentType:string , successUrl:string} ) => {
   const token = localStorage.getItem('accessToken');
   try{
     const response = await axiosInstance.post('/auth/create-checkout-session',data, {
@@ -482,4 +482,19 @@ export const fetchUnreadMessags = async (userId:string) => {
     }
   }
 
+
+  export const getAllNotificationByUserId = async(userId:string) => {
+    const token = localStorage.getItem('accessToken');
+    try{
+         const response = await axiosInstance.get(`/auth/get-notifications/${userId}` ,{
+          headers:{
+            'Authorization': `Bearer ${token}`,
+          }
+         })
+         console.log("notification" , response)
+         return response.data
+    }catch (error) {
+
+    }
+  }
  

@@ -18,7 +18,7 @@ export class PaymentService {
         }
     }
 
-    async createCheckoutSession(amount:number , bookingId:string): Promise<Stripe.Checkout.Session> {
+    async createCheckoutSession(amount:number , bookingId:string , paymentType:string , successUrl:string): Promise<Stripe.Checkout.Session> {
        
         try {
             const session = await stripe.checkout.sessions.create({
@@ -34,7 +34,7 @@ export class PaymentService {
                     quantity: 1, // Adjust quantity if necessary
                 }],
                 mode: 'payment',
-               success_url:  `http://localhost:5173/booking-success?bookingId=${bookingId}`, // Update with your success URL
+               success_url:  successUrl, // Update with your success URL
                 cancel_url: 'http://localhost:5173/cancel', // Update with your cancel URL
             });
             return session;

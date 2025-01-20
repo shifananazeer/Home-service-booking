@@ -69,16 +69,16 @@ export default function WorkerTodayBookings() {
     };
   }, [bookings, workerId]);
 
-  const markAsCompleted = async (bookingId: string, userId: string) => {
+  const markAsCompleted = async (id: string, userId: string , bookingId:string) => {
     try {
-      const response = await markBookingAsCompleted(bookingId);
+      const response = await markBookingAsCompleted(id);
       console.log("Response from markBookingAsCompleted:", response); // Log the response
   
       // Check if the response indicates success
       if (response && response.message === 'Work status updated and notification sent.') {
         setBookings((prevBookings) =>
           prevBookings.map((booking) =>
-            booking._id === bookingId
+            booking._id === id
               ? { ...booking, workStatus: 'completed' }
               : booking
           )
@@ -169,7 +169,7 @@ export default function WorkerTodayBookings() {
               </p>
               {booking.workStatus !== 'completed' ? (
                 <button
-                  onClick={() => markAsCompleted(booking._id, booking.userId)}
+                  onClick={() => markAsCompleted(booking._id, booking.userId , booking.bookingId)}
                   className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition"
                 >
                   Mark as Completed

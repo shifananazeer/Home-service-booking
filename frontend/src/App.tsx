@@ -40,6 +40,7 @@ import VideoCall from "./pages/User/Vedio";
 import AudioCall from "./pages/User/AudioCall";
 import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
 import { NotificationProviderUser } from "./NotificationContextForUser";
+import BalancePaymentSuccessPage from "./pages/User/balancePaymentSuccessPage";
 
 
 
@@ -72,6 +73,7 @@ const App = () => {
     <Route path="/user/edit-profile" element={<EditUserProfile />} />
     <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
     <Route path='/booking-success' element={<BookingSuccessPage/>}/>
+    <Route path="/balancePayment-success" element={<BalancePaymentSuccessPage/>}/>
     <Route path='/cancel' element={<CancelPage/>}/>
     <Route path='/view-worker/profile'element={<WorkerProfilePage/>}/>
     <Route path="/user/messages" element={<MessageList/>}/>

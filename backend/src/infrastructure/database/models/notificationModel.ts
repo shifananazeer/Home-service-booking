@@ -9,6 +9,7 @@ const NotificationSchema = new Schema <NotificationDocument>({
     required: true,
     enum: ["user", "worker"], // Allows dynamic referencing for User or Worker
   },
+  bookingId:{ type: String, required: true},
   message: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
   isRead: { type: Boolean, default: false },

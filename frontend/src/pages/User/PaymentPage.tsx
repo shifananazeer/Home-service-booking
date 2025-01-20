@@ -90,10 +90,13 @@ console.log("balance" , balanceAmount)
                 Swal.fire('Success', 'Booking created successfully!', 'success');
               console.log("bookingId" , response.data.bookingId)
                 // Create a checkout session with Stripe
-                const checkoutResponse = await createCheckoutSession({ 
-                    amount: advancePayment * 100,
-                    bookingId: response.data.bookingId // Assuming the response contains the booking ID
+                const checkoutResponse = await createCheckoutSession({
+                    amount: advancePayment * 100, // Advance payment in cents
+                    bookingId: response.data.bookingId, // Assuming the response contains the booking ID
+                    paymentType: 'advance', // Add the payment type as "advance"
+                    successUrl: `http://localhost:5173/booking-success?bookingId=${response.data.bookingId}`, // Dynamic success URL
                 });
+                
                 if (checkoutResponse.url) {
                     // Redirect to the Stripe checkout page
                     window.location.href = checkoutResponse.url;

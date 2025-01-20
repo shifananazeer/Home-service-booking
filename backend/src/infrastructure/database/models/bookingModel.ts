@@ -29,7 +29,7 @@ serviceName:{type:String},
 
 paymentStatus: {
   type: String,
-  enum: ['pending', 'advance_paid', 'balance_due', 'paid' , 'cancelled'],
+  enum: ['pending', 'advance_paid', 'balance_paid' , 'cancelled'],
   default: 'pending',
 },
 workStatus: {

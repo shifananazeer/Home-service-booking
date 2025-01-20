@@ -625,8 +625,8 @@ class WorkerController   {
                     const notificationData={
                         userId: typeof updateStatus?.userId === "string" ? updateStatus.userId : updateStatus?.userId.toString(),
                         userType: 'user' as 'user' | 'worker',
-                       message:'The worker marked your task as completed.'
-                    
+                       message:'The worker marked your task as completed.',
+                       bookingId
 
                     }
                     const notification = await notificationService.saveNotification(notificationData)

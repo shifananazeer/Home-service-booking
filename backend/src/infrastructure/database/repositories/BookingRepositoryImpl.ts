@@ -122,7 +122,7 @@ export class BookingRepositoryImpl implements BookingRepository {
         }
     }
     async findBalanceAmount (bookingId:string) :Promise < number| null> {
-        const booking = await BookingModel.findById(  bookingId );
+        const booking = await BookingModel.findOne({ bookingId : bookingId});
         if (!booking) {
             console.error(`Booking with ID ${bookingId} not found.`);
             return null;

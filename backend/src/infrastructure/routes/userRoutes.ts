@@ -42,4 +42,5 @@ router.get('/chat/:userId' , userController.getMessages)
 router.get("/unread-messages/:userId" ,authenticateUser , userController.getUnreadNotification)
 router.get('/get-workers/:userId'  ,authenticateUser, userController.getWorkersByUserId)
 router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBalanceAmount)
+router.get('/get-notifications/:userId' , authenticateUser , userController.getNotifications)
 export default router;

@@ -463,10 +463,10 @@ class UserController  {
         }
     
         async createCheckoutSession(req: Request, res: Response) {
-            const { amount , bookingId } = req.body; // Get amount from request body
+            const { amount , bookingId , paymentType  , successUrl } = req.body; // Get amount from request body
     
             try {
-                const session = await paymentService.createCheckoutSession(amount , bookingId);
+                const session = await paymentService.createCheckoutSession(amount , bookingId , paymentType , successUrl);
                 res.status(HttpStatus.OK).json({ url: session.url });
             } catch (error: any) {
                 console.error('Error creating checkout session:', error);
@@ -643,6 +643,16 @@ class UserController  {
         }catch(error) {
 
         }
+    }
+
+    async getNotifications (req:Request , res:Response){
+      const { userId } = req.params;
+      console.log("userId for notification" , userId)
+      try{
+       
+      }catch (error) {
+
+      }
     }
 }
 

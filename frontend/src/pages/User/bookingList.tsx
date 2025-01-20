@@ -14,7 +14,7 @@ interface Booking {
   slotId: string;
   serviceImage: string;
   workDescription: string;
-  paymentStatus: 'pending'| 'advance_paid'|  'paid'|'cancelled';
+  paymentStatus: 'pending'| 'advance_paid'|  'balance_paid'|'cancelled';
   advancePayment?: number;
   totalPayment?:number;
   balancePayment?:number;
@@ -36,10 +36,12 @@ const BookingList: React.FC = () => {
 
   const handleRetryPayment = async(amount:number , bookingId:string) => {
     console.log("amount",amount)
-    const checkoutResponse = await createCheckoutSession({ 
-                        amount: amount * 100,
-                         bookingId                   
-  })
+    const checkoutResponse = await createCheckoutSession({
+      amount: amount * 100,
+      bookingId,
+      paymentType: 'advance',
+      successUrl: `http://localhost:5173/booking-success?bookingId=${bookingId}`
+    })
   if (checkoutResponse.url) {
                       // Redirect to the Stripe checkout page
                       window.location.href = checkoutResponse.url;
@@ -181,6 +183,7 @@ const BookingList: React.FC = () => {
                       <Briefcase className="w-4 h-4 mr-2" /> {booking.workDescription}
                     </p>
                     <p>advance{booking.advancePayment}</p>
+                    <p>balance{booking.balancePayment}</p>
                   </div>
 
                   {/* Right Section: Status and Actions */}
@@ -191,7 +194,7 @@ const BookingList: React.FC = () => {
                  ? "bg-green-200 text-green-800"
                  : booking.paymentStatus === "pending"
                  ? "bg-yellow-200 text-yellow-800"
-                   : booking.paymentStatus === "paid"
+                   : booking.paymentStatus === "balance_paid"
                  ? "bg-blue-200 text-blue-800"
                    : "bg-red-200 text-red-800"
                  }`}
@@ -223,12 +226,12 @@ const BookingList: React.FC = () => {
     </button>
   )}
 
-  {booking.paymentStatus !== "cancelled" && booking.paymentStatus !== "paid" && (
+  {booking.paymentStatus !== "cancelled" && booking.paymentStatus !== "balance_paid" && (
     <button
       onClick={() => handleCancelBooking(booking._id)}
       className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 flex items-center"
     >
-      <X className="w-4 h-4 mr-2" /> Cancel Booking
+      <X className="w-4 h-4 mr-2" /> Cancel 
     </button>
   )}
 </div>

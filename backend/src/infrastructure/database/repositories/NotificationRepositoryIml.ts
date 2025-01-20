@@ -4,13 +4,14 @@ import NotificationModel from "../models/notificationModel";
 
 export class NotificationRepositoryImpl implements NotificationRepository {
   async saveNotification(notificationData: Notification): Promise<void> {
-    const { userId, userType, message } = notificationData;
+    const { userId, userType, message , bookingId } = notificationData;
 
     try {
       await NotificationModel.create({
         userId,
         userType,
         message,
+        bookingId,
         isRead: false,
         timestamp: new Date(),
       });
