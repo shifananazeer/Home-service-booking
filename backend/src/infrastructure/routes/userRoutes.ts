@@ -43,4 +43,5 @@ router.get("/unread-messages/:userId" ,authenticateUser , userController.getUnre
 router.get('/get-workers/:userId'  ,authenticateUser, userController.getWorkersByUserId)
 router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBalanceAmount)
 router.get('/get-notifications/:userId' , authenticateUser , userController.getNotifications)
+router.get('/bookings/:bookingId' , authenticateUser , userController.fetchBookingsDetails)
 export default router;

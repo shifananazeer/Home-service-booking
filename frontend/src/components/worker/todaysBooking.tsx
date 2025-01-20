@@ -69,7 +69,7 @@ export default function WorkerTodayBookings() {
     };
   }, [bookings, workerId]);
 
-  const markAsCompleted = async (id: string, userId: string , bookingId:string) => {
+  const markAsCompleted = async (id: string, userId: string , bookingId:string , serviceName:string , workerName:string) => {
     try {
       const response = await markBookingAsCompleted(id);
       console.log("Response from markBookingAsCompleted:", response); // Log the response
@@ -87,7 +87,7 @@ export default function WorkerTodayBookings() {
         const roomId = `${workerId}-${userId}`; // Ensure roomId is correctly created
         socket.emit('send-notification', {
           roomId,
-          message: `Booking ${bookingId} has been marked as completed.`,
+          message: `Booking ${bookingId} for ${serviceName} has been marked as completed by ${workerName}.`,
           bookingId:bookingId
         });
         console.log("Notification emitted to room:", roomId); // Log the emitted notification
@@ -169,7 +169,7 @@ export default function WorkerTodayBookings() {
               </p>
               {booking.workStatus !== 'completed' ? (
                 <button
-                  onClick={() => markAsCompleted(booking._id, booking.userId , booking.bookingId)}
+                  onClick={() => markAsCompleted(booking._id, booking.userId , booking.bookingId , booking.serviceName , booking.workerName)}
                   className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition"
                 >
                   Mark as Completed

@@ -20,4 +20,8 @@ export class NotificationRepositoryImpl implements NotificationRepository {
       throw new Error("Database error while saving notification.");
     }
   }
+  async retriveNotificationNyuserId (userId:string) :Promise<Notification[]|[]>{
+    const response = await NotificationModel.find({userId:userId})
+    return response ;
+  }
 }

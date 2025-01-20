@@ -27,6 +27,7 @@ import Stripe from "stripe";
 import { PaymentService } from "../../application/useCases/paymentService";
 import { ChatService } from "../../application/useCases/chatService";
 import { uploadChatImage } from "../../utils/uploadChatImage";
+import { NotificationService } from "../../application/useCases/notificationService";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -37,6 +38,8 @@ const serviceManagement = new ServiceManagement();
 const workerService = new WorkerService()
 const paymentService = new PaymentService()
 const chatService = new ChatService()
+const notificationService = new NotificationService()
+
 class UserController  {
    async register (req: Request, res: Response) {
         console.log("body", req.body)
@@ -649,10 +652,21 @@ class UserController  {
       const { userId } = req.params;
       console.log("userId for notification" , userId)
       try{
-       
+       const notifications = await notificationService.fetchNotifications(userId)
+       res.status(HttpStatus.OK).json({notifications})
       }catch (error) {
 
       }
+    }
+    async fetchBookingsDetails (req:Request , res:Response){
+        const  {bookingId} = req.params;
+        console.log("bookingId for notificationPage" , bookingId)
+        try{
+          const bookings = await bookingService.getBookings(bookingId)
+          res.status(HttpStatus.OK).json({bookings})
+        }catch (error) {
+
+        }
     }
 }
 

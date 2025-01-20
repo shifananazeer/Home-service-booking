@@ -41,6 +41,7 @@ import AudioCall from "./pages/User/AudioCall";
 import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
 import { NotificationProviderUser } from "./NotificationContextForUser";
 import BalancePaymentSuccessPage from "./pages/User/balancePaymentSuccessPage";
+import NotificationPage from "./pages/User/NotificationPage";
 
 
 
@@ -79,7 +80,8 @@ const App = () => {
     <Route path="/user/messages" element={<MessageList/>}/>
     <Route path="/videoCall/:workerId" element={<VideoCallPage/>}/>
     <Route path='/audioCall/:workerId' element={<AudioCall/>}/>
-    
+    <Route path="/user/notifications" element={<NotificationPage/>}/>
+
     <Route path="/worker/dashboard" element={<NotificationProvider> <WorkerDashboard /></NotificationProvider>} />
     <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
     <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>

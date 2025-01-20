@@ -11,4 +11,8 @@ export class NotificationService {
     async saveNotification(notificationData: Notification): Promise<void> {
       await this.notificationRepository.saveNotification(notificationData);
     }
+    async fetchNotifications (userId:string) :Promise<Notification[]|[]> {
+     const result = await this.notificationRepository.retriveNotificationNyuserId(userId)
+     return result;
+    }
 }
