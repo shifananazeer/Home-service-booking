@@ -1,5 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { HowItWorks } from './About'
+import { motion } from 'framer-motion'
 
 const HomePage = () => {
   const navigate = useNavigate()
@@ -13,7 +15,7 @@ const HomePage = () => {
       <div 
         className="relative h-[900px] w-full bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("home-renovation-insurance.jpg")',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("home.webp")',
         }}
       >
        
@@ -39,6 +41,7 @@ const HomePage = () => {
 </div>
 
       </div>
+      <HowItWorks />
     </div>
   )
 }

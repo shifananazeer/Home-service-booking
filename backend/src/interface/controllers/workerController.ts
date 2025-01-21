@@ -323,7 +323,7 @@ class WorkerController   {
                         res.status(HttpStatus.OK).json({ message: Messages.NO_SLOTS });
                         return;
                     }
-            
+                     console.log("result" ,result)
                     res.status(HttpStatus.OK).json({
                         data: result.availabilities,
                         pagination: result.pagination,

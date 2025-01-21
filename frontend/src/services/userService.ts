@@ -230,6 +230,7 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
   }
 
   export const fetchServices = async (page = 1, limit = 5, search = '') => {
+    const token = localStorage.getItem('accessToken');
     try {
       const response = await axiosInstance.get('/auth/services', {
         params: {
@@ -237,8 +238,12 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
           limit,
           search,
         },
-       
-      });
+        headers: {
+          Authorization: `Bearer ${token}`,
+      },
+        
+      },
+      );
       const { services, totalServices } = response.data;
       return { services, totalServices };
     } catch (error:any) {

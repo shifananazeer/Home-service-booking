@@ -42,6 +42,7 @@ import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
 import { NotificationProviderUser } from "./NotificationContextForUser";
 import BalancePaymentSuccessPage from "./pages/User/balancePaymentSuccessPage";
 import NotificationPage from "./pages/User/NotificationPage";
+import { Footer } from "./components/footer";
 
 
 
@@ -60,10 +61,10 @@ const App = () => {
 
     <Routes>
       <Route path="/" element={<NotificationProviderUser><HomePage/></NotificationProviderUser>}/>
-      <Route path="/services" element={<ServicesPage/>}/>
-      <Route path="/book/:serviceId" element={<BookingPage />} />
+      <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
+      <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
       <Route path="/payment" element={<PaymentPage/>}/>
-      <Route path="/booking-list" element={<BookingList/>}/>
+      <Route path="/booking-list" element={<NotificationProviderUser><BookingList/></NotificationProviderUser>}/>
     <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
@@ -97,7 +98,8 @@ const App = () => {
     <Route path="/admin/login" element={<AdminLogin/>}/>
     <Route path="/admin/dashboard" element={<AdminDashboard />}/>     
   </Routes>
-  
+   {/* Conditional Footer */}
+   <ConditionalFooter />
    </Router>
   )
 }
@@ -129,4 +131,28 @@ const ConditionalNavbar = () => {
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return shouldHideNavbar ? null : <Navbar />;
+};
+
+
+const ConditionalFooter = () => {
+  const location = useLocation();
+
+  // Define the routes where the Footer SHOULD NOT appear
+  const hideFooterRoutes = [
+    '/worker/verify-otp',
+    '/register-worker',
+    "/worker/dashboard",
+    "/worker/login",
+    "/worker/reset-password",
+    "/worker/forgotPassword",
+    "/admin/dashboard",
+    "/admin/login",
+    '/worker/videocall',
+    '/worker/audioCall'
+  ];
+
+  // Check if the current path is in the list of routes to hide the Footer
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
+
+  return shouldHideFooter ? null : <Footer />;
 };

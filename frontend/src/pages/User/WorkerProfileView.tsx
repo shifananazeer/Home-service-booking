@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Phone, MessageCircle, Star, MapPin, Clock, DollarSign, Briefcase, Mail, Award, ThumbsUp, PenToolIcon as Tool } from 'lucide-react';
+import { Phone, MessageCircle, Star, MapPin, Clock, DollarSign, Briefcase, Mail, Award,IndianRupee, ThumbsUp, PenToolIcon as Tool } from 'lucide-react';
 import { fetchChat, fetchMessages, fetchWorkerProfile } from '../../services/userService';
 import ChatModal from '../../components/ChatModel';
 
@@ -162,8 +162,8 @@ const WorkerProfilePage: React.FC = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-gray-700 rounded-xl p-4 text-center">
-                  <DollarSign className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                  <p className="text-white font-bold">${worker.hourlyRate}/hour</p>
+                  <IndianRupee className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+                  <p className="text-white font-bold">₹{worker.hourlyRate}/hour</p>
                   <p className="text-gray-300 text-sm">Hourly Rate</p>
                 </div>
                 <div className="bg-gray-700 rounded-xl p-4 text-center">
@@ -224,7 +224,7 @@ const WorkerProfilePage: React.FC = () => {
                   chatId={chatId || ''} 
                   userId={userId || ''} 
                   workerId={worker._id} 
-                  messages={messages} workerName={''}                  />
+                  messages={messages} workerName={worker.name}                  />
                  </div>
               </div>
             </div>

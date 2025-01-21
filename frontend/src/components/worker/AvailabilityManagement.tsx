@@ -23,7 +23,7 @@ const AvailabilityManagement = () => {
   const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+const [totalPages, setTotalPages] = useState();
 const navigate = useNavigate()
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 

@@ -284,7 +284,7 @@ const BookingPage: React.FC = () => {
                         <div>
                           <h3 className="text-xl font-semibold mb-1 text-gray-100">{worker.name}</h3>
                           <p className="text-gray-400 text-sm">Distance: <span className='text-gray-200 font-bold'>{worker.distance?.toFixed(2)} km</span></p>
-                          <p className="text-gray-400 text-sm">Rate: <span className='text-gray-200 font-bold'>${worker.hourlyRate || "N/A"}/hr</span></p>
+                          <p className="text-gray-400 text-sm">Rate: <span className='text-gray-200 font-bold'>₹{worker.hourlyRate || "N/A"}/hr</span></p>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2">
@@ -292,7 +292,7 @@ const BookingPage: React.FC = () => {
                         
                           onClick={() => navigate(`/view-worker/profile?workerId=${worker._id}`)}
                           className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 text-sm"
-                        >id{worker._id}
+                        >
                           View Profile
                         </button>
                         {worker.status === "Unavailable" ? (

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Availability, AvailabilitySlot } from "../../../domain/entities/Availability";
 import { AvailabilityRepository } from "../../../domain/repositories/availabilityRepository";
 import AvailabilityModel from "../models/availabilityModel";
+import moment from "moment";
 
 export class AvailabilityRepositoryImpl implements AvailabilityRepository {
     async createAvailability(workerId: string, date: Date, slots: any[]): Promise<Availability> {
@@ -38,11 +39,23 @@ export class AvailabilityRepositoryImpl implements AvailabilityRepository {
     }
 
     async getAllAvailabilityByWorkerId(workerId: string, skip: number, limit: number): Promise<Availability[]> {
+      
+
+        // Fetch all availabilities from the database for the given worker
         const availabilities = await AvailabilityModel.find({ workerId: new mongoose.Types.ObjectId(workerId) })
-            .skip(skip)
-            .limit(limit)
-            .exec();
-        return availabilities.map(avail => avail.toObject());
+            .exec(); // Fetch all slots first
+    
+        // Get the current date
+        const now = moment();
+    
+        // Filter the availabilities to return only valid slots (e.g., not in the past)
+        const validAvailabilities = availabilities.filter(avail => moment(avail.date).isSameOrAfter(now, 'day'));
+    
+        // Slice the valid availabilities to apply pagination
+        const result = validAvailabilities.slice(skip, skip + limit);
+    
+        // Return the valid slots (up to the limit)
+        return result.map(avail => avail.toObject());
     }
 
     async updateSlot(slotId: string, updateData: Partial<AvailabilitySlot>): Promise<AvailabilitySlot> {
@@ -72,7 +85,15 @@ export class AvailabilityRepositoryImpl implements AvailabilityRepository {
     }
 
     async countAvailableSlots(workerId: string): Promise<number> {
-        return await AvailabilityModel.countDocuments({ workerId });
+        const now = moment();
+
+        // Count valid slots based on the workerId
+        const count = await AvailabilityModel.countDocuments({
+            workerId,
+            date: { $gte: now.toDate() } // Assuming `date` is the field representing the availability date
+        });
+    
+        return count;
     }
 
     async deleteSlot(slotId: string): Promise<boolean | null> {
