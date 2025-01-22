@@ -10,7 +10,7 @@ export class AdminService {
         this.userRepository = new UserRepositoryImpl();
     }
 
-    public async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; adminId: string }> {
+    public async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; adminId: string , adminEmail:string , adminRole:string }> {
         // Find the admin user by email
         const admin = await this.userRepository.findByEmail(email);
 
@@ -50,6 +50,8 @@ export class AdminService {
             accessToken,
             refreshToken,
             adminId: admin._id.toString(),
+            adminEmail:admin.email,
+            adminRole:admin.role
         };
     }
 }

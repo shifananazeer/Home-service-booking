@@ -7,16 +7,8 @@ export const adminLogin = async (credentials: { email: string; password: string 
     try {
         const response = await axiosInstance.post('/admin/login', credentials); 
         console.log("response",response)
-        const refresToken = response.data.refreshToken; 
-        const accessToken = response.data.accessToken
-        const adminId = response.data.adminId
-        localStorage.setItem('admin_accessToken', accessToken);
-        localStorage.setItem('admin_refreshToken',refresToken)
-        localStorage.setItem('admin_Id' , adminId)
-        const acc = localStorage.getItem('admin_accessToken')
-        const rfre = localStorage.getItem('admin_refreshToken')
-        console.log("acc",acc)
-        console.log("rfre",rfre)
+        
+      
         return response;
     } catch (error: any) {
         errorHandler(error);

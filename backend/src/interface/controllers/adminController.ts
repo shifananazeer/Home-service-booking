@@ -25,7 +25,7 @@ class AdminController {
         console.log("body", req.body);
         try {
             const { email, password } = req.body;
-            const { accessToken, refreshToken, adminId } = await adminService.login(email, password);
+            const { accessToken, refreshToken, adminId  , adminEmail , adminRole} = await adminService.login(email, password);
             res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
             res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
             res.status(HttpStatus.OK).json({
@@ -33,6 +33,8 @@ class AdminController {
                 accessToken,
                 refreshToken,
                 adminId,
+                adminEmail,
+                adminRole,
             });
         } catch (error: any) {
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });

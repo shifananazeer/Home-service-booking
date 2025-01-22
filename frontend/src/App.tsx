@@ -46,6 +46,7 @@ import { Footer } from "./components/footer";
 import ProtectedRoute from "./components/ProtectRoute";
 import UnauthorizedPage from "./components/Unotherized";
 import ProtectedWorkerRoute from "./components/ProtectWorkerRoute";
+import AdminProtectedRoute from "./components/ProtectAdminRoutes";
 
 
 
@@ -107,10 +108,10 @@ const App = () => {
     <Route path="/worker/audioCall" element={<WorkerAudioCall/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
     </Route>
-   {/* <Route element={<ProtectedRoute requiredRole="admin" />}> */}
+    <Route element={<AdminProtectedRoute requiredRole="admin" />}>
    
     <Route path="/admin/dashboard" element={<AdminDashboard />}/>
-    {/* </Route>      */}
+    </Route>     
   </Routes>
    {/* Conditional Footer */}
    <ConditionalFooter />
@@ -137,7 +138,8 @@ const ConditionalNavbar = () => {
     "/admin/dashboard",
     "/admin/login",
     '/worker/videocall',
-    '/worker/audioCall'
+    '/worker/audioCall',
+    '/unauthorized'
     
   ];
 
@@ -162,7 +164,10 @@ const ConditionalFooter = () => {
     "/admin/dashboard",
     "/admin/login",
     '/worker/videocall',
-    '/worker/audioCall'
+    '/worker/audioCall',
+     '/unauthorized',
+    '/videoCall/:workerId',
+    '/audioCall/:workerId'
   ];
 
   // Check if the current path is in the list of routes to hide the Footer

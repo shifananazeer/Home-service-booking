@@ -40,15 +40,16 @@ const AdminLogin = () => {
            
             const response = await adminLogin({ email, password });
            
-
-            if (response.status === 200) {
-                dispatch(loginSuccess(response.data.accessToken)); 
+  
+            if (response.data) {
+                const { accessToken, refreshToken ,adminId , adminEmail , adminRole } = response.data; 
+                dispatch(loginSuccess({accessToken ,refreshToken , adminId ,adminEmail ,adminRole})); 
                
                 toast.success('Login successful!');
                 navigate('/admin/dashboard'); 
             } else {
-                toast.error(response.message || 'Login failed. Please try again.');
-                dispatch(loginFail(response.message)); 
+                toast.error(response.data.message || 'Login failed. Please try again.');
+                dispatch(loginFail(response.data.message)); 
             }
         } catch (error: any) {
             console.error('Error during admin login:', error);
