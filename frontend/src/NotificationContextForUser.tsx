@@ -5,6 +5,7 @@ import NotificationModal from './components/notificationModel'; // Import the mo
 import socket from './utils/socket';
 import axios from 'axios';
 import { getWorkersIds } from './services/userService';
+import { useNavigate } from 'react-router-dom';
 
 interface NotificationContextType {
     workerIds: string[];
@@ -26,6 +27,7 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [currentNotification, setCurrentNotification] = useState<string>(''); 
     const [currentBookingId , setCurrentBookingId] = useState<string>('')
+    const navigate = useNavigate()
 
     const joinNotificationRoom = (workerId: string) => {
         const roomId = `${workerId}-${userId}`;
@@ -62,8 +64,25 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
             console.log('New notification received:', notification);
         });
 
+         // Listen for blockUser event
+         socket.on('blockUser', (blockedUserId: string) => {
+            if (userId === blockedUserId) {
+                // Clear local storage
+                localStorage.removeItem('userData');
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+
+                // Redirect to unauthorized page
+                navigate('/unauthorized', {
+                    state: { message: 'You have been blocked by the admin.' },
+                });
+            }
+        });
+
+
    
         return () => {
+            socket.off('blockUser'),
             workerIds.forEach((workerId: string) => leaveNotificationRoom(workerId));
             socket.disconnect();
         };

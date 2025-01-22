@@ -70,6 +70,19 @@ export const setupSocket = (httpServer: HttpServer) => {
       
     });
 
+    socket.on('blockUser', async (userId: string) => {
+      const userSocketId = onlineUsers.get(userId); // Get the socket ID of the user to block
+      
+      if (userSocketId) {
+        // Emit an event to notify the user they are blocked
+        io.to(userSocketId).emit('userBlocked');
+
+        // Optionally, you can log the event or take additional actions
+        console.log(`[Socket.IO] User ${userId} has been blocked.`);
+      }
+    });
+
+
     socket.on("getOnlineUsers", () => {
       const onlineUsersList = Array.from(onlineUsers.keys()); 
       socket.emit("onlineUsersList", onlineUsersList);

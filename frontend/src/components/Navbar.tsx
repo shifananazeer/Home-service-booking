@@ -14,22 +14,22 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if(token && userIds) {
-    const userId = userIds; 
-    socket.emit('join', userId);
-    socket.on('userOnline', (data) => {
-      console.log(`worker ${data.userId} is online.`);
-    });
-    socket.on('userOffline', (data) => {
-      console.log(`worker ${data.userId} is offline.`);
-    });
+  // useEffect(() => {
+  //   if(token && userIds) {
+  //   const userId = userIds; 
+  //   socket.emit('join', userId);
+  //   socket.on('userOnline', (data) => {
+  //     console.log(`worker ${data.userId} is online.`);
+  //   });
+  //   socket.on('userOffline', (data) => {
+  //     console.log(`worker ${data.userId} is offline.`);
+  //   });
 
-    return () => {
-      socket.disconnect(); 
-    };
-  }
-  }, []);
+  //   return () => {
+  //     socket.disconnect(); 
+  //   };
+  // }
+  // }, []);
 
   const handleLoginClick = () => {
     navigate('/login')
@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
             Register as a Worker 
           </button>
 
-          {!token && !userIds ? (
+          {!token && !userData ? (
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLoginClick}

@@ -164,6 +164,8 @@ class UserController  {
                 res.status(HttpStatus.NOT_FOUND).json({ message:Messages.NOT_FOUNT });
                 return;
             }
+            const io = getIo(); 
+            io.emit('blockUser', userId);
             res.json({ message: Messages.BLOCKED_SUCCESSFULLY, user: updatedUser });
         } catch (error) {
             console.error('Error blocking user:', error);
@@ -685,6 +687,10 @@ class UserController  {
           } catch (error: any) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message || Messages.INTERNAL_SERVER_ERROR });
           }
+    }
+
+    async checkStatus (req:Request , res:Response) {
+
     }
 }
 
