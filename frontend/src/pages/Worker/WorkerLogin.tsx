@@ -8,6 +8,7 @@ import { RootState } from '../../app/store';
 import { refreshAccessToken } from '../../utils/auth';
 import socket from '../../utils/socket';
 
+
 const WorkerLogin: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ const WorkerLogin: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
    const workerId = localStorage.getItem('workerId')
+ 
 
     const { isLoading, error, success } = useSelector((state: RootState) => state.worker); 
 
@@ -39,6 +41,7 @@ const WorkerLogin: React.FC = () => {
             console.log("respo", response);
             const { accessToken, refreshToken , workerId } = response.data; 
             dispatch(loginSuccess({ accessToken, refreshToken , workerId })); 
+       
             toast.success("Login successful");
             navigate('/worker/dashboard');
             

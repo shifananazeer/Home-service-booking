@@ -15,6 +15,10 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const token = localStorage.getItem('accessToken')
     const userId = localStorage.getItem('user_Id');
+  
+
+  
+   
     useEffect(()=> {
         if(token) {
           
@@ -25,6 +29,7 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
         dispatch(loginStart());
+       
         console.log('Dispatching loginStart');
     
         try {
@@ -32,18 +37,21 @@ const Login = () => {
             const response = await loginUser({ email, password });
           console.log("ressssssssss",response)
           
-            const { accessToken, refreshToken, name, email: userEmail ,userId } = response;
+            const { accessToken, refreshToken ,userId  , userFirstName , userEmail , userRole} = response;
               console.log("user....." , userId)
+              console.log("email" , email)
+              console.log("")
           
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user_Id' , userId)
     
            const userData = {
-                name,
+                name:userFirstName,
                 email: userEmail,
                 refreshToken: refreshToken,
-                accessToken: accessToken
+                accessToken: accessToken,
+                role:userRole
             };
             
     

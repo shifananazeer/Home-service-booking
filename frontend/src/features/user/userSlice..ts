@@ -4,7 +4,8 @@ interface UserData {
     name: string;
     email: string;
     accessToken: string;   
-    refreshToken: string;  
+    refreshToken: string; 
+    role?: string; 
     
 }
 

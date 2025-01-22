@@ -57,9 +57,9 @@ export const loginUser = async (credentials: { email: string; password: string }
             },
         });
         console.log('Login Response:', response.data);
-        const { accessToken, refreshToken, name, email  , userId} = response.data;
+        const { accessToken, refreshToken,userId , userFirstName , userEmail , userRole} = response.data;
 
-        return { accessToken, refreshToken, name, email  , userId}; 
+        return { accessToken, refreshToken,userId ,  userFirstName , userEmail , userRole}; 
     } catch (error: any) {
         errorHandler(error);
         throw error;

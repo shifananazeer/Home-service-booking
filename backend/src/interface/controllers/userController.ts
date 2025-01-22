@@ -56,7 +56,7 @@ class UserController  {
    async login (req: Request, res: Response)  {
         console.log('Login request received:', req.body);
         try {
-            const { accessToken, refreshToken ,userId } = await userService.loginUser(
+            const { accessToken, refreshToken ,userId  , userFirstName , userEmail , userRole} = await userService.loginUser(
                 req.body.email,
                 req.body.password
             );
@@ -69,7 +69,10 @@ class UserController  {
                 message: Messages.LOGIN,
                 accessToken,
                 refreshToken,
-                userId
+                userId,
+                userFirstName , 
+                userEmail ,
+                userRole
             });
         } catch (error: any) {
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });

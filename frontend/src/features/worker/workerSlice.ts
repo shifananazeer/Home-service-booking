@@ -8,6 +8,15 @@ interface WorkerState {
     refreshToken: string | null; 
     isVerified: boolean; 
 }
+interface WorkeData {
+    name: string;
+    email: string;
+    accessToken: string;   
+    refreshToken: string; 
+    role?: string; 
+    
+}
+
 
 const accessTokenFromStorage = localStorage.getItem('accessToken');
 const refreshTokenFromStorage = localStorage.getItem('refreshToken');

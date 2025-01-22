@@ -26,7 +26,7 @@ export class UserService {
     public async loginUser(
         email: string,
         password: string
-    ): Promise<{ accessToken: string; refreshToken: string; userId: string }> {
+    ): Promise<{ accessToken: string; refreshToken: string; userId: string ,userFirstName:string , userEmail:string , userRole:string}> {
         const user: User | null = await this.userRepository.findByEmail(email);
         if (!user) {
             throw new Error("Invalid email or password");
@@ -54,6 +54,9 @@ export class UserService {
             accessToken,
             refreshToken,
             userId: user._id.toString(), 
+            userFirstName : user.firstName,
+            userEmail: user.email,
+            userRole:user.role,
         };
     }
 

@@ -43,6 +43,9 @@ import { NotificationProviderUser } from "./NotificationContextForUser";
 import BalancePaymentSuccessPage from "./pages/User/balancePaymentSuccessPage";
 import NotificationPage from "./pages/User/NotificationPage";
 import { Footer } from "./components/footer";
+import ProtectedRoute from "./components/ProtectRoute";
+import UnauthorizedPage from "./components/Unotherized";
+
 
 
 
@@ -60,17 +63,27 @@ const App = () => {
       {/* <Toaster position="top-right" reverseOrder={false} />  */}
 
     <Routes>
+
+         {/* Public Routes */}
       <Route path="/" element={<NotificationProviderUser><HomePage/></NotificationProviderUser>}/>
       <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
-      <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
-      <Route path="/payment" element={<PaymentPage/>}/>
-      <Route path="/booking-list" element={<NotificationProviderUser><BookingList/></NotificationProviderUser>}/>
-    <Route path="/register" element={<Register />} />
+      <Route path="/register" element={<Register />} />
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/register-worker" element={<WorkerSignup />} />
+    <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
+    <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
+    <Route path="/worker/login" element={<WorkerLogin/>}/>
+    <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
+    <Route path="/admin/login" element={<AdminLogin/>}/>
+    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+     <Route element={<ProtectedRoute requiredRole="user" />}> 
+      <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
+      <Route path="/payment" element={<PaymentPage/>}/>
+      <Route path="/booking-list" element={<NotificationProviderUser><BookingList/></NotificationProviderUser>}/>
     <Route path="/user/profile" element={<UserProfile/>}/>
     <Route path="/user/edit-profile" element={<EditUserProfile />} />
     <Route path="/confirm-booking/:workerId" element={<BookingConfirm/>}/>
@@ -82,21 +95,21 @@ const App = () => {
     <Route path="/videoCall/:workerId" element={<VideoCallPage/>}/>
     <Route path='/audioCall/:workerId' element={<AudioCall/>}/>
     <Route path="/user/notifications" element={<NotificationPage/>}/>
+    </Route>
 
+   {/* <Route element={<ProtectedRoute requiredRole="worker" />}> */}
     <Route path="/worker/dashboard" element={<NotificationProvider> <WorkerDashboard /></NotificationProvider>} />
-    <Route path="/worker/verify-otp" element= {<WorkerOtp/>}/>
-    <Route path="/worker/forgotPassword" element={<WorkerForgotPassword/>}/>
-    <Route path="/worker/login" element={<WorkerLogin/>}/>
-    <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
+   
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
     <Route path="/worker/bookings" element= {<WorkerBookings/>}/>
     <Route path="/worker/videocall"element={<WorkerVideoCallPage/>}/>
     <Route path="/worker/audioCall" element={<WorkerAudioCall/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
-
-    
-    <Route path="/admin/login" element={<AdminLogin/>}/>
-    <Route path="/admin/dashboard" element={<AdminDashboard />}/>     
+    {/* </Route>
+    <Route element={<ProtectedRoute requiredRole="admin" />}> */}
+   
+    <Route path="/admin/dashboard" element={<AdminDashboard />}/>
+    {/* </Route>      */}
   </Routes>
    {/* Conditional Footer */}
    <ConditionalFooter />
