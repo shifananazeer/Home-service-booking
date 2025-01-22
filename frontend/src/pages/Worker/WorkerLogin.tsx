@@ -39,11 +39,13 @@ const WorkerLogin: React.FC = () => {
                 throw new Error('Invalid response from server');
             }
             console.log("respo", response);
-            const { accessToken, refreshToken , workerId } = response.data; 
-            dispatch(loginSuccess({ accessToken, refreshToken , workerId })); 
+            const { accessToken, refreshToken , workerId , workerName , workerEmail , workerRole } = response.data; 
+            dispatch(loginSuccess({ accessToken, refreshToken , workerId  , workerName , workerEmail , workerRole})); 
        
             toast.success("Login successful");
             navigate('/worker/dashboard');
+            const workerData = localStorage.getItem('workerData')
+            console.log("workerData" , workerData)
             
         } catch (error: any) {
             dispatch(loginFail(error.message));

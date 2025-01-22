@@ -74,14 +74,18 @@ class WorkerController   {
 
    async  login  (req: Request, res: Response) {
         try {
-            const { accessToken, refreshToken , workerId} = await workerService.loginWorker( req.body.email, req.body.password);
+            const { accessToken, refreshToken , workerId ,workerName , workerEmail, workerRole} = await workerService.loginWorker( req.body.email, req.body.password);
             res.cookie('auth_token', accessToken, { httpOnly: true, maxAge: 86400000 }); // 1 day
             res.cookie('refresh_token', refreshToken, { httpOnly: true, maxAge: 604800000 }); // 7 days
             res.status(HttpStatus.OK).json({
                 message: Messages.LOGIN,
                 accessToken,
                 refreshToken,
-                workerId
+                workerId,
+                workerName,
+                workerEmail,
+                workerRole,
+               
             });
         }catch(error:any) {
             res.status(HttpStatus.BAD_REQUEST).json({message:error.message})

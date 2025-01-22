@@ -24,7 +24,7 @@ export class WorkerService {
     }
 
 
-    public async loginWorker(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; workerId: string }> {
+    public async loginWorker(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; workerId: string , workerName:string , workerEmail:string , workerRole:string }> {
         console.log("password", password);
         console.log("email", email);
         const user = await this.workerRepository.findByEmail(email);
@@ -42,7 +42,7 @@ export class WorkerService {
             process.env.REFRESH_TOKEN_SECRET as string,
             { expiresIn: '7d' }
         );
-        return { accessToken, refreshToken, workerId: user._id.toString() };
+        return { accessToken, refreshToken, workerId: user._id.toString() , workerName:user.name , workerEmail:user.email , workerRole:user.role };
     }
 
     public async workerProfile(email: string) {

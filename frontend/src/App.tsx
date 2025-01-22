@@ -45,6 +45,7 @@ import NotificationPage from "./pages/User/NotificationPage";
 import { Footer } from "./components/footer";
 import ProtectedRoute from "./components/ProtectRoute";
 import UnauthorizedPage from "./components/Unotherized";
+import ProtectedWorkerRoute from "./components/ProtectWorkerRoute";
 
 
 
@@ -97,7 +98,7 @@ const App = () => {
     <Route path="/user/notifications" element={<NotificationPage/>}/>
     </Route>
 
-   {/* <Route element={<ProtectedRoute requiredRole="worker" />}> */}
+    <Route element={<ProtectedWorkerRoute requiredRole="worker" />}>
     <Route path="/worker/dashboard" element={<NotificationProvider> <WorkerDashboard /></NotificationProvider>} />
    
     <Route path="/worker/edit-profile" element={<WorkerEditProfile/>}/>
@@ -105,8 +106,8 @@ const App = () => {
     <Route path="/worker/videocall"element={<WorkerVideoCallPage/>}/>
     <Route path="/worker/audioCall" element={<WorkerAudioCall/>}/>
     {/* <Route path="/worker/slot" element={<AvailabilityManagement/>}/> */}
-    {/* </Route>
-    <Route element={<ProtectedRoute requiredRole="admin" />}> */}
+    </Route>
+   {/* <Route element={<ProtectedRoute requiredRole="admin" />}> */}
    
     <Route path="/admin/dashboard" element={<AdminDashboard />}/>
     {/* </Route>      */}

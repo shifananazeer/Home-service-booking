@@ -7,8 +7,9 @@ interface WorkerState {
     accessToken: string | null; 
     refreshToken: string | null; 
     isVerified: boolean; 
+    workerData:WorkerData | null;
 }
-interface WorkeData {
+interface WorkerData {
     name: string;
     email: string;
     accessToken: string;   
@@ -17,6 +18,15 @@ interface WorkeData {
     
 }
 
+const getStoredWorkerData = (): WorkerData | null => {
+    try {
+        const storedUserData = localStorage.getItem('workerData');
+        return storedUserData ? JSON.parse(storedUserData) : null;
+    } catch (error) {
+        console.error('Error parsing userData from localStorage:', error);
+        return null;
+    }
+};
 
 const accessTokenFromStorage = localStorage.getItem('accessToken');
 const refreshTokenFromStorage = localStorage.getItem('refreshToken');
@@ -28,6 +38,7 @@ const initialState: WorkerState = {
     accessToken: accessTokenFromStorage, 
     refreshToken: refreshTokenFromStorage,
     isVerified: false, 
+    workerData:getStoredWorkerData()
 };
 
 const workerSlice = createSlice({
@@ -65,14 +76,30 @@ const workerSlice = createSlice({
             state.error = null;
             state.success = false;
         },
-        loginSuccess: (state, action: PayloadAction<{ accessToken: string; refreshToken: string, workerId:string}>) => {
+        loginSuccess: (state, action: PayloadAction<{ accessToken: string; refreshToken: string; workerId: string; workerName: string; workerEmail: string; workerRole?: string }>) => {
             state.isLoading = false;
             state.success = true;
-            state.accessToken = action.payload.accessToken; 
-            state.refreshToken = action.payload.refreshToken; 
-            localStorage.setItem('worker_accessToken', action.payload.accessToken); 
-            localStorage.setItem('worker_refreshToken', action.payload.refreshToken); 
-            localStorage.setItem('workerId' , action.payload.workerId)
+            
+            const { accessToken, refreshToken, workerId, workerName, workerEmail, workerRole } = action.payload;
+        
+            // Update state
+            state.workerData = {
+                name: workerName,
+                email: workerEmail,
+                role: workerRole,
+                accessToken,
+                refreshToken,
+            };
+        
+            // Store in localStorage
+            localStorage.setItem('worker_accessToken', accessToken);
+            localStorage.setItem('worker_refreshToken', refreshToken);
+            localStorage.setItem('workerId', workerId);
+            localStorage.setItem('workerData', JSON.stringify({
+                name: workerName,
+                email: workerEmail,
+                role: workerRole,
+            }));
         },
         loginFail: (state, action) => {
             state.isLoading = false;
@@ -94,6 +121,7 @@ const workerSlice = createSlice({
             state.refreshToken = null; 
             state.success = false; 
             state.isVerified = false; 
+            localStorage.removeItem('workerData');
             localStorage.removeItem('worker_accessToken'); 
             localStorage.removeItem('worker_refreshToken'); 
             localStorage.removeItem('workerId')
