@@ -60,7 +60,7 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
             console.log("receive notification")
             setCurrentNotification(notification.message);
             setCurrentBookingId(notification.bookingId)
-            setIsModalOpen(true); // Open the modal
+            setIsModalOpen(true); 
             console.log('New notification received:', notification);
         });
 

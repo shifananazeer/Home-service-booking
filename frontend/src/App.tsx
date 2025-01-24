@@ -167,7 +167,8 @@ const ConditionalFooter = () => {
     '/worker/audioCall',
      '/unauthorized',
     '/videoCall/:workerId',
-    '/audioCall/:workerId'
+    '/audioCall/:workerId',
+    '/user/messages',
   ];
 
   // Check if the current path is in the list of routes to hide the Footer

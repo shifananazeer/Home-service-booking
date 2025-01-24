@@ -22,19 +22,19 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Worker ID:", workerId); // Add this log
+    console.log("Worker ID:", workerId);
     socket.emit("join-room", roomId);
     console.log("Joined room:", roomId);
    
     socket.on("offerNotification", ({ roomId, userName, caller, callType, offer }) => {
       console.log("Received offerNotification", { roomId, userName, caller, callType });
-      // The worker should receive the call, so we check if the roomId matches
+   
       if (roomId === workerId) {
         setJoinedRoomId(roomId);
         setCallType(callType);
         setCaller(userName);
         setCallModel(true);
-        console.log("Call model set to true"); // Add this log
+        console.log("Call model set to true"); 
       }
     });
 
@@ -47,7 +47,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (callType === "Video") {
       navigate("/worker/videocall", { state: { caller } });
     } else if (callType === "Audio") {
-      // Navigate to audio call page when implemented
+   
       navigate('/worker/audioCall' ,{state:{caller}})
     }
     setCallModel(false);

@@ -14,22 +14,7 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  // useEffect(() => {
-  //   if(token && userIds) {
-  //   const userId = userIds; 
-  //   socket.emit('join', userId);
-  //   socket.on('userOnline', (data) => {
-  //     console.log(`worker ${data.userId} is online.`);
-  //   });
-  //   socket.on('userOffline', (data) => {
-  //     console.log(`worker ${data.userId} is offline.`);
-  //   });
-
-  //   return () => {
-  //     socket.disconnect(); 
-  //   };
-  // }
-  // }, []);
+ 
 
   const handleLoginClick = () => {
     navigate('/login')
@@ -57,22 +42,32 @@ const Navbar: React.FC = () => {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <a href="/" className="flex items-center gap-2">
-          <img 
-              src="/logo.png" 
-              alt="ServiceHub Logo"
-              style={{ width: '100px', height: '100px' }}
-              className="object-contain"
-            />
-            <span className="text-lg font-bold text-white">ServiceHub</span>
-          </a>
-        </div>
+    <nav className="bg-black ">
+      <div className="container mx-auto flex flex-wrap items-center justify-between ">
+        {/* Logo and Brand Name */}
+        <a href="/" className="flex items-center gap-2">
+          <img src="/logo.png" alt="ServiceHub Logo" style={{ width: '90px', height: '90px' }}  className=" object-contain" />
+          <span className="text-lg font-bold text-white sm:inline">ServiceHub</span>
+        </a>
 
-        {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Mobile Menu Button */}
+        <button
+        className="md:hidden text-white p-2 focus:outline-none"
+        onClick={toggleMobileMenu}
+        aria-label="Toggle mobile menu"
+    >
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+            />
+        </svg>
+    </button>
+
+        {/* Navigation Links and User Actions (Desktop) */}
+        <div className="hidden md:flex items-center space-x-4">
           <a href="/" className="text-sm font-medium text-white hover:text-white/80">
             Home
           </a>
@@ -87,64 +82,53 @@ const Navbar: React.FC = () => {
           </a>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={handleSignupWorkerClick}
-            className=" hidden md:block px-4 py-2 text-sm font-medium  text-white bg-blue-600 rounded-md hover:bg-blue-500"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500 transition-colors"
           >
-            Register as a Worker 
+            Register as a Worker
           </button>
 
           {!token && !userData ? (
-            <div className="flex items-center gap-2">
+            <>
               <button
                 onClick={handleLoginClick}
-                className="px-4 py-2 text-sm font-medium text-white hover:text-white/80"
+                className="px-4 py-2 text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 Login
               </button>
               <button
                 onClick={handleSignupClick}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500 transition-colors"
               >
                 Sign up
               </button>
-            </div>
+            </>
           ) : (
-            <div className="flex items-center gap-2">
+            <>
               <button
                 onClick={handleProfileClick}
-                className="px-4 py-2 text-sm font-medium  text-white hover:text-white/80"
+                className="px-4 py-2 text-sm font-medium text-white hover:text-white/80 transition-colors flex items-center"
               >
-                   <div style={{ display: 'flex', alignItems: 'center' }}>
-               <FaUser style={{ fontSize: '22px', marginRight: '8px' }} />
-                  <span>My Profile</span>
-                   </div>
+                <FaUser className="mr-2" />
+                <span>My Profile</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 flex text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-500"
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-500 transition-colors flex items-center"
               >
-              <FaSignOutAlt className="mr-2 mt-1" />   Logout  
+                <FaSignOutAlt className="mr-2" />
+                Logout
               </button>
-            </div>
+            </>
           )}
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-white p-2"
-            onClick={toggleMobileMenu}
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-black">
+        {/* Mobile Menu */}
+        <div
+          className={`md:hidden bg-black transition-all duration-300 ease-in-out ${isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+        >
           <div className="px-2 pt-2 pb-3 space-y-1">
             <a href="/" className="block px-3 py-2 text-white hover:text-white/80">
               Home
@@ -164,9 +148,42 @@ const Navbar: React.FC = () => {
             >
               Register as a Worker
             </button>
+            {!token && !userData ? (
+              <>
+                <button
+                  onClick={handleLoginClick}
+                  className="block w-full text-left px-3 py-2 text-white hover:text-white/80"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={handleSignupClick}
+                  className="block w-full text-left px-3 py-2 text-white hover:text-white/80"
+                >
+                  Sign up
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleProfileClick}
+                  className="block w-full text-left px-3 py-2 text-white hover:text-white/80 flex items-center"
+                >
+                  <FaUser className="mr-2" />
+                  <span>My Profile</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-3 py-2 text-white hover:text-white/80 flex items-center"
+                >
+                  <FaSignOutAlt className="mr-2" />
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   )
 }

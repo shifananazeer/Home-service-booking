@@ -263,6 +263,8 @@ const BookingPage: React.FC = () => {
                 {!mapLoaded && <div className="text-center text-gray-400">Loading map...</div>}
               </div>
             </div>
+            <h1>According to your location you </h1>
+            <button>Change Location</button>
           </div>
 
           {/* Right side: Worker List */}

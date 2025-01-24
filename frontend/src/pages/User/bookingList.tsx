@@ -18,6 +18,7 @@ interface Booking {
   advancePayment?: number;
   totalPayment?:number;
   balancePayment?:number;
+  workStatus:string;
 }
 
 const BookingList: React.FC = () => {
@@ -234,6 +235,17 @@ const BookingList: React.FC = () => {
       <X className="w-4 h-4 mr-2" /> Cancel 
     </button>
   )}
+
+  {/* Render Rate Button */}
+  {booking.paymentStatus === 'balance_paid' &&
+    booking.workStatus === 'completed' && (
+      <button
+        onClick={() => navigate(`/rate-booking/${booking._id}`)}
+        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+      >
+       Add Ratings
+      </button>
+    )}
 </div>
                 </div>
               </div>

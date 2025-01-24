@@ -11,11 +11,11 @@ const HomePage = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-black">
       <div 
-        className="relative h-[900px] w-full bg-cover bg-center bg-no-repeat"
+        className="relative h-[900px] w-full bg-cover bg-center bg-no-repeat "
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("home.webp")',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("wp.webp")',
         }}
       >
        

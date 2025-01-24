@@ -1,16 +1,16 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-// Define the context type
+
 interface MsgNotificationContextType {
   notifications: { chatId: string; count: number }[];
   addNotification: (chatId: string) => void;
   clearNotification: (chatId: string) => void;
 }
 
-// Create the context
+
 const MsgNotificationContext = createContext<MsgNotificationContextType | undefined>(undefined);
 
-// Provider component
+
 export const MsgNotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<{ chatId: string; count: number }[]>([]);
 
@@ -37,7 +37,7 @@ export const MsgNotificationProvider: React.FC<{ children: ReactNode }> = ({ chi
   );
 };
 
-// Custom hook to use the context
+
 export const useMsgNotification = () => {
   const context = useContext(MsgNotificationContext);
   if (!context) {

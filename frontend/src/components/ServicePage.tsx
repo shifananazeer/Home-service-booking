@@ -20,7 +20,7 @@ export default function ServicesPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [limit] = useState<number>(8);
+  const [limit] = useState<number>(4);
   useEffect(() => {
     async function loadServices() {
       try {
