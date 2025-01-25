@@ -522,4 +522,17 @@ export const fetchUnreadMessags = async (userId:string) => {
 
     }
   }
+
+
+  export const fetchingSlotsByDate = async (date: string) => {
+    try {
+      const response = await axiosInstance.get(`/auth/slots?date=${date}`);
+      console.log("slot by date " , response)
+      return response.data; // Return the data to the caller
+    } catch (error) {
+      console.error("Error fetching slots:", error); // Log the error
+      throw error; // Optionally re-throw the error so the caller can handle it
+    }
+  };
+  
  

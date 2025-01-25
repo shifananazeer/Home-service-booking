@@ -689,6 +689,28 @@ class UserController  {
           }
     }
 
+    async  getSlotsByDate (req:Request , res:Response) {
+        console.log("date" , req.query)
+        try {
+            const { date } = req.query;
+        
+            // Validate query params
+            if (!date) {
+            res.status(400).json({ message: "Date is required" });
+              return
+            }
+        
+            const slots = await availabilityService.fetchSlotsByDate(date as string);
+        
+             res.status(200).json({ success: true, data: slots });
+             return
+          } catch (error) {
+            console.error("Error fetching slots:", error);
+           res.status(500).json({ success: false, message: "Internal server error" });
+            return
+          }
+    }
+
     async checkStatus (req:Request , res:Response) {
 
     }

@@ -1,6 +1,6 @@
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
-import { fetchAddress, fetchWorkersByService } from "../../services/userService"
+import { fetchAddress, fetchingSlotsByDate, fetchWorkersByService } from "../../services/userService"
 import { useLocation, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FaUserTie } from "react-icons/fa"
@@ -45,6 +45,8 @@ const BookingPage: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false)
   const [locationSource, setLocationSource] = useState<string | null>(null) // Added state for location source
   const [searchQuery, setSearchQuery] = useState("") // Added state for search query
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([]);
 
   const userId = localStorage.getItem("user_Id")
 
@@ -271,6 +273,39 @@ const BookingPage: React.FC = () => {
       toast.error("Failed to search location.")
     }
   }
+
+
+
+  const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+  
+    if (date) {
+      try {
+        // Replace this with your API call or database query to fetch slots
+        const response = await fetchingSlotsByDate(date)
+        const slots = await response.json();
+  
+        // Filter slots for available workers
+        const availableWorkerIds = slots
+          .filter((slot: any) => slot.isAvailable) // Check if the slot is available
+          .map((slot: any) => slot.workerId); // Extract workerId
+  
+        // Filter workers array to include only those with available slots
+        const filteredWorkers = workers.filter(worker =>
+          availableWorkerIds.includes(worker._id)
+        );
+  
+        setFilteredWorkers(filteredWorkers);
+      } catch (error) {
+        console.error("Error fetching slots:", error);
+        setFilteredWorkers([]); // Handle error case
+      }
+    } else {
+      // Reset to all workers if no date is selected
+      setFilteredWorkers(workers);
+    }
+  };
   
   
   if (loading) {
@@ -290,6 +325,8 @@ const BookingPage: React.FC = () => {
       </div>
     )
   }
+ 
+
   return (
     <div className="min-h-screen text-gray-900 bg-white">
       <h1 className="text-4xl font-bold text-center m-4 flex items-center justify-center blink">
@@ -386,6 +423,11 @@ const BookingPage: React.FC = () => {
           {/* Right side: Worker List */}
           <div className="lg:w-1/2">
             <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
+            <div className="mb-4">
+        {/* Date picker component */}
+        <input type="date" onChange={handleDateChange} />
+      </div>
+
             {sortedWorkers.length === 0 ? (
               <div className="text-center text-gray-400 bg-black p-8 rounded-xl shadow-md">
                 No workers available for this service in your area.

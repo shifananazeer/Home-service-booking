@@ -45,4 +45,5 @@ router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBal
 router.get('/get-notifications/:userId' , authenticateUser , userController.getNotifications)
 router.get('/bookings/:bookingId' , authenticateUser , userController.fetchBookingsDetails)
 router.get('/check/status' , userController.checkStatus)
+router.get('/slots' , userController. getSlotsByDate)
 export default router;

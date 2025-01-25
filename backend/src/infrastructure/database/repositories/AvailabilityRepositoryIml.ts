@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { startOfDay, endOfDay } from "date-fns";
 import { Availability, AvailabilitySlot } from "../../../domain/entities/Availability";
 import { AvailabilityRepository } from "../../../domain/repositories/availabilityRepository";
 import AvailabilityModel from "../models/availabilityModel";
@@ -135,5 +136,14 @@ export class AvailabilityRepositoryImpl implements AvailabilityRepository {
             console.error("Error updating slot status:", error);
             throw new Error("Could not update slot status");
         }
+    }
+    async findSlotsByDate(date:string) {
+        const startDate = startOfDay(new Date(date)); // Start of the day (2025-01-31T00:00:00.000Z)
+  const endDate = endOfDay(new Date(date));  
+        const slots =  await AvailabilityModel.find({
+            date: { $gte: startDate, $lte: endDate }, // Match the entire day's range
+          }).lean();
+        console.log("slots by date " , slots)
+        return slots
     }
 }

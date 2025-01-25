@@ -122,6 +122,14 @@ export class AvailabilityService {
 
         return { availabilities, pagination };
     }
+    public async fetchSlotsByDate(date:string) {
+        try{
+            const slots = await this.availabilityRepository.findSlotsByDate(date);
+            return slots;
+        }catch (error) {
+
+        }
+    }
 }
 
 

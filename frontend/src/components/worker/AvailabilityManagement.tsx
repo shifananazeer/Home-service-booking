@@ -24,6 +24,7 @@ const AvailabilityManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState();
+const [selectedDays, setSelectedDays] = useState<string[]>([]); 
 const navigate = useNavigate()
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -38,57 +39,51 @@ const navigate = useNavigate()
     return today.add(daysUntilSelectedDay, 'days').startOf('day').toISOString();
   };
 
-  const handleAddSlot = async () => {
-    if (selectedDay && startTime && endTime) {
-      const slotId = `${selectedDay}-${startTime}-${endTime}`;
-      const date = calculateDate(selectedDay);
-   console.log("date",date)
-      const newSlot: AvailabilitySlot = {
-        slotId,
-        startTime,
-        endTime,
-        isAvailable: true,
-      };
-      const payload: AddAvailability = {
-        date,
-        slots: [newSlot],
-      };
+  const handleCheckboxChange = (day: string) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
 
+  const handleAddSlot = async () => {
+    if (selectedDays.length > 0 && startTime && endTime) {
       setLoading(true);
       setError(null);
 
+      const slotsToCreate = selectedDays.map((day) => ({
+        date: calculateDate(day),
+        slot: {
+          slotId: `${day}-${startTime}-${endTime}`,
+          startTime,
+          endTime,
+          isAvailable: true,
+        },
+      }));
+
       try {
-        const createdAvailability: AddAvailability = await addAvailability(payload);
-
-        const createdSlot: AvailabilityWithSlots = {
-          date: createdAvailability.date,
-          slots: createdAvailability.slots.map((slot) => ({
-            slotId: slot.slotId,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-            isAvailable: true,
-          })),
-        };
-
-        if (createdSlot) {
-          // setSlots((prevSlots) => [...prevSlots, createdSlot]);
-          fetchSlots();
-          setSelectedDay('');
-          setStartTime('');
-          setEndTime('');
-          Swal.fire({
-            icon: 'success',
-            title: 'Slot Added!',
-            text: 'Your availability slot has been successfully added.',
-            confirmButtonText: 'OK',
-          });
+        for (const { date, slot } of slotsToCreate) {
+          const payload: AddAvailability = {
+            date,
+            slots: [slot],
+          };
+          await addAvailability(payload);
         }
+        Swal.fire({
+          icon: 'success',
+          title: 'Slots Added!',
+          text: 'Your availability slots have been successfully added.',
+          confirmButtonText: 'OK',
+        });
+        setSelectedDays([]);
+        setStartTime('');
+        setEndTime('');
+        fetchSlots();
       } catch (err: any) {
-        setError(err.response?.data?.error || 'Failed to add slot');
+        setError(err.response?.data?.error || 'Failed to add slots');
         Swal.fire({
           icon: 'error',
-          title: 'Slot unable to add!',
-          text: err.response?.data?.error || 'Already you  have slot on  this time .  please choose different time',
+          title: 'Error!',
+          text: err.response?.data?.error || 'Failed to add slots. Please try again.',
           confirmButtonText: 'OK',
         });
       } finally {
@@ -96,6 +91,7 @@ const navigate = useNavigate()
       }
     }
   };
+
 
   const fetchSlots = async (page = 1) => {
     setLoading(true);
@@ -208,40 +204,43 @@ const navigate = useNavigate()
       <div className="space-y-6 bg-gray-800 p-6 rounded-lg mb-8">
         <h2 className="text-xl font-bold mb-4">Add New Slot</h2>
         <div className="flex flex-wrap gap-4">
-          <select
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-            className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-          >
-            <option value="">Select a day</option>
+        <div className="flex flex-wrap gap-2">
             {days.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
+              <label key={day} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  value={day}
+                  checked={selectedDays.includes(day)}
+                  onChange={() => handleCheckboxChange(day)}
+                  className="w-4 h-4"
+                />
+                <span>{day}</span>
+              </label>
             ))}
-          </select>
-
+          </div>
+          <div className='flex flex-wrap gap-2'>
+        <p>Start Time:-</p>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
             className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
           />
-
+          <p>End Time:-</p>
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
             className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
           />
-
           <button
             onClick={handleAddSlot}
-            disabled={!selectedDay || !startTime || !endTime}
+            disabled={selectedDays.length === 0 || !startTime || !endTime}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
           >
             ADD SLOT
           </button>
+          </div>
         </div>
       </div>
 
