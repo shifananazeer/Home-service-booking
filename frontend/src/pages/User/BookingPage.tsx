@@ -341,6 +341,9 @@ const BookingPage: React.FC = () => {
   }
 
 
+  
+
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
