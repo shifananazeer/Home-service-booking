@@ -69,8 +69,9 @@ export class ChatRepositoryImpl implements chatRepository {
   }
 
 
-  async getChatByUserId(userId:string) :Promise <Chat[]|[]> {
-    console.log('Fetching chats for user ID:', userId); 
+  async getChatByUserId(userId: string): Promise<Chat[] | []> {
+    console.log('Fetching chats for user ID:', userId);
+  
     const chats = await ChatModel.aggregate([
       {
         $match: {
@@ -79,16 +80,36 @@ export class ChatRepositoryImpl implements chatRepository {
       },
       {
         $lookup: {
-          from: 'workers', 
+          from: 'workers', // Replace with your actual workers collection name
           localField: 'participants.participantId',
           foreignField: '_id',
           as: 'workerInfo',
         },
       },
       {
+        $lookup: {
+          from: 'messages', // Replace with your actual messages collection name
+          let: { chatId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$chatId', '$$chatId'] },
+              },
+            },
+            {
+              $sort: { createdAt: -1 }, // Sort by createdAt to get the latest message first
+            },
+            {
+              $limit: 1, // Limit to the latest message
+            },
+          ],
+          as: 'lastMessage',
+        },
+      },
+      {
         $project: {
           _id: 1,
-          participants: 1, 
+          participants: 1,
           createdAt: 1,
           updatedAt: 1,
           userInfo: {
@@ -97,20 +118,21 @@ export class ChatRepositoryImpl implements chatRepository {
               {
                 $cond: [
                   { $eq: ['$participants.role', 'worker'] },
-                  0, 
+                  0,
                   -1,
                 ],
               },
             ],
           },
+          lastMessage: { $arrayElemAt: ['$lastMessage', 0] }, // Extract the latest message from the array
         },
       },
     ]);
   
-    console.log('Chats with worker info:', chats);
+    console.log('Chats with worker info and last message:', chats);
     return chats;
-}
-
+  }
+  
   async chatByWorkerId(workerId: string) {
     return await ChatModel.find({ 
         participants: { $elemMatch: { participantId: workerId } } 

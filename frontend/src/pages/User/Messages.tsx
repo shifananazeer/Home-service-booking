@@ -12,6 +12,7 @@ interface Chat {
     profilePic: string;
     isOnline: boolean;
   };
+  lastMessage?: Message;
 }
 
 export interface Reaction {
@@ -90,7 +91,14 @@ const MessageList: React.FC = () => {
           return acc;
         }, {});
         setUnreadCounts(counts);
-        setChats(chats);
+
+        const sortedChats = chats.sort(
+          (a, b) =>
+            new Date(b.lastMessage?.createdAt || 0).getTime() -
+            new Date(a.lastMessage?.createdAt || 0).getTime()
+        );
+  
+        setChats(sortedChats);
       } catch (error) {
         console.error("Error fetching chats:", error);
       }
@@ -145,21 +153,46 @@ const MessageList: React.FC = () => {
       senderModel: "user",
       chatId: selectedChat._id,
       timestamp: new Date().toISOString(),
+      text: text.trim() || undefined, // Trimmed text or undefined
     };
   
-    if (text.trim() !== '') {
-      messageData.text = text.trim();
-    }
-  
     try {
-      await sendingMessage(messageData, mediaFile);
+      // Assuming sendingMessage returns the newly created message
+      const newMessage = await sendingMessage(messageData, mediaFile);
+      console.log("newMessage", newMessage);
+  
+      // Clear input fields
       setText('');
       setMediaFile(null);
       setMediaPreview(null);
+  
+      // Update the chat list
+      setChats((prevChats) => {
+        // Create a new array for updated chats
+        const updatedChats = prevChats.map((chat) =>
+          chat._id === selectedChat._id
+            ? {
+                ...chat,
+                lastMessage: {
+                  _id: newMessage?.data._id, // Optional if you want to keep track of the new message ID
+                  text: newMessage?.data.text,
+                  createdAt: newMessage?.data.createdAt, // Assuming this comes from the newMessage
+                } as Message, // Ensure lastMessage is typed as Message
+              }
+            : chat
+        );
+  
+        // Sort chats by the last message date, moving the updated chat to the top
+        return updatedChats.sort((a, b) =>
+          new Date(b.lastMessage?.createdAt || 0).getTime() -
+          new Date(a.lastMessage?.createdAt || 0).getTime()
+        );
+      });
     } catch (error) {
       console.error('Failed to send message:', error);
     }
   };
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -224,6 +257,13 @@ const MessageList: React.FC = () => {
   }
 
 
+  const formatTime = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  };
+  
+
+
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="w-1/3 bg-white overflow-y-auto border-r border-gray-200">
@@ -258,6 +298,14 @@ const MessageList: React.FC = () => {
                     onlineUsers.includes(chat.userInfo._id) ? 'bg-green-500' : 'bg-gray-500'
                   }`}
                 ></span>
+                   {/* Unread Messages Badge */}
+    {unreadCounts[chat._id] > 0 && (
+      <span
+        className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow"
+      >
+        {unreadCounts[chat._id]}
+      </span>
+    )}
               </div>
               <div className="flex justify-between items-center">
   <div>
@@ -268,9 +316,10 @@ const MessageList: React.FC = () => {
       {onlineUsers.includes(chat.userInfo._id) ? 'Online' : 'Offline'}
     </div>
     <div className="text-sm text-gray-500">
-      {unreadCounts[chat._id] > 0 
+      {/* {unreadCounts[chat._id] > 0 
         ? `${unreadCounts[chat._id]} Unread Message${unreadCounts[chat._id] > 1 ? 's' : ''}` 
-        : 'No Unread Messages'}
+        : 'No Unread Messages'} */}
+        <p>{chat.lastMessage?.text} : {chat.lastMessage?.createdAt ? formatTime(chat.lastMessage.createdAt):""}</p>
     </div>
   </div>
   <div className='justify-between ml-20'>
