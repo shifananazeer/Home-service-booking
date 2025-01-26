@@ -10,14 +10,14 @@ interface Worker {
   name: string
   profilePic?: string
   hourlyRate?: number
-  status: string;
-  isAvailable?: boolean; 
+  status: string
+  isAvailable?: boolean
 }
 interface Slot {
-  workerId: string;
-  isAvailable: boolean;
-  start?:string;
-  end?:string
+  workerId: string
+  isAvailable: boolean
+  start?: string
+  end?: string
   // Add other relevant fields
 }
 
@@ -42,7 +42,6 @@ const BookingPage: React.FC = () => {
   const mapInstance = useRef<google.maps.Map | null>(null)
   const markerRef = useRef<google.maps.Marker | null>(null)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-  
 
   const [error, setError] = useState<string | null>(null)
   const [userAddress, setUserAddress] = useState<string | null>(null)
@@ -53,9 +52,10 @@ const BookingPage: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false)
   const [locationSource, setLocationSource] = useState<string | null>(null) // Added state for location source
   const [searchQuery, setSearchQuery] = useState("") // Added state for search query
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([]);
-  const [slots, setSlots] =  useState<Slot[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([])
+  const [slots, setSlots] = useState<Slot[]>([])
+  const [dateInput, setDateInput] = useState<string>("") // Added state for date input
   const userId = localStorage.getItem("user_Id")
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -91,31 +91,31 @@ const BookingPage: React.FC = () => {
   useEffect(() => {
     const fetchUserAddressAndGeocode = async () => {
       if (!userId) {
-        setError("User ID not found.");
-        return;
+        setError("User ID not found.")
+        return
       }
-      
+
       try {
-        const address = await fetchAddress(userId);
+        const address = await fetchAddress(userId)
         if (!address) {
-          toast.error("Complete your profile to book workers.");
-          navigate("/user/profile");
+          toast.error("Complete your profile to book workers.")
+          navigate("/user/profile")
         } else {
-          if (address.area !== userAddress) { // Check if address has changed
-            const location = await geocodeAddress(address.area);
-            setUserAddress(address.area);
-            setUserLocation(location);
+          if (address.area !== userAddress) {
+            // Check if address has changed
+            const location = await geocodeAddress(address.area)
+            setUserAddress(address.area)
+            setUserLocation(location)
           }
         }
       } catch (err: any) {
-        console.error("Error fetching or geocoding user address:", err);
-        setError("Failed to fetch or geocode user address. Please try again later.");
+        console.error("Error fetching or geocoding user address:", err)
+        setError("Failed to fetch or geocode user address. Please try again later.")
       }
-    };
-  
-    fetchUserAddressAndGeocode();
-  }, [navigate, userId, userAddress]); // Include userAddress in the dependency array to prevent infinite loops
-  
+    }
+
+    fetchUserAddressAndGeocode()
+  }, [navigate, userId, userAddress]) // Include userAddress in the dependency array to prevent infinite loops
 
   const geocodeAddress = async (address: string) => {
     try {
@@ -258,6 +258,7 @@ const BookingPage: React.FC = () => {
           }
           mapInstance.current?.setCenter({ lat: latitude, lng: longitude })
           updateWorkerDistances({ lat: latitude, lng: longitude })
+          resetDateAndWorkers()
         },
         (error) => {
           console.error("Error fetching current location:", error)
@@ -268,7 +269,7 @@ const BookingPage: React.FC = () => {
       toast.error("Geolocation is not supported by your browser.")
     }
   }
-  
+
   const handleSearchLocation = async () => {
     if (!searchQuery) return
     try {
@@ -276,61 +277,70 @@ const BookingPage: React.FC = () => {
       setUserLocation(location)
       setLocationSource("search")
       updateWorkerDistances(location)
+      resetDateAndWorkers()
     } catch (error) {
       console.error("Error searching location:", error)
       toast.error("Failed to search location.")
     }
   }
 
+  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDateInput(e.target.value)
+  }
 
-
-  const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value;
-    setSelectedDate(date);
-  
-    if (date) {
+  const handleDateChange = async () => {
+    if (dateInput) {
       try {
-        const data = await fetchingSlotsByDate(date);
-        const fetchedData = data.data; 
-  
-        console.log(fetchedData); 
+        const data = await fetchingSlotsByDate(dateInput)
+        const fetchedData = data.data
+
+        console.log(fetchedData)
         if (!Array.isArray(fetchedData)) {
-          throw new Error("Fetched slots is not an array");
+          throw new Error("Fetched slots is not an array")
         }
-  
-        setSlots(fetchedData);
-  
-    
+
+        setSlots(fetchedData)
+        setSelectedDate(dateInput)
+
         const updatedSortedWorkers = sortedWorkers.map((worker) => {
-          const matchingWorker = fetchedData.find(
-            (slotData: any) => slotData.workerId === worker._id
-          );
-          const isAvailable = matchingWorker?.slots.some((slot: any) => slot.isAvailable);
-  
+          const matchingWorker = fetchedData.find((slotData: any) => slotData.workerId === worker._id)
+          const isAvailable = matchingWorker?.slots.some((slot: any) => slot.isAvailable)
+
           return {
             ...worker,
-            isAvailable: isAvailable || false, 
-          };
-        });
+            isAvailable: isAvailable || false,
+          }
+        })
 
-        console.log("updatedworkers" , updatedSortedWorkers)
-  
-        setSortedWorkers(updatedSortedWorkers);
+        console.log("updatedworkers", updatedSortedWorkers)
+
+        setSortedWorkers(updatedSortedWorkers)
       } catch (error) {
-        console.error("Error fetching slots:", error);
+        console.error("Error fetching slots:", error)
       }
     } else {
       const resetWorkers = sortedWorkers.map((worker) => ({
         ...worker,
         isAvailable: false,
-       
-      }));
-      console.log("restWorkers" , resetWorkers)
-      setSortedWorkers(resetWorkers);
+      }))
+      console.log("resetWorkers", resetWorkers)
+      setSortedWorkers(resetWorkers)
+      setSelectedDate(null)
     }
-  };
-  
-  
+  }
+
+
+  const resetDateAndWorkers = () => {
+    setSelectedDate(null)
+    setDateInput("")
+    const resetWorkers = sortedWorkers.map((worker) => ({
+      ...worker,
+      isAvailable: false,
+    }))
+    setSortedWorkers(resetWorkers)
+  }
+
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -348,7 +358,6 @@ const BookingPage: React.FC = () => {
       </div>
     )
   }
- 
 
   return (
     <div className="min-h-screen text-gray-900 bg-white">
@@ -446,10 +455,22 @@ const BookingPage: React.FC = () => {
           {/* Right side: Worker List */}
           <div className="lg:w-1/2">
             <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
-            <div className="mb-4">
-        {/* Date picker component */}
-        <input type="date" onChange={handleDateChange} />
-      </div>
+            <div className="mb-4 flex items-center">
+              {" "}
+              {/* Updated date picker */}
+              <input
+                type="date"
+                value={dateInput}
+                onChange={handleDateInputChange}
+                className="p-2 border border-gray-300 rounded-lg mr-2"
+              />
+              <button
+                onClick={handleDateChange}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Search
+              </button>
+            </div>
 
             {sortedWorkers.length === 0 ? (
               <div className="text-center text-gray-400 bg-black p-8 rounded-xl shadow-md">
@@ -478,12 +499,12 @@ const BookingPage: React.FC = () => {
                             Rate: <span className="text-gray-200 font-bold">₹{worker.hourlyRate || "N/A"}/hr</span>
                           </p>
                           {selectedDate ? ( // Show availability status only if a date is selected
-              <p className={`text-lg ${worker.isAvailable ? "text-green-500" : "text-red-500"}`}>
-               {worker.isAvailable 
-                  ? `This worker has slots on ${selectedDate}. Go with him!` 
-                  : "No slots available on this date."}
-              </p>
-            ) : null}
+                            <p className={`text-lg ${worker.isAvailable ? "text-green-500" : "text-red-500"}`}>
+                              {worker.isAvailable
+                                ? `This worker has slots on ${selectedDate}. Go with him!`
+                                : "No slots available on this date."}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2">
