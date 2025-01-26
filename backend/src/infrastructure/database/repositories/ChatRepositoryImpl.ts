@@ -80,7 +80,7 @@ export class ChatRepositoryImpl implements chatRepository {
       },
       {
         $lookup: {
-          from: 'workers', // Replace with your actual workers collection name
+          from: 'workers', 
           localField: 'participants.participantId',
           foreignField: '_id',
           as: 'workerInfo',
@@ -88,7 +88,7 @@ export class ChatRepositoryImpl implements chatRepository {
       },
       {
         $lookup: {
-          from: 'messages', // Replace with your actual messages collection name
+          from: 'messages', 
           let: { chatId: '$_id' },
           pipeline: [
             {
@@ -97,10 +97,10 @@ export class ChatRepositoryImpl implements chatRepository {
               },
             },
             {
-              $sort: { createdAt: -1 }, // Sort by createdAt to get the latest message first
+              $sort: { createdAt: -1 }, 
             },
             {
-              $limit: 1, // Limit to the latest message
+              $limit: 1, 
             },
           ],
           as: 'lastMessage',

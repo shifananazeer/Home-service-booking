@@ -165,24 +165,21 @@ const MessageList: React.FC = () => {
       setText('');
       setMediaFile(null);
       setMediaPreview(null);
-  
-      // Update the chat list
       setChats((prevChats) => {
-        // Create a new array for updated chats
         const updatedChats = prevChats.map((chat) =>
           chat._id === selectedChat._id
             ? {
                 ...chat,
                 lastMessage: {
-                  _id: newMessage?.data._id, // Optional if you want to keep track of the new message ID
+                  _id: newMessage?.data._id, 
                   text: newMessage?.data.text,
-                  createdAt: newMessage?.data.createdAt, // Assuming this comes from the newMessage
-                } as Message, // Ensure lastMessage is typed as Message
+                  createdAt: newMessage?.data.createdAt,
+                } as Message, 
               }
             : chat
         );
   
-        // Sort chats by the last message date, moving the updated chat to the top
+     
         return updatedChats.sort((a, b) =>
           new Date(b.lastMessage?.createdAt || 0).getTime() -
           new Date(a.lastMessage?.createdAt || 0).getTime()
