@@ -38,10 +38,10 @@ const BookingPage: React.FC = () => {
   const navigate = useNavigate()
   const { serviceName, serviceImage, serviceDescription } = location.state || {}
   const mapRef = useRef<HTMLDivElement | null>(null)
-  const autocompleteRef = useRef<HTMLInputElement | null>(null)
+ 
   const mapInstance = useRef<google.maps.Map | null>(null)
   const markerRef = useRef<google.maps.Marker | null>(null)
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+ 
 
   const [error, setError] = useState<string | null>(null)
   const [userAddress, setUserAddress] = useState<string | null>(null)
@@ -57,6 +57,8 @@ const BookingPage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([])
   const [dateInput, setDateInput] = useState<string>("") // Added state for date input
   const userId = localStorage.getItem("user_Id")
+  const autocompleteRef = useRef<HTMLInputElement | null>(null);
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const toRadians = (deg: number) => (deg * Math.PI) / 180
@@ -221,24 +223,52 @@ const BookingPage: React.FC = () => {
     }
   }, [userLocation, mapLoaded])
 
-  const loadAutocomplete = () => {
-    const google = window.google
-    const input = autocompleteRef.current!
-    const autocomplete = new google.maps.places.Autocomplete(input)
+  useEffect(() => {
+  // Load Google Maps script
+  const loadScript = () => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.onload = () => initializeAutocomplete();
+    document.body.appendChild(script);
+  };
 
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace()
-      if (place.geometry) {
-        const location = place.geometry.location
-        const lat = location?.lat()
-        const lng = location?.lng()
-        if (lat && lng) {
-          setUserLocation({ lat, lng })
-          mapInstance.current?.setCenter({ lat, lng })
+  const initializeAutocomplete = () => {
+    if (autocompleteRef.current) {
+      const google = window.google;
+      const autocomplete = new google.maps.places.Autocomplete(autocompleteRef.current);
+
+      // Listen for place selection
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry && place.geometry.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+
+          // Ensure lat and lng are defined before updating state
+          if (lat !== undefined && lng !== undefined) {
+            const location = {
+              lat: lat,
+              lng: lng,
+            };
+
+            setUserLocation(location); // This ensures proper type matching
+            console.log("Selected location:", place.formatted_address, location);
+          }
         }
-      }
-    })
+      });
+    }
+  };
+
+  if (!window.google) {
+    loadScript();
+  } else {
+    initializeAutocomplete();
   }
+}, []);
+
+
+
 
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -430,12 +460,17 @@ const BookingPage: React.FC = () => {
                     </button>
                     <div className="flex gap-2">
                       <input
+                       ref={autocompleteRef}
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search location"
                         className="p-2 border border-gray-300 rounded-lg flex-grow"
-                      />
+                      />  {userLocation && (
+                        <p className="mt-2 text-green-500">
+                          Selected Location: Latitude: {userLocation.lat}, Longitude: {userLocation.lng}
+                        </p>
+                      )}
                       <button
                         onClick={handleSearchLocation}
                         className={`px-4 py-2 rounded-lg ${
