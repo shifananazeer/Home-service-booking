@@ -17,6 +17,7 @@ export interface Worker {
     longitude?: number; 
     locationName?: string; 
     isOnline:boolean;
+    averageRating?: number;
 }
 
 

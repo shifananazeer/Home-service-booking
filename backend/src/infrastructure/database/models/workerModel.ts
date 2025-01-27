@@ -24,6 +24,7 @@ const workerSchema = new Schema<WorkerDocument>({
     longitude: { type: Number },
     locationName: { type: String },
     isOnline:{type:Boolean , default:false},
+    averageRating: { type: Number, default: 0,  min: 0, max: 5, },
 });
 
 const WorkerModel = mongoose.model<WorkerDocument>('Worker', workerSchema);

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { Ratings } from "../../../domain/entities/Rating";
 import { RatingRepository } from "../../../domain/repositories/ratingRepository";
 import RatingsModel from "../models/ratingsModel";
@@ -11,5 +12,8 @@ async createRatings(ratingData: Ratings): Promise<Ratings> {
         console.error("Error creating rating:", error);
         throw new Error("Unable to create rating");
     }
+}
+async getRatingsByWorkerId (workerId: string | Types.ObjectId) :Promise<Ratings[]|[]> {
+    return await RatingsModel.find({ workerId });
 }
 }

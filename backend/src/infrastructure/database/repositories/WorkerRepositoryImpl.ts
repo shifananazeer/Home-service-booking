@@ -1,3 +1,4 @@
+import { ObjectId, Types } from "mongoose";
 import { Worker } from "../../../domain/entities/worker";
 import { WorkerRepository } from "../../../domain/repositories/workerRepository";
 import WorkerModel from "../models/workerModel";
@@ -67,6 +68,10 @@ export class WorkerRepositoryImpl implements WorkerRepository {
             console.error('Error fetching worker IDs:', error);
             return []; 
         }
+    }
+    async updateWorkerAverageRating (workerId: string |Types.ObjectId, averageRating: number): Promise<void>  {
+        const updateAverage = await WorkerModel.findByIdAndUpdate(workerId, { averageRating });
+        console.log("updateAvgRaings" , updateAverage)
     }
 
 }

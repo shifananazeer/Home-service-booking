@@ -1,3 +1,4 @@
+import { ObjectId, Types } from 'mongoose';
 import { Worker } from '../entities/worker';
 
 export interface WorkerRepository {
@@ -10,4 +11,5 @@ export interface WorkerRepository {
      getWorkerById(workerId:string) :Promise<Worker | null>;
      findAllWorkers(skip: number, limit: number, search: string):Promise<Worker[]|null>
      getWorkerIdsByNames (workerNames:Set<string>):Promise<string[]>
+     updateWorkerAverageRating (workerId:string|Types.ObjectId , averageRating:number):Promise<void>
 }

@@ -545,9 +545,9 @@ export const fetchUnreadMessags = async (userId:string) => {
   export const addRatings = async (ratingData: Ratings) => {
     try {
         const response = await axiosInstance.post('/auth/ratings', ratingData); // Ensure the endpoint URL is correct
-        return response.data; // Return the data received from the response
+        return response.data; 
     } catch (error) {
         console.error('Error adding rating:', error);
-        throw error; // Optionally rethrow the error for handling in the calling function
+        throw error; 
     }
 };
