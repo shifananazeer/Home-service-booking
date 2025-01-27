@@ -12,6 +12,7 @@ interface Chat {
     firstName: string
     profilePic: string
   }
+  lastMessage?: Message
 }
 
 export interface Reaction {
@@ -75,10 +76,10 @@ const ChatList: React.FC = () => {
 
     // Cleanup function to remove listeners
     return () => {
-      socket.off("connect", handleConnect) 
-      socket.off("onlineUsersList", handleOnlineUsersList) 
+      socket.off("connect", handleConnect)
+      socket.off("onlineUsersList", handleOnlineUsersList)
     }
-  }, [workerId]) 
+  }, [workerId])
 
   useEffect(() => {
     const loadChats = async () => {
@@ -95,7 +96,12 @@ const ChatList: React.FC = () => {
           return acc
         }, {})
         setUnreadCounts(counts)
-        setChats(chats)
+        const sortedChats = chats.sort(
+          (a, b) =>
+            new Date(b.lastMessage?.createdAt || 0).getTime() - new Date(a.lastMessage?.createdAt || 0).getTime(),
+        )
+
+        setChats(sortedChats)
       } catch (error) {
         console.error("Error fetching chats:", error)
       }
@@ -228,14 +234,18 @@ const ChatList: React.FC = () => {
   const handleAudioCall = (id: string) => {
     navigate(`/worker/audioCall`)
   }
+  const formatTime = (isoDate: string) => {
+    const date = new Date(isoDate)
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100 chat-container relative">
+    <div className="flex h-[calc(100vh-64px)] bg-gray-100 ">
       <div className="w-1/3 bg-white border-r border-gray-200 overflow-y-auto">
-        <div className="p-4 sticky top-0 bg-white z-10 border-b border-gray-200">
+        <div className="p-4 sticky top-[20px]  bg-white z-10 border-b border-gray-200">
           <h2 className="text-2xl font-bold">Chats</h2>
         </div>
-        <div className="p-4">
+        <div className="p-6">
           {chats.map((chat) => (
             <div
               key={chat._id}
@@ -262,6 +272,12 @@ const ChatList: React.FC = () => {
                     onlineUsers.includes(chat.userInfo._id) ? "bg-green-500" : "bg-gray-500"
                   }`}
                 ></span>
+                {/* Unread Messages Badge */}
+                {unreadCounts[chat._id] > 0 && (
+                  <span className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow">
+                    {unreadCounts[chat._id]}
+                  </span>
+                )}
               </div>
               <div>
                 <div className="font-semibold">{chat.userInfo?.firstName || "Unknown User"}</div>
@@ -269,9 +285,10 @@ const ChatList: React.FC = () => {
                   {onlineUsers.includes(chat.userInfo._id) ? "Online" : "Offline"}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {unreadCounts[chat._id] > 0
-                    ? `${unreadCounts[chat._id]} Unread Message${unreadCounts[chat._id] > 1 ? "s" : ""}`
-                    : "No Unread Messages"}
+                  <p>
+                    {chat.lastMessage?.text} :{" "}
+                    {chat.lastMessage?.createdAt ? formatTime(chat.lastMessage.createdAt) : ""}
+                  </p>
                 </div>
               </div>
               <div className="justify-between ml-20">
@@ -292,6 +309,8 @@ const ChatList: React.FC = () => {
         {selectedChat ? (
           <>
             <div className="bg-white p-4 border-b border-gray-200 sticky top-[64px] z-20">
+              {" "}
+              {/* Update 1 */}
               <div className="flex items-center">
                 <h2 className="text-xl font-semibold mr-2">{selectedChat.userInfo?.firstName || "Unknown User"}</h2>
                 <span
@@ -304,7 +323,9 @@ const ChatList: React.FC = () => {
                 </span>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 pt-0">
+            <div className="flex-1 overflow-y-auto p-4 pt-0" style={{ height: "calc(100vh - 180px)" }}>
+              {" "}
+              {/* Update 2 */}
               {messages.map((message) => (
                 <div
                   key={message._id}
@@ -357,7 +378,9 @@ const ChatList: React.FC = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
-            <div className="bg-white p-4 border-t border-gray-200 sticky bottom-0 z-10">
+            <div className="bg-white p-4 border-t border-gray-200 sticky bottom-0 z-20">
+              {" "}
+              {/* Update 3 */}
               <div className="flex items-center">
                 <input
                   type="text"

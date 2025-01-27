@@ -188,7 +188,7 @@ class WorkerController   {
                     const addressResponse = await addressService.userAddress(worker._id)
                     console.log("Address worker:", addressResponse, "Worker:", worker);
             
-                    const { _id: workerId, name, email, phone, profilePic, expirience, status, skills , hourlyRate } = worker;
+                    const { _id: workerId, name, email, phone, profilePic, expirience, status, skills , hourlyRate , averageRating } = worker;
                   
                     if (!addressResponse.address) {
                         res.status(HttpStatus.OK).json({
@@ -202,6 +202,7 @@ class WorkerController   {
                                 status,
                                 expirience,
                                 hourlyRate,
+                                averageRating
                             },
                             address: null,
                         });
@@ -210,7 +211,7 @@ class WorkerController   {
             
                     const { id: addressId, userId: addressuserId, address: useraddress, area } = addressResponse.address;
                     res.status(HttpStatus.OK).json({
-                        worker: { _id: workerId, name, email, phone, expirience, skills, profilePic, hourlyRate ,status },
+                        worker: { _id: workerId, name, email, phone, expirience, skills, profilePic, hourlyRate ,status  , averageRating},
                         address: { id: addressId, userId: addressuserId, address: useraddress, area }
                     });
                 } catch (error) {

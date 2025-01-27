@@ -17,6 +17,7 @@ interface WorkerProfile {
   skills: string[];
   expirience: string;
   phoneNumber: string;
+  averageRating:number
 }
 
 interface Address {
@@ -147,8 +148,17 @@ const WorkerProfilePage: React.FC = () => {
               {/* Rating & Status */}
               <div className="flex justify-center items-center space-x-4 mb-6">
                 <div className="flex items-center bg-gray-700 rounded-full px-3 py-1">
-                  <Star className="text-yellow-400 w-4 h-4 mr-1" />
-                  <span className="text-white text-sm">5.0 (10 jobs)</span>
+                     {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                  key={star}
+                                                  className={`w-4 h-4 ${
+                                                    star <= Math.round(worker.averageRating)
+                                                      ? "text-yellow-400 fill-current"
+                                                      : "text-gray-300"
+                                                  }`}
+                                                />
+                                              ))}
+                 <span className="ml-2 text-gray-400 text-sm">({worker.averageRating.toFixed(1)})</span>
                 </div>
                 <div className="flex items-center bg-green-600 rounded-full px-3 py-1">
                   <Clock className="text-white w-4 h-4 mr-1" />

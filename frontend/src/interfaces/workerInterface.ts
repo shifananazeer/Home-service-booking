@@ -20,6 +20,7 @@ export interface WorkerProfileInterface {
     profilePic?:string;
     latitude?: number; 
     longitude?: number; 
+    averageRating:number;
 
 }
 

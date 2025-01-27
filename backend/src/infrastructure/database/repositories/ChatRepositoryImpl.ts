@@ -43,6 +43,26 @@ export class ChatRepositoryImpl implements chatRepository {
           },
         },
         {
+          $lookup: {
+            from: 'messages', 
+            let: { chatId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$chatId', '$$chatId'] },
+                },
+              },
+              {
+                $sort: { createdAt: -1 }, 
+              },
+              {
+                $limit: 1, 
+              },
+            ],
+            as: 'lastMessage',
+          },
+        },
+        {
           $project: {
             _id: 1,
             participants: 1, 
@@ -60,6 +80,7 @@ export class ChatRepositoryImpl implements chatRepository {
                 },
               ],
             },
+            lastMessage: { $arrayElemAt: ['$lastMessage', 0] },
           },
         },
       ]);

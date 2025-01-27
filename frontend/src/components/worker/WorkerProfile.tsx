@@ -7,6 +7,7 @@ import { ProfileSkeleton } from '../ProfileSkelton'
 import { refreshAccessToken } from '../../utils/auth'
 import { logout } from '../../features/worker/workerSlice'
 import { useDispatch } from 'react-redux'
+import { Star } from 'lucide-react'
 
 const WorkerProfile = () => {
     const navigate = useNavigate()
@@ -70,6 +71,23 @@ const WorkerProfile = () => {
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">Experience</h2>
                         <p className="text-gray-600">{workerProfile?.expirience || 'Not specified'} years</p>
                     </div>
+                   
+                    <div className="flex items-center">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">Ratings</h2>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= Math.round(workerProfile?.averageRating||0 )
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                            <span className="ml-2 text-gray-400 text-sm">
+                             ({(workerProfile?.averageRating ?? 0).toFixed(1)})  {/* Fallback to 0 for toFixed */}
+                            </span>
+                          </div>
 
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">Skills</h2>
@@ -92,7 +110,7 @@ const WorkerProfile = () => {
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">Rate Per Hour</h2>
                         <p className="text-2xl font-bold text-blue-600">
-                            ${workerProfile?.hourlyRate !== undefined ? workerProfile.hourlyRate.toFixed(2) : 'Not specified'}
+                        ₹{workerProfile?.hourlyRate !== undefined ? workerProfile.hourlyRate.toFixed(2) : 'Not specified'}
                         </p>
                     </div>
 

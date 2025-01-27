@@ -4,6 +4,8 @@ import { fetchAddress, fetchingSlotsByDate, fetchWorkersByService } from "../../
 import { useLocation, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FaUserTie } from "react-icons/fa"
+import { Star } from "lucide-react"
+import WorkerProfile from "../../components/worker/WorkerProfile"
 
 interface Worker {
   _id: string
@@ -12,6 +14,7 @@ interface Worker {
   hourlyRate?: number
   status: string
   isAvailable?: boolean
+  averageRating:number;
 }
 interface Slot {
   workerId: string
@@ -371,7 +374,7 @@ const BookingPage: React.FC = () => {
   }
 
 
-  
+   
 
 
   if (loading) {
@@ -536,6 +539,21 @@ const BookingPage: React.FC = () => {
                           <p className="text-gray-400 text-sm">
                             Rate: <span className="text-gray-200 font-bold">₹{worker.hourlyRate || "N/A"}/hr</span>
                           </p>
+                          
+                          <div className="flex items-center">
+                        
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= Math.round(worker.averageRating)
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                            <span className="ml-2 text-gray-400 text-sm">({worker.averageRating.toFixed(1)})</span>
+                          </div>
                           {selectedDate ? ( // Show availability status only if a date is selected
                             <p className={`text-lg ${worker.isAvailable ? "text-green-500" : "text-red-500"}`}>
                               {worker.isAvailable
