@@ -28,6 +28,9 @@ import { PaymentService } from "../../application/useCases/paymentService";
 import { ChatService } from "../../application/useCases/chatService";
 import { uploadChatImage } from "../../utils/uploadChatImage";
 import { NotificationService } from "../../application/useCases/notificationService";
+import { Ratings } from "../../domain/entities/Rating";
+import RatingsModel from "../../infrastructure/database/models/ratingsModel";
+import { RatingService } from "../../application/useCases/ratingservice";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -39,6 +42,7 @@ const workerService = new WorkerService()
 const paymentService = new PaymentService()
 const chatService = new ChatService()
 const notificationService = new NotificationService()
+const ratingService = new RatingService()
 
 class UserController  {
    async register (req: Request, res: Response) {
@@ -709,6 +713,31 @@ class UserController  {
            res.status(500).json({ success: false, message: "Internal server error" });
             return
           }
+    }
+
+    async addRatings (req:Request , res:Response) {
+        try {
+            const { userId, workerId, bookingId, review, rating } = req.body;
+
+            // Validate the incoming data
+            if (!userId || !workerId || !bookingId || !review || typeof rating !== 'number') {
+                 res.status(400).json({ message: 'Invalid input' });
+            }
+
+            const ratingData: Ratings = {
+                userId,
+                workerId,
+                bookingId,
+                review,
+                rating,
+            };
+
+            const createdRating = await ratingService.addRating(ratingData);
+             res.status(201).json(createdRating);
+        } catch (error) {
+            console.error('Error adding rating:', error);
+             res.status(500).json({ message: 'Internal server error' });
+        }
     }
 
     async checkStatus (req:Request , res:Response) {

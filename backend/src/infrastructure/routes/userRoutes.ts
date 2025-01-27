@@ -46,4 +46,5 @@ router.get('/get-notifications/:userId' , authenticateUser , userController.getN
 router.get('/bookings/:bookingId' , authenticateUser , userController.fetchBookingsDetails)
 router.get('/check/status' , userController.checkStatus)
 router.get('/slots' , userController. getSlotsByDate)
+router.post('/ratings' , userController.addRatings)
 export default router;

@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
-import { cancelBooking, createCheckoutSession, fetchBookigs } from '../../services/userService';
+import { addRatings, cancelBooking, createCheckoutSession, fetchBookigs } from '../../services/userService';
 import Swal from 'sweetalert2';
 import { Calendar, Clock, User, Briefcase, X } from 'lucide-react';
+import RatingModal from '../../components/RatingModel';
+import { devNull } from 'node:os';
+
 
 interface Booking {
   _id: string;
   bookingId:string;
   workerName: string;
+  workerId:string;
   serviceName: string;
   date: string;
   slotId: string;
@@ -29,6 +33,12 @@ const BookingList: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const navigate = useNavigate();
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false)
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
+  const userId = localStorage.getItem('user_Id')
+  const [workerId, setWorkerId] = useState<string | null>(null);
+
+
 
   const parseSlotId = (slotId: string) => {
     const [day, startTime, endTime] = slotId.split('-');
@@ -121,6 +131,28 @@ const BookingList: React.FC = () => {
       setCurrentPage((prev) => prev - 1);
     }
   };
+
+  const handleRatingSubmit = async (rating: number, review: string) => {
+    if (selectedBookingId) {
+      try {
+        
+        const ratingData = {
+          bookingId:selectedBookingId,
+          userId  , 
+          workerId, 
+          review ,
+          rating
+        }
+        await addRatings(ratingData)
+        Swal.fire("Success", "Rating submitted successfully", "success")
+        setIsRatingModalOpen(false)
+        setSelectedBookingId(null)
+      } catch (error) {
+        console.error("Error submitting rating:", error)
+        Swal.fire("Error", "Failed to submit rating. Please try again.", "error")
+      }
+    }
+  }
 
   if (isLoading) {
     return (
@@ -240,11 +272,15 @@ const BookingList: React.FC = () => {
   {booking.paymentStatus === 'balance_paid' &&
     booking.workStatus === 'completed' && (
       <button
-        onClick={() => navigate(`/rate-booking/${booking._id}`)}
-        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-      >
-       Add Ratings
-      </button>
+      onClick={() => {
+        setSelectedBookingId(booking._id)
+        setWorkerId(booking.workerId);
+        setIsRatingModalOpen(true)
+      }}
+      className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+    >
+      Add Ratings
+    </button>
     )}
 </div>
                 </div>
@@ -287,6 +323,15 @@ const BookingList: React.FC = () => {
           Book New Service
         </button>
       </div>
+      <RatingModal
+        isOpen={isRatingModalOpen}
+        onClose={() => {
+          setIsRatingModalOpen(false)
+          setSelectedBookingId(null)
+        }}
+        onSubmit={handleRatingSubmit}
+        bookingId={selectedBookingId || ""}
+      />
     </div>
   );
 };
