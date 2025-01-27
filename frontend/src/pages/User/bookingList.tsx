@@ -4,11 +4,13 @@ import axiosInstance from '../../utils/axiosInstance';
 import { cancelBooking, createCheckoutSession, fetchBookigs } from '../../services/userService';
 import Swal from 'sweetalert2';
 import { Calendar, Clock, User, Briefcase, X } from 'lucide-react';
+import RatingModal from '../../components/RatingsModel';
 
 interface Booking {
   _id: string;
   bookingId:string;
   workerName: string;
+  workerId:string;
   serviceName: string;
   date: string;
   slotId: string;
@@ -28,7 +30,10 @@ const BookingList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false)
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const navigate = useNavigate();
+  const userId = localStorage.getItem('user_Id')
 
   const parseSlotId = (slotId: string) => {
     const [day, startTime, endTime] = slotId.split('-');
@@ -65,6 +70,7 @@ const BookingList: React.FC = () => {
 
         if (fetchedData && fetchedData.bookings && Array.isArray(fetchedData.bookings.bookings)) {
           setBookings(fetchedData.bookings.bookings);
+
           setTotalPages(Math.ceil(fetchedData.bookings.total / limit));
         } else {
           setError('Invalid data structure received from the server');
@@ -121,6 +127,28 @@ const BookingList: React.FC = () => {
       setCurrentPage((prev) => prev - 1);
     }
   };
+
+
+
+  const handleRatingSubmit = async (rating: number, review: string) => {
+    if (selectedBookingId) {
+      try {
+        // await addRating({
+        //   bookingId: selectedBookingId,
+        //   rating,
+        //   review,
+        //   userId,
+          
+        // })
+        Swal.fire("Success", "Rating submitted successfully", "success")
+        setIsRatingModalOpen(false)
+        setSelectedBookingId(null)
+      } catch (error) {
+        console.error("Error submitting rating:", error)
+        Swal.fire("Error", "Failed to submit rating. Please try again.", "error")
+      }
+    }
+  }
 
   if (isLoading) {
     return (
@@ -240,11 +268,14 @@ const BookingList: React.FC = () => {
   {booking.paymentStatus === 'balance_paid' &&
     booking.workStatus === 'completed' && (
       <button
-        onClick={() => navigate(`/rate-booking/${booking._id}`)}
-        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-      >
-       Add Ratings
-      </button>
+      onClick={() => {
+        setSelectedBookingId(booking._id)
+        setIsRatingModalOpen(true)
+      }}
+      className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+    >
+      Add Ratings
+    </button>
     )}
 </div>
                 </div>
@@ -287,6 +318,17 @@ const BookingList: React.FC = () => {
           Book New Service
         </button>
       </div>
+      <RatingModal
+        isOpen={isRatingModalOpen}
+        onClose={() => {
+          setIsRatingModalOpen(false)
+          setSelectedBookingId(null)
+        }}
+        onSubmit={handleRatingSubmit}
+        bookingId={selectedBookingId || ""}
+      
+      
+      />
     </div>
   );
 };
