@@ -740,8 +740,31 @@ class UserController  {
         }
     }
 
-    async checkStatus (req:Request , res:Response) {
+    async unreadNotification (req:Request , res:Response) {
+     const {userId} = req.params 
+     try{
+      const unreadCount = await notificationService.getUnreadNotificationCount(userId)
+      res.status(200).json({ unreadCount });
+     }  catch (error) {
+        console.error('Error fetching unread notifications:', error);
+        res.status(500).json({ error: 'Failed to fetch unread notifications' });
+     }
+    }
 
+    async markTrue (req:Request , res:Response) {
+        const {userId} = req.params
+        try{
+      const IsReadTrue  = await notificationService.markIsReadTrue(userId)
+      res.status(200).json({
+        success: true,
+    });
+        }catch (error:any) {
+            res.status(500).json({
+                success: false,
+                message: "Failed to mark notifications as read.",
+                error: error.message,
+            });
+        }
     }
 }
 

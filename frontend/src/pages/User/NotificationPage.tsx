@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { createCheckoutSession, getAllNotificationByUserId, getBalanceAmount, getBooking } from "../../services/userService";
+import { createCheckoutSession, getAllNotificationByUserId, getBalanceAmount, getBooking, markTrue } from "../../services/userService";
 import Swal from "sweetalert2";
 
 export interface Notification {
@@ -79,8 +79,21 @@ const NotificationPage: React.FC = () => {
     }
   };
 
+
+  const markNotificationsAsRead = async () => {
+    if(!userId) {
+      return
+    }
+    try {
+     await  markTrue(userId)
+    } catch (error) {
+        console.error('Failed to mark notifications as read:', error);
+    }
+};
+
   useEffect(() => {
     fetchNotificationsAndBookings();
+    markNotificationsAsRead();
   }, [userId]);
 
   if (loading) {
@@ -91,6 +104,7 @@ const NotificationPage: React.FC = () => {
     );
   }
 
+ 
   const sortedNotifications = notifications.sort((a, b) => moment(b.timestamp).unix() - moment(a.timestamp).unix());
 
   const handleContinuePayment = async (bookingId: any) => {

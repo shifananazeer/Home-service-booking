@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUserProfile, resetPassword, resetPasswordFromPassword } from '../../services/userService';
+import { getUserProfile, resetPassword, resetPasswordFromPassword, unreadNotifications } from '../../services/userService';
 import { ProfileSkeleton } from '../../components/ProfileSkelton';
 import { useNavigate } from 'react-router-dom';
 import { UserProfileInterface } from '../../interfaces/userInterface';
@@ -20,8 +20,25 @@ const UserProfile = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
-
+    const [unreadCount, setUnreadCount] = useState<number>(0);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
+   const userId = localStorage.getItem('user_Id')
+    useEffect(() => {
+        const fetchUnreadNotifications = async () => {
+            if(!userId){
+                return
+            }
+            try {
+              const data  = await unreadNotifications(userId)
+              
+                setUnreadCount(data.unreadCount);
+            } catch (error) {
+                console.error('Failed to fetch unread notifications count:', error);
+            }
+        };
+    
+        fetchUnreadNotifications();
+    }, []);
 
     const handleOpenModal = (action: string) => {
         setSelectedAction(action);
@@ -101,25 +118,28 @@ const UserProfile = () => {
                     <div className="lg:w-1/4 bg-gray-200 p-6 border-r border-gray-200">
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
                         <nav>
-                            <ul className="space-y-2">
-                                {[
-                                    { text: 'Change Password', onClick: () => handleOpenModal('Change Password') },
-                                    { text: 'Booking List', path: '/booking-list' },
-                                    { text: 'Messages', path: '/user/messages' },
-                                    { text: 'Notifications', path: '/user/notifications' },
-                                ].map((item, index) => (
-                                    <li key={index}>
-                                        <button
-                                            onClick={
-                                                item.onClick || (() => item.path && navigate(item.path))
-                                            }
-                                            className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-gray-950 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            {item.text}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                        <ul className="space-y-2">
+            {[
+                { text: 'Change Password', onClick: () => handleOpenModal('Change Password') },
+                { text: 'Booking List', path: '/booking-list' },
+                { text: 'Messages', path: '/user/messages' },
+                { text: 'Notifications', path: '/user/notifications' },
+            ].map((item, index) => (
+                <li key={index}>
+                    <button
+                        onClick={item.onClick || (() => item.path && navigate(item.path))}
+                        className="w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-gray-950 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {item.text}
+                        {item.text === 'Notifications' && unreadCount > 0 && (
+                            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white">
+                                {unreadCount}
+                            </span>
+                        )}
+                    </button>
+                </li>
+            ))}
+        </ul>
                         </nav>
                     </div>
 

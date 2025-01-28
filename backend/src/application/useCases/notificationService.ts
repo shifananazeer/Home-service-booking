@@ -15,4 +15,11 @@ export class NotificationService {
      const result = await this.notificationRepository.retriveNotificationNyuserId(userId)
      return result;
     }
+    async getUnreadNotificationCount(userId: string): Promise<number> {
+      return await this.notificationRepository.countUnreadNotifications(userId);
+  }
+  async markIsReadTrue (userId:string):Promise<void> {
+    const result = await this.notificationRepository.changeStatus(userId)
+    return  result
+  }
 }

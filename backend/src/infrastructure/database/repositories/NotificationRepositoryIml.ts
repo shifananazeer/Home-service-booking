@@ -24,4 +24,13 @@ export class NotificationRepositoryImpl implements NotificationRepository {
     const response = await NotificationModel.find({userId:userId})
     return response ;
   }
+  async countUnreadNotifications(userId: string): Promise<number> {
+    return await NotificationModel.countDocuments({ userId, isRead: false });
+}
+async changeStatus (userId:string) : Promise<any> {
+   return await NotificationModel.updateMany(
+    { userId, isRead: false }, 
+    { $set: { isRead: true } } 
+);
+}
 }

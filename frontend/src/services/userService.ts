@@ -551,3 +551,22 @@ export const fetchUnreadMessags = async (userId:string) => {
         throw error; 
     }
 };
+
+
+export const unreadNotifications = async (userId:string) => {
+try{
+       const response = await axiosInstance.get(`/auth/unreadNotifications/${userId}`);
+       return response.data
+}catch (error){
+
+}
+}
+
+export const markTrue =async (userId:string) => {
+  try{
+    const response = await axiosInstance.patch(`/auth/markTrue/${userId}`)
+  }catch (error) {
+
+  }
+
+}
