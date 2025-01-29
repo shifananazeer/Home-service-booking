@@ -31,6 +31,8 @@ import { NotificationService } from "../../application/useCases/notificationServ
 import { Ratings } from "../../domain/entities/Rating";
 import RatingsModel from "../../infrastructure/database/models/ratingsModel";
 import { RatingService } from "../../application/useCases/ratingservice";
+import { WalletService } from "../../application/useCases/walletService";
+import { Types } from "mongoose";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -43,6 +45,7 @@ const paymentService = new PaymentService()
 const chatService = new ChatService()
 const notificationService = new NotificationService()
 const ratingService = new RatingService()
+const walletService = new WalletService()
 
 class UserController  {
    async register (req: Request, res: Response) {
@@ -766,6 +769,47 @@ class UserController  {
             });
         }
     }
+    async updateWallet(req: Request, res: Response) {
+        const { userId, amount, transactionDetails } = req.body
+        console.log("bodywallet", req.body)
+    
+        try {
+          const adminShare = amount * 0.1 // 10% for admin
+          const workerShare = amount * 0.9 // 90% for worker
+          console.log("shares", adminShare, workerShare)
+    
+          // Update worker's wallet
+          await walletService.workerWallet(userId, workerShare, {
+            ...transactionDetails,
+            amount: workerShare,
+            type: "credit",
+          })
+    
+          // Update admin's wallet
+          let adminWallet = await walletService.getAdminWallet()
+          if (!adminWallet) {
+            console.log("Creating Admin Wallet...")
+            adminWallet = await walletService.createAdminWallet(adminShare, {
+              ...transactionDetails,
+              amount: adminShare,
+              type: "credit",
+            })
+          } else {
+            console.log("Updating Admin Wallet...")
+            await walletService.updateAdminWallet(adminShare, {
+              ...transactionDetails,
+              amount: adminShare,
+              type: "credit",
+            })
+          }
+    
+          console.log("Wallet update successful!")
+          res.status(200).json({ success: true, message: "Wallets updated successfully" })
+        } catch (error:any) {
+          console.error("Error updating wallets:", error)
+          res.status(500).json({ success: false, message: "Error updating wallets", error: error.message })
+        }
+      }
 }
 
 

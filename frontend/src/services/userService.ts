@@ -570,3 +570,22 @@ export const markTrue =async (userId:string) => {
   }
 
 }
+
+export interface WalletData {
+  userId:string;
+  amount:number;
+  transactionDetails : {
+    type:string ;
+    description:string;
+    relatedBookingId:string;
+  }
+}
+
+export const updateWallet = async (walletData:WalletData) => {
+try{
+const response = await axiosInstance.post('/auth/update-wallet' , walletData)
+console.log("walletResponse" , response)
+}catch (error) {
+
+}
+}

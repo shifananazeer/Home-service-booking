@@ -49,4 +49,5 @@ router.get('/slots' , userController. getSlotsByDate)
 router.post('/ratings' , userController.addRatings)
 router.get('/unreadNotifications/:userId' , userController.unreadNotification)
 router.patch('/markTrue/:userId' , userController.markTrue)
+router.post('/update-wallet' , userController.updateWallet)
 export default router;

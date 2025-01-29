@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getBookingDetails, updateBookingStatus } from '../../services/userService';
+import { getBookingDetails, updateBookingStatus, updateWallet } from '../../services/userService';
 import { CheckCircle, Calendar, Clock, DollarSign, User, Briefcase } from 'lucide-react';
 
 interface BookingDetails {
@@ -11,6 +11,7 @@ interface BookingDetails {
   totalPayment: number;
   advancePayment: number;
   balancePayment: number;
+  workerId:string;
 }
 
 const BookingSuccessPage: React.FC = () => {
@@ -30,6 +31,18 @@ const BookingSuccessPage: React.FC = () => {
           setBookingDetails(details);
           console.log("details",details)
           await updateBookingStatus(bookingId, 'advance_paid');
+          const walletData = {
+            userId: details.workerId,
+            amount: details.advancePayment,
+            transactionDetails: {
+              type: 'credit',
+              description: 'Advance payment for booking',
+              relatedBookingId: bookingId, // Ensure you're referencing the correct field
+            },
+          }
+          await updateWallet(walletData);
+
+          console.log('Wallet updated successfully!');
           
         }
       } catch (error) {

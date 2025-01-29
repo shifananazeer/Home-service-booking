@@ -91,6 +91,7 @@ export class BookingRepositoryImpl implements BookingRepository {
 
     async getBookingById (bookingId:string) : Promise<Booking| null> {
         const details = await BookingModel.findOne({bookingId});
+        console.log("details" , details)
         return details;
     }
 
