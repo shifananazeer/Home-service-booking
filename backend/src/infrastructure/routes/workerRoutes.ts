@@ -33,4 +33,5 @@ router.get('/chat/:workerId' , workerController.getMessages)
 router.post('/reaction/:messageId',authenticateWorker, workerController.addReaction)
 router.get("/unread-messages/:workerId" ,authenticateWorker , workerController.getUnreadNotification)
 router.post('/bookings/mark-as-completed' ,authenticateWorker , workerController.updateWorkStatus)
+router.get ('/revenue/:workerId' ,  workerController.getRevenue)
 export default router;

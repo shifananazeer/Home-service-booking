@@ -57,4 +57,24 @@ export class WalletRepositoryImpl implements WalletRepository {
       return createdWallet
     }
   }
+  async getRevenueByWorker(workerId: string) {
+    console.log(`Fetching revenue for workerId: ${workerId}`);
+    
+    const results = await WalletModel.aggregate([
+      { $match: { userId: new Types.ObjectId(workerId) } }, 
+        { $unwind: "$transactions" },
+        { $match: { "transactions.type": "credit" } },
+        {
+            $group: {
+                _id: { $month: "$transactions.date" },
+                totalRevenue: { $sum: "$transactions.amount" },
+            },
+        },
+        { $sort: { _id: 1 } },
+    ]);
+
+    console.log('Aggregation results:', results);
+    return results;
+}
+
 }

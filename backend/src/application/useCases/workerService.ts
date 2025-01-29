@@ -6,6 +6,7 @@ import { WorkerRepositoryImpl } from "../../infrastructure/database/repositories
 
 export class WorkerService {
     private workerRepository: WorkerRepository;
+    
 
     constructor() {
         this.workerRepository = new WorkerRepositoryImpl();
@@ -133,6 +134,8 @@ public async getWorkerIds(workerNames: Set<string>): Promise<string[]> {
     const workerIds =  await this.workerRepository.getWorkerIdsByNames(workerNames);
     return workerIds;
 }
+
+
 }
 
 

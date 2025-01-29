@@ -30,4 +30,22 @@ export class WalletService {
   async updateAdminWallet(amount: number, transactionDetails: any): Promise<Wallet> {
     return await this.walletRepository.updateOrCreateWallet(null, amount, transactionDetails, true)
   }
+
+  async getWorkerRevenue(workerId: string): Promise<{ month: string; revenue: number }[]> {
+    const rawRevenueData = await this.walletRepository.getRevenueByWorker(workerId);
+
+    // Convert numeric month (_id) to string month name
+    const monthNames: string[] = [
+        "", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    // Map the raw data to the desired format
+    return rawRevenueData.map((data: { _id: number; totalRevenue: number }) => ({
+        month: monthNames[data._id], // Convert month number to month name
+        revenue: data.totalRevenue
+    }));
+}
+
+
 }

@@ -27,6 +27,7 @@ import { ChatService } from '../../application/useCases/chatService';
 import { getIo } from '../../infrastructure/sockets/chatSocket';
 import { uploadChatImage } from '../../utils/uploadChatImage';
 import { NotificationService } from '../../application/useCases/notificationService';
+import { WalletService } from '../../application/useCases/walletService';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
@@ -34,6 +35,7 @@ const availabilityService = new AvailabilityService();
 const bookingService = new BookingService();
 const chatService = new ChatService()
 const notificationService = new NotificationService()
+const walletService  = new WalletService();
 
 class WorkerController   {
  async signupWorker(req :Request , res: Response):Promise<void> {
@@ -641,6 +643,17 @@ class WorkerController   {
                      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.FAILED_TO_CHANGE_STATUS, error: error.message });
                      return
                 }
+               }
+
+               async getRevenue (req:Request , res:Response) {
+                try {
+                    const { workerId } = req.params;
+                    const revenue = await walletService.getWorkerRevenue(workerId);
+                    res.status(200).json(revenue);
+                  } catch (error:any) {
+                    console.error("Error fetching revenue data:", error);
+                    res.status(500).json({ error: error.message });
+                  }
                }
     }
 
