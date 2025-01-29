@@ -9,7 +9,7 @@ const TransactionSchema = new Schema<Transaction>({
     type: { type: String, enum: ['credit', 'debit'], required: true },
     date: { type: Date, required: true, default: Date.now },
     description: { type: String },
-    relatedBookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking' },
+    relatedBookingId: { type: String, required:true },
 });
 
 // Wallet Schema

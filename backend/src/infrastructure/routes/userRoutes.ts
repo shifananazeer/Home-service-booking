@@ -45,9 +45,9 @@ router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBal
 router.get('/get-notifications/:userId' , authenticateUser , userController.getNotifications)
 router.get('/bookings/:bookingId' , authenticateUser , userController.fetchBookingsDetails)
 
-router.get('/slots' , userController. getSlotsByDate)
-router.post('/ratings' , userController.addRatings)
-router.get('/unreadNotifications/:userId' , userController.unreadNotification)
-router.patch('/markTrue/:userId' , userController.markTrue)
-router.post('/update-wallet' , userController.updateWallet)
+router.get('/slots' , authenticateUser, userController. getSlotsByDate)
+router.post('/ratings' , authenticateUser, userController.addRatings)
+router.get('/unreadNotifications/:userId' ,  authenticateUser,userController.unreadNotification)
+router.patch('/markTrue/:userId' , authenticateUser, userController.markTrue)
+router.post('/update-wallet' ,  authenticateUser,userController.updateWallet)
 export default router;

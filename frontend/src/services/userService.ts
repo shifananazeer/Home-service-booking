@@ -331,7 +331,7 @@ export const updateBookingStatus = async (bookingId: string, status: string) => 
         },
       }
     );
-    return res.data; 
+    return res 
   } catch (error:any) {
     if (error.response && error.response.status === 401) {
       console.error('Unauthorized access', error);
@@ -525,8 +525,13 @@ export const fetchUnreadMessags = async (userId:string) => {
 
 
   export const fetchingSlotsByDate = async (date: string) => {
+    const token = localStorage.getItem('accessToken');
     try {
-      const response = await axiosInstance.get(`/auth/slots?date=${date}`);
+      const response = await axiosInstance.get(`/auth/slots?date=${date}` ,{
+        headers:{
+          'Authorization': `Bearer ${token}`,
+        }
+      });
       console.log("slot by date " , response)
       return response.data; // Return the data to the caller
     } catch (error) {
@@ -543,8 +548,13 @@ export const fetchUnreadMessags = async (userId:string) => {
   }
   
   export const addRatings = async (ratingData: Ratings) => {
+    const token = localStorage.getItem('accessToken');
     try {
-        const response = await axiosInstance.post('/auth/ratings', ratingData); // Ensure the endpoint URL is correct
+        const response = await axiosInstance.post('/auth/ratings', ratingData ,{
+          headers:{
+            'Authorization': `Bearer ${token}`,
+          }
+        }); // Ensure the endpoint URL is correct
         return response.data; 
     } catch (error) {
         console.error('Error adding rating:', error);
@@ -554,8 +564,13 @@ export const fetchUnreadMessags = async (userId:string) => {
 
 
 export const unreadNotifications = async (userId:string) => {
+  const token = localStorage.getItem('accessToken');
 try{
-       const response = await axiosInstance.get(`/auth/unreadNotifications/${userId}`);
+       const response = await axiosInstance.get(`/auth/unreadNotifications/${userId}` ,{
+        headers:{
+          'Authorization': `Bearer ${token}`,
+        }
+       });
        return response.data
 }catch (error){
 
@@ -563,8 +578,13 @@ try{
 }
 
 export const markTrue =async (userId:string) => {
+  const token = localStorage.getItem('accessToken');
   try{
-    const response = await axiosInstance.patch(`/auth/markTrue/${userId}`)
+    const response = await axiosInstance.patch(`/auth/markTrue/${userId}` ,{
+      headers:{
+        'Authorization': `Bearer ${token}`,
+      }
+    })
   }catch (error) {
 
   }
@@ -581,11 +601,24 @@ export interface WalletData {
   }
 }
 
-export const updateWallet = async (walletData:WalletData) => {
-try{
-const response = await axiosInstance.post('/auth/update-wallet' , walletData)
-console.log("walletResponse" , response)
-}catch (error) {
+export const updateWallet = async (walletData: WalletData) => {
+  try {
+    const token = localStorage.getItem("accessToken");
 
-}
-}
+    if (!token) {
+      console.error("No access token found in localStorage");
+      return;
+    }
+
+    const response = await axiosInstance.post("/auth/update-wallet", walletData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Wallet updated successfully!", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating wallet:", error.response?.data || error.message);
+  }
+};

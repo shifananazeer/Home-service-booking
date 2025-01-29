@@ -25,35 +25,49 @@ const BookingSuccessPage: React.FC = () => {
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
+      setLoading(true); // Ensure loading state is set before fetching data
       try {
         if (bookingId) {
           const details = await getBookingDetails(bookingId);
           setBookingDetails(details);
-          console.log("details",details)
-          await updateBookingStatus(bookingId, 'advance_paid');
-          const walletData = {
-            userId: details.workerId,
-            amount: details.advancePayment,
-            transactionDetails: {
-              type: 'credit',
-              description: 'Advance payment for booking',
-              relatedBookingId: bookingId, // Ensure you're referencing the correct field
-            },
-          }
-          await updateWallet(walletData);
-
-          console.log('Wallet updated successfully!');
+          console.log("details", details);
+          console.log("dddd" , details.workerId)
+          console.log("ddd" , details.advancePayment)
+          console.log("boo" , bookingId)
           
+          if (details?.workerId && details?.advancePayment) {
+            // Update booking status
+            console.log('Updating booking status...');
+            const response = await updateBookingStatus(bookingId, 'advance_paid');
+            console.log("Booking status updated!", response);
+            
+            const walletData = {
+              userId: details.workerId,
+              amount: details.advancePayment,
+              transactionDetails: {
+                type: 'credit',
+                description: 'Advance payment for booking',
+                relatedBookingId: bookingId,
+              },
+            };
+            console.log("walletdata" , walletData)
+            console.log("Sending request to update wallet:", walletData);
+            const walletResponse = await updateWallet(walletData);
+            console.log("Wallet API Response:", walletResponse);
+          } else {
+            console.error('Invalid booking details:', details);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch booking details:', error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false after fetch completes
       }
     };
-
+  
     fetchBookingDetails();
   }, [bookingId]);
+  
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getBookingDetails, updateBookingStatus } from '../../services/userService';
+import { getBookingDetails, updateBookingStatus, updateWallet } from '../../services/userService';
 import { CheckCircle, Calendar, Clock, User, Briefcase } from 'lucide-react';
 
 interface BookingDetails {
@@ -30,7 +30,19 @@ const BalancePaymentSuccessPage: React.FC = () => {
            setBookingDetails(details);
            console.log("details",details)
            await updateBookingStatus(bookingId, 'balance_paid');
-           
+           const walletData = {
+                      userId: details.workerId,
+                      amount: details.advancePayment,
+                      transactionDetails: {
+                        type: 'credit',
+                        description: 'Balance payment for booking',
+                        relatedBookingId: bookingId, // Ensure you're referencing the correct field
+                      },
+                    }
+                    await updateWallet(walletData);
+          
+                    console.log('Wallet updated successfully!');
+                     
          }
        } catch (error) {
          console.error('Failed to fetch booking details:', error);
@@ -40,6 +52,7 @@ const BalancePaymentSuccessPage: React.FC = () => {
      };
  
      fetchBookingDetails();
+     
    }, [bookingId]);
  
    if (loading) {

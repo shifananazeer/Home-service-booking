@@ -507,8 +507,10 @@ class UserController  {
         async updatePaymentStatus (req:Request , res:Response) {
             const {bookingId} = req.params;
             const {status } = req.body
+            console.log("body" , req.body)
             try{
              const update = await bookingService.updateBookingById(bookingId , status)
+             res.status(200) .json({message :'statusUpdated'})
             }catch(error) {
                 console.error('Error updating payment', error);
                 res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'error updating payment' });

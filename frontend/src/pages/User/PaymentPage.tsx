@@ -96,20 +96,23 @@ console.log("balance" , balanceAmount)
                     paymentType: 'advance',
                     successUrl: `http://localhost:5173/booking-success?bookingId=${response.data.bookingId}`, 
                 });
-                
-                if (checkoutResponse.url) {
-                    // Redirect to the Stripe checkout page
-                    window.location.href = checkoutResponse.url;
-                } else {
-                    Swal.fire('Error', 'Failed to create Stripe session', 'error');
-                }
-            } else {
-                Swal.fire('Error', response.data.message || 'Failed to create booking', 'error');
-            }
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'An error occurred while creating the booking', 'error');
+                Swal.close();
+
+        if (checkoutResponse.url) {
+            // Redirect to the Stripe checkout page
+            window.location.href = checkoutResponse.url;
+        } else {
+            Swal.fire('Error', 'Failed to create Stripe session', 'error');
         }
+    } else {
+        Swal.close(); // Close the loading spinner if booking fails
+        Swal.fire('Error', response.data.message || 'Failed to create booking', 'error');
+    }
+} catch (error) {
+    console.error(error);
+    Swal.close(); // Ensure the loading spinner is closed on error
+    Swal.fire('Error', 'An unexpected error occurred.', 'error');
+}
     };
     
     return (

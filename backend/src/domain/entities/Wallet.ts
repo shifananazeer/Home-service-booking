@@ -6,7 +6,7 @@ export interface Transaction {
     type: 'credit' | 'debit'; 
     date: Date;
     description?: string;
-    relatedBookingId: Types.ObjectId; 
+    relatedBookingId: string; 
 }
 
 // Wallet Interface
