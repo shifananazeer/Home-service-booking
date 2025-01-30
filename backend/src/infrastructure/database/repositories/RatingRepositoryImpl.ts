@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Ratings } from "../../../domain/entities/Rating";
 import { RatingRepository } from "../../../domain/repositories/ratingRepository";
 import RatingsModel from "../models/ratingsModel";
@@ -13,7 +13,22 @@ async createRatings(ratingData: Ratings): Promise<Ratings> {
         throw new Error("Unable to create rating");
     }
 }
-async getRatingsByWorkerId (workerId: string | Types.ObjectId) :Promise<Ratings[]|[]> {
-    return await RatingsModel.find({ workerId });
+// async getRatingsByWorkerId (workerId: string | Types.ObjectId) :Promise<Ratings[]|[]> {
+//     return await RatingsModel.find({ workerId });
+// }
+async getRatingsByWorkerId (workerId: string) {
+    try {
+        const objectId = new mongoose.Types.ObjectId(workerId); // Convert workerId to ObjectId
+
+        const ratings = await RatingsModel.find({ workerId: objectId }) // Use ObjectId
+            .populate({ path: "userId", select: "firstName lastName" }) // Populate user details
+            .lean(); // Convert Mongoose docs to JSON
+        
+        console.log(ratings);
+        return ratings;
+    } catch (error) {
+        console.error("Error fetching ratings:", error);
+        return [];
+    }
 }
 }

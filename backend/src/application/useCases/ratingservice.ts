@@ -24,4 +24,20 @@ export class RatingService {
   console.log("averageRatings" , newAverageRating)
   await this.workerRepository.updateWorkerAverageRating(ratingData.workerId, newAverageRating);
         return createdRating;
- }}
+ }
+
+ public   async getWorkerRatings(workerId: string) {
+    const ratings = await this.ratingRepository.getRatingsByWorkerId(workerId);
+    console.log('Fetched Ratings:', ratings); 
+
+    const ratingValues = ratings.map((rating: { rating: any; }) => rating.rating);
+    const reviews = ratings.map((rating: { userId: any; review: any; bookingId: any; }) => ({
+        userId: rating.userId,
+        review: rating.review,
+        userName: `${rating.userId.firstName} ${rating.userId.lastName}`, 
+        bookingId: rating.bookingId,
+    }));
+
+    return { ratings: ratingValues, reviews };
+}
+}

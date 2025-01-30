@@ -57,24 +57,50 @@ export class WalletRepositoryImpl implements WalletRepository {
       return createdWallet
     }
   }
-  async getRevenueByWorker(workerId: string) {
-    console.log(`Fetching revenue for workerId: ${workerId}`);
-    
+  async getRevenueByWorker(workerId: string, timeFrame: string): Promise<{ _id: string; totalRevenue: number }[]> {
+    console.log(`Fetching revenue for workerId: ${workerId} with timeFrame: ${timeFrame}`);
+
+    const matchCriteria: any = {
+        userId: new Types.ObjectId(workerId),
+        "transactions.type": "credit",
+    };
+
+    const currentDate = new Date();
+    let startDate: Date;
+    let endDate: Date;
+
+    // Set date range based on time frame
+    if (timeFrame === 'monthly') {
+        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        matchCriteria["transactions.date"] = { $gte: startDate, $lte: endDate };
+    } else if (timeFrame === 'weekly') {
+        startDate = new Date(currentDate);
+        startDate.setDate(startDate.getDate() - 6);
+        matchCriteria["transactions.date"] = { $gte: startDate };
+    } else if (timeFrame === 'yearly') {
+        startDate = new Date(currentDate.getFullYear(), 0, 1);
+        endDate = new Date(currentDate.getFullYear() + 1, 0, 0);
+        matchCriteria["transactions.date"] = { $gte: startDate, $lte: endDate };
+    }
+
     const results = await WalletModel.aggregate([
-      { $match: { userId: new Types.ObjectId(workerId) } }, 
+        { $match: matchCriteria },
         { $unwind: "$transactions" },
-        { $match: { "transactions.type": "credit" } },
         {
             $group: {
-                _id: { $month: "$transactions.date" },
+                _id: timeFrame === 'weekly' ? { $dateToString: { format: "%Y-%m-%d", date: "$transactions.date" } } :
+                    timeFrame === 'monthly' ? { $month: "$transactions.date" } :
+                    { $year: "$transactions.date" },
                 totalRevenue: { $sum: "$transactions.amount" },
             },
         },
         { $sort: { _id: 1 } },
     ]);
 
-    console.log('Aggregation results:', results);
-    return results;
+    return results.map(item => ({
+        _id: item._id as string,  // Ensure _id is treated as a string
+        totalRevenue: item.totalRevenue,
+    }));
 }
-
 }

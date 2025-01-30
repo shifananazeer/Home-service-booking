@@ -139,6 +139,34 @@ export class BookingRepositoryImpl implements BookingRepository {
         return bookings;
 
     }
+
+    async getCount(workerId: string, timeFrame: string) {
+        const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    
+        const matchCriteria: any = {
+            workerId: workerObjectId,
+            status: { $ne: "cancelled" } // Exclude cancelled bookings
+        };
+    
+        const currentDate = new Date();
+        let groupStage: any = {};
+    
+        if (timeFrame === "weekly") {
+            groupStage = { _id: { $dayOfWeek: "$createdAt" }, totalCount: { $sum: 1 } };
+        } else if (timeFrame === "monthly") {
+            groupStage = { _id: { $month: "$createdAt" }, totalCount: { $sum: 1 } };
+        } else if (timeFrame === "yearly") {
+            groupStage = { _id: { $year: "$createdAt" }, totalCount: { $sum: 1 } };
+        }
+    
+        const result = await BookingModel.aggregate([
+            { $match: matchCriteria },
+            { $group: groupStage },
+            { $sort: { _id: 1 } }
+        ]);
+    
+        return result;
+    }
 }
 
 

@@ -6,5 +6,5 @@ export interface WalletRepository {
     createWallet(userId: string | null, balance: number, isAdmin: boolean, transactionDetails: any): Promise<Wallet>;
     createAdminWallet(amount: number, transactionDetails: any): Promise<Wallet>;
     updateOrCreateWallet(userId: string | null, amount: number, transactionDetails: any, isAdmin: boolean): Promise<Wallet>;
-    getRevenueByWorker(workerId: string): Promise<{ _id: number; totalRevenue: number }[]>; 
+    getRevenueByWorker(workerId: string , timeFrame: string):Promise<{ _id: string, totalRevenue: number }[]> ; 
 }

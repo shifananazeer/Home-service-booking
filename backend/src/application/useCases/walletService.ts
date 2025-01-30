@@ -31,21 +31,68 @@ export class WalletService {
     return await this.walletRepository.updateOrCreateWallet(null, amount, transactionDetails, true)
   }
 
-  async getWorkerRevenue(workerId: string): Promise<{ month: string; revenue: number }[]> {
-    const rawRevenueData = await this.walletRepository.getRevenueByWorker(workerId);
+  async getWorkerRevenue(workerId: string, timeFrame: string): Promise<{ label: string; revenue: number }[]> {
+    const rawRevenueData = await this.walletRepository.getRevenueByWorker(workerId, timeFrame);
 
-    // Convert numeric month (_id) to string month name
-    const monthNames: string[] = [
-        "", "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
+    if (timeFrame === 'weekly') {
+        const dayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const weeklyRevenueData = dayLabels.map((label, index) => {
+            const dayOfWeek = new Date();
+            dayOfWeek.setDate(dayOfWeek.getDate() - (dayOfWeek.getDay() - index)); // Adjust to current day index
 
-    // Map the raw data to the desired format
-    return rawRevenueData.map((data: { _id: number; totalRevenue: number }) => ({
-        month: monthNames[data._id], // Convert month number to month name
-        revenue: data.totalRevenue
-    }));
+            const dateString = dayOfWeek.toISOString().split('T')[0];
+
+            const dayRevenueData = rawRevenueData.find((data) => data._id === dateString);
+
+            return {
+                label: label,
+                revenue: dayRevenueData ? dayRevenueData.totalRevenue : 0, // Ensure default 0
+            };
+        });
+
+        return weeklyRevenueData;
+    } 
+    
+    if (timeFrame === 'monthly') {
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        // Create a map of revenue data
+        const revenueMap = rawRevenueData.reduce((acc, data) => {
+            acc[Number(data._id) - 1] = data.totalRevenue; // Convert month index (1-12) to array index (0-11)
+            return acc;
+        }, {} as Record<number, number>);
+
+        // Ensure all 12 months are included
+        const fullRevenueData = monthNames.map((month, index) => ({
+            label: month,
+            revenue: revenueMap[index] || 0, // Default 0 if no data for the month
+        }));
+
+        return fullRevenueData;
+    }
+
+    if (timeFrame === 'yearly') {
+      // Get the current year and look back 5 years
+      const currentYear = new Date().getFullYear();
+      const years = Array.from({ length: 5 }, (_, i) => currentYear - i).reverse();
+
+      // Create a map of revenue data for years
+      const revenueMap = rawRevenueData.reduce((acc, data) => {
+          acc[Number(data._id)] = data.totalRevenue;
+          return acc;
+      }, {} as Record<number, number>);
+
+      const fullRevenueData = years.map((year) => ({
+          label: year.toString(),
+          revenue: revenueMap[year] || 0,
+      }));
+
+      return fullRevenueData;
+  }
+
+    return [];
 }
-
-
 }

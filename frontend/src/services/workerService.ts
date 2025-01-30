@@ -368,10 +368,10 @@ export const getWorkerLocation = async (workerId :string) => {
          }
     }
 
-export const revenueDataForWorker = async (workerId:string) => {
+export const revenueDataForWorker = async (workerId:string , timeFrame:string) => {
     const token = localStorage.getItem('worker_accessToken');
     try{
-    const response = await axiosInstance.get(`/workers/revenue/${workerId}` ,{
+    const response = await axiosInstance.get(`/workers/revenue/${workerId}?timeFrame=${timeFrame}` ,{
         headers: {
             'Authorization': `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
@@ -384,3 +384,26 @@ export const revenueDataForWorker = async (workerId:string) => {
 
 }
   
+
+export const numberOfBookings  = async (workerId:string , timeFrame:string) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try{
+     const response = await axiosInstance.get(`/workers/bookingsCount/${workerId}?timeFrame=${timeFrame}`)
+     return response.data;
+    }catch (error) {
+
+    }
+    
+}
+
+
+export const getWorkerRatings = async (workerId: string) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try {
+        const response = await axiosInstance.get(`/workers/ratings/${workerId}`);
+        return response.data; // Assuming it returns { ratings: number[], reviews: Review[] }
+    } catch (error) {
+        console.error("Error fetching ratings:", error);
+        throw error; // Rethrow error to handle it in the component
+    }
+};

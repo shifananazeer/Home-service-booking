@@ -28,6 +28,7 @@ import { getIo } from '../../infrastructure/sockets/chatSocket';
 import { uploadChatImage } from '../../utils/uploadChatImage';
 import { NotificationService } from '../../application/useCases/notificationService';
 import { WalletService } from '../../application/useCases/walletService';
+import { RatingService } from '../../application/useCases/ratingservice';
 
 const workerService = new WorkerService();
 const addressService = new AddressService();
@@ -36,6 +37,7 @@ const bookingService = new BookingService();
 const chatService = new ChatService()
 const notificationService = new NotificationService()
 const walletService  = new WalletService();
+const ratingsService = new RatingService()
 
 class WorkerController   {
  async signupWorker(req :Request , res: Response):Promise<void> {
@@ -648,13 +650,45 @@ class WorkerController   {
                async getRevenue (req:Request , res:Response) {
                 try {
                     const { workerId } = req.params;
-                    const revenue = await walletService.getWorkerRevenue(workerId);
+                    const timeFrame: string | undefined = req.query.timeFrame as string;
+
+                    // Optionally check if timeFrame is undefined and set a default value
+                    const validTimeFrame = timeFrame || 'monthly';
+                    const revenue = await walletService.getWorkerRevenue(workerId, validTimeFrame);
                     res.status(200).json(revenue);
                   } catch (error:any) {
                     console.error("Error fetching revenue data:", error);
                     res.status(500).json({ error: error.message });
                   }
                }
+
+               async getBookingCount(req: Request, res: Response) {
+                try {
+                    const { workerId } = req.params;
+                    const timeFrame: string | undefined = req.query.timeFrame as string;
+            
+                    // Default to 'monthly' if timeFrame is undefined
+                    const validTimeFrame = timeFrame || 'monthly';
+            
+                    const count = await bookingService.getCountByWorker(workerId, validTimeFrame);
+                    res.status(200).json(count);
+                } catch (error) {
+                    console.error("Error fetching booking count:", error);
+                    res.status(500).json({ message: "Internal Server Error" });
+                }
+            }
+
+            async getRatingsAndReview(req:Request , res:Response) {
+                const {workerId} = req.params;
+
+                try {
+                    const ratingsData = await ratingsService.getWorkerRatings(workerId);
+                    res.status(200).json(ratingsData);
+                } catch (error) {
+                    console.error("Error fetching worker ratings:", error);
+                    res.status(500).json({ message: 'Error fetching ratings', error });
+                }
+            }
     }
 
     export const workerController  = new WorkerController();

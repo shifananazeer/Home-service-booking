@@ -1,113 +1,144 @@
-import React, { useEffect, useState } from 'react'
-import WorkerNavbar from './WorkerNavbar'
-import WorkerSidebar from './WorkerSidebar'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../app/store'
-import { Navigate, useNavigate } from 'react-router-dom'
-import WorkerProfile from '../../components/worker/WorkerProfile'
-import AvailabilityManagement from '../../components/worker/AvailabilityManagement'
-import WorkerBookings from '../../components/worker/bookings'
-import WorkerTodayBookings from '../../components/worker/todaysBooking'
-import { refreshAccessToken } from '../../utils/auth'
-
-import socket from '../../utils/socket'
-import ChatList from '../../components/worker/ChatList'
-import { revenueDataForWorker } from '../../services/workerService'
-import RevenueChart from '../../components/worker/RevenueChart'
+import type React from "react"
+import { useEffect, useState } from "react"
+import WorkerNavbar from "./WorkerNavbar"
+import WorkerSidebar from "./WorkerSidebar"
+import { useNavigate } from "react-router-dom"
+import WorkerProfile from "../../components/worker/WorkerProfile"
+import AvailabilityManagement from "../../components/worker/AvailabilityManagement"
+import WorkerBookings from "../../components/worker/bookings"
+import WorkerTodayBookings from "../../components/worker/todaysBooking"
+import ChatList from "../../components/worker/ChatList"
+import { getWorkerRatings, numberOfBookings, revenueDataForWorker } from "../../services/workerService"
+import RevenueChart from "../../components/worker/RevenueChart"
+import BookingCountChart from "../../components/worker/BookingsCountChart"
+import WorkerRatingsAndReviews from "../../components/worker/RatingsandReview"
 
 
-interface RevenueData {
-    month: string;
-    revenue: number;
-}
-
-
-const defaultMonths: string[] = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
+interface RatingsAndReviews {
+    ratings: number[]
+    reviews: {
+      userId: string
+      review: string
+      bookingId: string
+    }[]
+  }
+  
 
 const WorkerDashboard = () => {
-const navigate = useNavigate()
-const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
-const workerId = localStorage.getItem('workerId')
-useEffect(() => {
-    const accessToken = localStorage.getItem("worker_accessToken");
+  const navigate = useNavigate()
+  const [revenueData, setRevenueData] = useState<{ label: string; revenue: number }[]>([])
+  const [bookingData, setBookingData] = useState<{ label: string; count: number }[]>([])
+  const [timeFrame, setTimeFrame] = useState<"weekly" | "monthly" | "yearly">("monthly")
+  const [currentComponent, setCurrentComponent] = useState("dashboard")
+  const [ratingsAndReviews, setRatingsAndReviews] = useState<RatingsAndReviews>({ ratings: [], reviews: [] })
+  const workerId = localStorage.getItem("workerId")
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("worker_accessToken")
     if (!accessToken) {
-        navigate("/worker/login");
+      navigate("/worker/login")
+    }
+  }, [navigate])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!workerId) return
+
+      try {
+        const revenue = await revenueDataForWorker(workerId, timeFrame)
+        setRevenueData(revenue)
+        const bookings = await numberOfBookings(workerId, timeFrame)
+        setBookingData(bookings)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      }
     }
 
-    const fetchRevenueData = async () => {
-        if (!workerId) return;
-        try {
-            const data = await revenueDataForWorker(workerId);
-
-            // Map API data for quick lookup
-            const revenueMap = new Map(data?.map((item: RevenueData) => [item.month, item.revenue]));
-
-            // Ensure all months are present with default revenue 0
-            const formattedData: RevenueData[] = defaultMonths.map((month) => ({
-                month,
-                revenue: Number(revenueMap.get(month) || 0), // Ensure revenue is always a number
-            }));
-
-            setRevenueData(formattedData);
-        } catch (error) {
-            console.error("Error fetching revenue data:", error);
+    const fetchRatingsAndReviews = async () => {
+        if (!workerId) return
+        try{
+     const ratings = await getWorkerRatings(workerId)
+     setRatingsAndReviews(ratings)
+        }catch (error) {
+            console.error("Error fetching ratings and reviews:", error)
         }
-    };
-
-    fetchRevenueData();
-}, [workerId, navigate]);
-    
-    
-   const [currentComponent, setCurrentComponent] = useState("dashboard"); 
-   const renderComponent = () => {
-    switch (currentComponent) {
-        case "profile":
-            return <WorkerProfile />;
-        case 'availabilityManagement': 
-            return <AvailabilityManagement/>
-        case 'workerBookings' :
-            return <WorkerBookings/>    
-        case 'todaysBooking':
-              return <WorkerTodayBookings/>
-        case 'chats':
-            return <ChatList/>
-        case "dashboard":
-            return (
-                <>
-                    <h1 className="text-2xl font-bold">Worker Dashboard</h1>
-                    <p className="mt-4">Welcome to your Worker dashboard!</p>
-                       {/* Add revenue chart here */}
-                       {revenueData.length > 0 ? (
-                            <RevenueChart revenueData={revenueData} />
-                        ) : (
-                            <p>Loading revenue data...</p>
-                        )}
-                </>
-            );
-        default:
-            return <h1 className="text-2xl font-bold">Component Not Found</h1>;
     }
-};
+   
+    fetchData()
+    fetchRatingsAndReviews()
+  }, [workerId, timeFrame])
+
+  const handleTimeFrameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTimeFrame(e.target.value as "weekly" | "monthly" | "yearly")
+  }
+
+  const renderComponent = () => {
+    switch (currentComponent) {
+      case "profile":
+        return <WorkerProfile />
+      case "availabilityManagement":
+        return <AvailabilityManagement />
+      case "workerBookings":
+        return <WorkerBookings />
+      case "todaysBooking":
+        return <WorkerTodayBookings />
+      case "chats":
+        return <ChatList />
+      case "dashboard":
+        return (
+          <div className="space-y-6">
+            <h1 className="text-3xl font-bold text-gray-800">Worker Dashboard</h1>
+            <p className="text-lg text-gray-600">Welcome to your Worker dashboard!</p>
+            <div className="flex items-center space-x-4">
+              <label htmlFor="timeframe" className="text-sm font-medium text-gray-700">
+                Select Timeframe:
+              </label>
+              <select
+                id="timeframe"
+                onChange={handleTimeFrameChange}
+                value={timeFrame}
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              >
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Revenue</h2>
+                <RevenueChart data={revenueData} />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Booking Count</h2>
+                <BookingCountChart data={bookingData} />
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <WorkerRatingsAndReviews ratings={ratingsAndReviews.ratings} reviews={ratingsAndReviews.reviews} />
+            </div>
+          </div>
+        )
+      default:
+        return <h1 className="text-2xl font-bold">Component Not Found</h1>
+    }
+  }
+
   return (
-    <div className="flex flex-col h-screen ">
-    {/* Admin Navbar */}
-    <WorkerNavbar />
-
-    {/* Admin Sidebar and Main Content */}
-    <div className="flex flex-1">
-        {/* Sidebar */}
+    <div className="flex flex-col h-screen bg-gray-100">
+      <WorkerNavbar />
+      <div className="flex flex-1 overflow-hidden">
         <WorkerSidebar setCurrentComponent={setCurrentComponent} />
-
-        {/* Main Content */}
-        <div className="flex-1 p-6 bg-gray-100" style={{ marginLeft: "16rem", marginTop: "4rem" }}>
-            {renderComponent()}
-        </div>
+        <main
+          className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6"
+          style={{ marginLeft: "16rem", marginTop: "4rem" }}
+        >
+          {renderComponent()}
+        </main>
+      </div>
     </div>
-</div>
   )
 }
 
 export default WorkerDashboard
+
