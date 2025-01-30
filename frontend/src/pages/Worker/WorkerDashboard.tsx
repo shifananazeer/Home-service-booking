@@ -12,19 +12,53 @@ import { refreshAccessToken } from '../../utils/auth'
 
 import socket from '../../utils/socket'
 import ChatList from '../../components/worker/ChatList'
+import { revenueDataForWorker } from '../../services/workerService'
+import RevenueChart from '../../components/worker/RevenueChart'
 
+
+interface RevenueData {
+    month: string;
+    revenue: number;
+}
+
+
+const defaultMonths: string[] = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
 
 const WorkerDashboard = () => {
 const navigate = useNavigate()
+const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
 const workerId = localStorage.getItem('workerId')
-     useEffect(()=> {
-            const accessToken = localStorage.getItem('worker_accessToken')
-            if(!accessToken) {
-                navigate('/worker/login')
-            }
-        },[])
+useEffect(() => {
+    const accessToken = localStorage.getItem("worker_accessToken");
+    if (!accessToken) {
+        navigate("/worker/login");
+    }
 
-       
+    const fetchRevenueData = async () => {
+        if (!workerId) return;
+        try {
+            const data = await revenueDataForWorker(workerId);
+
+            // Map API data for quick lookup
+            const revenueMap = new Map(data?.map((item: RevenueData) => [item.month, item.revenue]));
+
+            // Ensure all months are present with default revenue 0
+            const formattedData: RevenueData[] = defaultMonths.map((month) => ({
+                month,
+                revenue: Number(revenueMap.get(month) || 0), // Ensure revenue is always a number
+            }));
+
+            setRevenueData(formattedData);
+        } catch (error) {
+            console.error("Error fetching revenue data:", error);
+        }
+    };
+
+    fetchRevenueData();
+}, [workerId, navigate]);
     
     
    const [currentComponent, setCurrentComponent] = useState("dashboard"); 
@@ -45,6 +79,12 @@ const workerId = localStorage.getItem('workerId')
                 <>
                     <h1 className="text-2xl font-bold">Worker Dashboard</h1>
                     <p className="mt-4">Welcome to your Worker dashboard!</p>
+                       {/* Add revenue chart here */}
+                       {revenueData.length > 0 ? (
+                            <RevenueChart revenueData={revenueData} />
+                        ) : (
+                            <p>Loading revenue data...</p>
+                        )}
                 </>
             );
         default:

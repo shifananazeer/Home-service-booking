@@ -368,5 +368,19 @@ export const getWorkerLocation = async (workerId :string) => {
          }
     }
 
+export const revenueDataForWorker = async (workerId:string) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try{
+    const response = await axiosInstance.get(`/workers/revenue/${workerId}` ,{
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          }, 
+    })
+    return response.data
+    }catch (error) {
+  console.log("error" , error)
+    }
 
+}
   
