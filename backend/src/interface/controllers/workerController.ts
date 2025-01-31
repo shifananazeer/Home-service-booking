@@ -689,6 +689,17 @@ class WorkerController   {
                     res.status(500).json({ message: 'Error fetching ratings', error });
                 }
             }
+
+            async getWallet (req:Request , res:Response) {
+                const {workerId} = req.params ;
+                console.log("id" , workerId)
+                try{
+                    const walletDetails = await walletService.getWalletDetails(workerId);
+                    res.status(200).json(walletDetails);
+                }catch (error) {
+                    
+                }
+            }
     }
 
     export const workerController  = new WorkerController();

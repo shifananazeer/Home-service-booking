@@ -6,6 +6,7 @@ import errorHandler from "../utils/errorHandler";
 import { fetchServices } from "./adminService";
 import { Message } from "../components/ChatModel";
 import { Reaction } from "../components/worker/ChatList";
+import { format } from "date-fns";
 
 
 
@@ -401,9 +402,53 @@ export const getWorkerRatings = async (workerId: string) => {
     const token = localStorage.getItem('worker_accessToken');
     try {
         const response = await axiosInstance.get(`/workers/ratings/${workerId}`);
+        console.log("rating" , response.data)
         return response.data; // Assuming it returns { ratings: number[], reviews: Review[] }
+        
     } catch (error) {
         console.error("Error fetching ratings:", error);
         throw error; // Rethrow error to handle it in the component
     }
 };
+
+export const getWalletDetails  = async (workerId:string) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try{
+   const response = await axiosInstance.get(`/workers/wallet/${workerId}`)
+   console.log("respo" , response.data)
+   return response.data
+    }catch (error) {
+
+    }
+}
+
+
+export const getRevenueData = async (workerId: string, start: Date, end: Date) => {
+    try {
+      const response = await axiosInstance.get(`/workers/revenue/${workerId}`, {
+        params: {
+          start: format(start, "yyyy-MM-dd"),
+          end: format(end, "yyyy-MM-dd"),
+        },
+      })
+      return response.data
+    } catch (error) {
+      console.error("Error fetching revenue data:", error)
+      throw error
+    }
+  }
+  
+  export const getBookingsData = async (workerId: string, start: Date, end: Date) => {
+    try {
+      const response = await axiosInstance.get(`/workers/bookings/${workerId}`, {
+        params: {
+          start: format(start, "yyyy-MM-dd"),
+          end: format(end, "yyyy-MM-dd"),
+        },
+      })
+      return response.data
+    } catch (error) {
+      console.error("Error fetching bookings data:", error)
+      throw error
+    }
+  }

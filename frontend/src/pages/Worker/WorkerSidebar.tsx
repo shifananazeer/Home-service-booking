@@ -63,6 +63,22 @@ const WorkerSidebar: React.FC<WorkerSidebarProps> = ({ setCurrentComponent }) =>
                             </button>
                        
                     </li>
+                    <li>
+                      
+                      <button 
+                       onClick={() => setCurrentComponent("walletAndRevenue")}className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                          Wallet & Revenue
+                      </button>
+                 
+              </li>
+              <li>
+                      
+                      <button 
+                       onClick={() => setCurrentComponent("revenue")}className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
+                         Revenue
+                      </button>
+                 
+              </li>
                 </ul>
             </nav>
         </div>

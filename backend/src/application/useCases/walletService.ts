@@ -95,4 +95,10 @@ export class WalletService {
 
     return [];
 }
+
+async getWalletDetails(workerId:string) {
+  const wallet = await this.walletRepository.getworkerWallet(workerId)
+  console.log("wallet" , wallet)
+  return wallet;
+}
 }

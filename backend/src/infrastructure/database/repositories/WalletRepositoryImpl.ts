@@ -4,6 +4,7 @@ import WalletModel, { WalletDocument } from "../models/walletModel"; // ✅ Use 
 import { Wallet } from "../../../domain/entities/Wallet";
 
 export class WalletRepositoryImpl implements WalletRepository {
+ 
    // Find Worker Wallet
    async findWalletByUserId(userId: string): Promise<Wallet | null> {
     return await WalletModel.findOne({ userId }).lean()
@@ -102,5 +103,14 @@ export class WalletRepositoryImpl implements WalletRepository {
         _id: item._id as string,  // Ensure _id is treated as a string
         totalRevenue: item.totalRevenue,
     }));
+}
+
+async getworkerWallet(workerId: string): Promise<Wallet> {
+  const wallet = await WalletModel.findOne({ userId:workerId });
+  if (!wallet) {
+    throw new Error('Wallet not found for this user');
+  }
+  console.log("wallet" , wallet)
+  return wallet;
 }
 }
