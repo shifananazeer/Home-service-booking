@@ -29,7 +29,7 @@ const WorkerWalletPage: React.FC = () => {
   useEffect(() => {
     const fetchWalletData = async () => {
       try {
-        const workerId = localStorage.getItem("workerId") // Assuming you store workerId in localStorage
+        const workerId = localStorage.getItem("workerId") 
         if (!workerId) {
           throw new Error("Worker ID not found")
         }

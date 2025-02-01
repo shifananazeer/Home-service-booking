@@ -52,7 +52,7 @@ const BookingSuccessPage: React.FC = () => {
             };
             console.log("walletdata" , walletData)
             console.log("Sending request to update wallet:", walletData);
-            const walletResponse = await updateWallet(walletData);
+            const walletResponse = await updateWallet(walletData , bookingId);
             console.log("Wallet API Response:", walletResponse);
           } else {
             console.error('Invalid booking details:', details);

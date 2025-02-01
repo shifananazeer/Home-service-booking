@@ -231,7 +231,7 @@ const RevenueAnalyticsPage: React.FC = () => {
             </div>
             <div className="h-64 md:h-80">
               {" "}
-              {/* Adjust the height here */}
+            
               <Line data={chartData} options={chartOptions} />
             </div>
           </div>

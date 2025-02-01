@@ -103,13 +103,13 @@ export class BookingRepositoryImpl implements BookingRepository {
         try {
             const booking = await BookingModel.findByIdAndUpdate(
                 bookingId,
-                { workStatus: 'completed' }, // Assuming there's a status field
-                { new: true } // Return the updated document
+                { workStatus: 'completed' },
+                { new: true } 
             );
             return booking;
         } catch (error) {
             console.error('Error in BookingRepository:', error);
-            throw error; // Propagate the error to be handled in the service
+            throw error; 
         }
     }
 
@@ -145,7 +145,7 @@ export class BookingRepositoryImpl implements BookingRepository {
     
         const matchCriteria: any = {
             workerId: workerObjectId,
-            status: { $ne: "cancelled" } // Exclude cancelled bookings
+            status: { $ne: "cancelled" } 
         };
     
         const currentDate = new Date();
@@ -208,14 +208,14 @@ export class BookingRepositoryImpl implements BookingRepository {
 
     async getBookedSkillsByWorker(workerId: string): Promise<{ skill: string; count: number }[]> {
         const results = await BookingModel.aggregate([
-            { $match: { workerId: new Types.ObjectId(workerId) } }, // Filter by worker
+            { $match: { workerId: new Types.ObjectId(workerId) } },
             {
                 $group: {
-                    _id: "$serviceName", // Group by skill
-                    count: { $sum: 1 } // Count occurrences of each skill
+                    _id: "$serviceName", 
+                    count: { $sum: 1 } 
                 }
             },
-            { $sort: { count: -1 } } // Sort by most booked skill
+            { $sort: { count: -1 } } 
         ]);
     
         return results.map(item => ({

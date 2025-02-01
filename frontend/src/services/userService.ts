@@ -601,7 +601,7 @@ export interface WalletData {
   }
 }
 
-export const updateWallet = async (walletData: WalletData) => {
+export const updateWallet = async (walletData: WalletData, bookingId: string) => {
   try {
     const token = localStorage.getItem("accessToken");
 
@@ -610,7 +610,13 @@ export const updateWallet = async (walletData: WalletData) => {
       return;
     }
 
-    const response = await axiosInstance.post("/auth/update-wallet", walletData, {
+    // Include bookingId in walletData
+    const dataToSend = {
+      ...walletData,
+      bookingId, // Add bookingId here
+    };
+
+    const response = await axiosInstance.post("/auth/update-wallet", dataToSend, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

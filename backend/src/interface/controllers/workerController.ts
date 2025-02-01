@@ -652,7 +652,6 @@ class WorkerController   {
                     const { workerId } = req.params;
                     const timeFrame: string | undefined = req.query.timeFrame as string;
 
-                    // Optionally check if timeFrame is undefined and set a default value
                     const validTimeFrame = timeFrame || 'monthly';
                     const revenue = await walletService.getWorkerRevenue(workerId, validTimeFrame);
                     res.status(200).json(revenue);
@@ -667,7 +666,6 @@ class WorkerController   {
                     const { workerId } = req.params;
                     const timeFrame: string | undefined = req.query.timeFrame as string;
             
-                    // Default to 'monthly' if timeFrame is undefined
                     const validTimeFrame = timeFrame || 'monthly';
             
                     const count = await bookingService.getCountByWorker(workerId, validTimeFrame);

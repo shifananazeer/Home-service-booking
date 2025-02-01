@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { WalletRepository } from "../../../domain/repositories/walletRepository";
 import WalletModel, { WalletDocument } from "../models/walletModel"; // ✅ Use WalletDocument
 import { Wallet } from "../../../domain/entities/Wallet";
+import { getIo } from "../../sockets/chatSocket";
 
 export class WalletRepositoryImpl implements WalletRepository {
  
@@ -51,6 +52,18 @@ export class WalletRepositoryImpl implements WalletRepository {
       wallet.balance += amount
       wallet.transactions.push(transactionDetails)
       await wallet.save()
+
+
+      const io = getIo();
+      if (userId) {
+        io.to(userId).emit("receive-notification", {
+          message: `A new wallet has been created for you with an initial balance of: ${amount}`,
+          timestamp: new Date().toISOString(),
+          transactionDetails,
+        });
+      }
+
+
       return wallet.toObject()
     } else {
       const createdWallet = await this.createWallet(userId, amount, isAdmin, transactionDetails)
@@ -63,12 +76,12 @@ export class WalletRepositoryImpl implements WalletRepository {
 
     const currentDate = new Date();
     let startDate: Date;
-    let endDate: Date = new Date(); // Default to today
+    let endDate: Date = new Date(); 
 
     if (timeFrame === 'weekly') {
-        // Get the start of the current week (last 6 days + today)
+      
         startDate = new Date();
-        startDate.setDate(currentDate.getDate() - currentDate.getDay()); // Start from Sunday
+        startDate.setDate(currentDate.getDate() - currentDate.getDay()); 
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
 
@@ -96,10 +109,10 @@ export class WalletRepositoryImpl implements WalletRepository {
         {
             $group: {
                 _id: timeFrame === 'weekly'
-                    ? { day: { $dayOfWeek: "$transactions.date" } }  // Group by day (1=Sunday, 7=Saturday)
+                    ? { day: { $dayOfWeek: "$transactions.date" } } 
                     : timeFrame === 'yearly'
-                    ? { year: { $year: "$transactions.date" } }  // Group by year
-                    : { month: { $month: "$transactions.date" } }, // Group by month
+                    ? { year: { $year: "$transactions.date" } }  
+                    : { month: { $month: "$transactions.date" } }, 
                 totalRevenue: { $sum: "$transactions.amount" },
             },
         },

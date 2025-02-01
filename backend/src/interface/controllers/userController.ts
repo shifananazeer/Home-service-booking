@@ -772,7 +772,7 @@ class UserController  {
         }
     }
     async updateWallet(req: Request, res: Response) {
-        const { userId, amount, transactionDetails } = req.body
+        const { userId, amount, transactionDetails, bookingId } = req.body;
         console.log("bodywallet", req.body)
     
         try {
@@ -787,6 +787,15 @@ class UserController  {
             type: "credit",
           })
     
+
+          await notificationService.saveNotification({
+            userId: userId,
+            userType: "worker",
+            bookingId: bookingId,
+            message: `Your wallet has been credited with ₹${workerShare}`,
+            isRead: false,
+            timestamp: new Date(),
+        });
           // Update admin's wallet
           let adminWallet = await walletService.getAdminWallet()
           if (!adminWallet) {

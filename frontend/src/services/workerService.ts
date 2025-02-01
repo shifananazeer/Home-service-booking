@@ -388,7 +388,11 @@ export const revenueDataForWorker = async (workerId:string , timeFrame:string) =
 export const numberOfBookings  = async (workerId:string , timeFrame:string) => {
     const token = localStorage.getItem('worker_accessToken');
     try{
-     const response = await axiosInstance.get(`/workers/bookingsCount/${workerId}?timeFrame=${timeFrame}`)
+     const response = await axiosInstance.get(`/workers/bookingsCount/${workerId}?timeFrame=${timeFrame}` ,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+          },
+     })
      return response.data;
     }catch (error) {
 
@@ -400,20 +404,28 @@ export const numberOfBookings  = async (workerId:string , timeFrame:string) => {
 export const getWorkerRatings = async (workerId: string) => {
     const token = localStorage.getItem('worker_accessToken');
     try {
-        const response = await axiosInstance.get(`/workers/ratings/${workerId}`);
+        const response = await axiosInstance.get(`/workers/ratings/${workerId}` ,{
+            headers: {
+                "Content-Type": "multipart/form-data",
+              },
+        });
         console.log("rating" , response.data)
-        return response.data; // Assuming it returns { ratings: number[], reviews: Review[] }
+        return response.data; 
         
     } catch (error) {
         console.error("Error fetching ratings:", error);
-        throw error; // Rethrow error to handle it in the component
+        throw error;
     }
 };
 
 export const getWalletDetails  = async (workerId:string) => {
     const token = localStorage.getItem('worker_accessToken');
     try{
-   const response = await axiosInstance.get(`/workers/wallet/${workerId}`)
+   const response = await axiosInstance.get(`/workers/wallet/${workerId}` ,{
+    headers: {
+        "Content-Type": "multipart/form-data",
+      },
+   })
    console.log("respo" , response.data)
    return response.data
     }catch (error) {
@@ -424,7 +436,11 @@ export const getWalletDetails  = async (workerId:string) => {
 export const getSkillsCount = async (workerId:string) => {
     const token = localStorage.getItem('worker_accessToken');
     try{
-      const response = await axiosInstance.get(`/workers/skills/${workerId}`)
+      const response = await axiosInstance.get(`/workers/skills/${workerId}` ,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+          },
+      })
       console.log("respo" , response.data)
    return response.data
     }catch (error) {

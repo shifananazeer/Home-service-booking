@@ -2,7 +2,7 @@ import React from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 
-// Register required chart elements
+
 Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface RevenueChartProps {
@@ -11,11 +11,11 @@ interface RevenueChartProps {
 
 const RevenueChart: React.FC<RevenueChartProps> = ({ data }) => {
     const chartData = {
-        labels: data.map(item => item.label), // Days of the week
+        labels: data.map(item => item.label), 
         datasets: [
             {
                 label: "Revenue ($)",
-                data: data.map(item => item.revenue), // Revenue values
+                data: data.map(item => item.revenue), 
                 backgroundColor: "rgba(75, 192, 192, 0.6)",
                 borderColor: "rgba(75, 192, 192, 1)",
                 borderWidth: 1,

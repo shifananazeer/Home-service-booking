@@ -13,16 +13,14 @@ async createRatings(ratingData: Ratings): Promise<Ratings> {
         throw new Error("Unable to create rating");
     }
 }
-// async getRatingsByWorkerId (workerId: string | Types.ObjectId) :Promise<Ratings[]|[]> {
-//     return await RatingsModel.find({ workerId });
-// }
+
 async getRatingsByWorkerId (workerId: string) {
     try {
-        const objectId = new mongoose.Types.ObjectId(workerId); // Convert workerId to ObjectId
+        const objectId = new mongoose.Types.ObjectId(workerId); 
 
-        const ratings = await RatingsModel.find({ workerId: objectId }) // Use ObjectId
-            .populate({ path: "userId", select: "firstName lastName" }) // Populate user details
-            .lean(); // Convert Mongoose docs to JSON
+        const ratings = await RatingsModel.find({ workerId: objectId }) 
+            .populate({ path: "userId", select: "firstName lastName" }) 
+            .lean();
         
         console.log(ratings);
         return ratings;

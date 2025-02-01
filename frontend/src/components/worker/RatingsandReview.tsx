@@ -4,7 +4,7 @@ interface Review {
   userId: { _id: string; firstName: string; lastName: string };
   review: string;
   bookingId: string;
-  userName: string; // Include this
+  userName: string; 
 }
 
 interface WorkerRatingsAndReviewsProps {
@@ -31,13 +31,11 @@ const WorkerRatingsAndReviews: React.FC<WorkerRatingsAndReviewsProps> = ({
     ratings.length > 0
       ? ratings.reduce((a, b) => a + b, 0) / ratings.length
       : 0;
+  const [visibleReviews, setVisibleReviews] = React.useState(3); 
 
-  // State to manage the number of reviews shown
-  const [visibleReviews, setVisibleReviews] = React.useState(3); // Start with 3 visible reviews
-
-  // Function to handle "See More" click
+ 
   const handleSeeMore = () => {
-    setVisibleReviews((prev) => prev + 3); // Show 3 more reviews
+    setVisibleReviews((prev) => prev + 3); 
   };
 
   return (
