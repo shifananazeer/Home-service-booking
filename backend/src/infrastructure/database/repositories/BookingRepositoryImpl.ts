@@ -167,6 +167,44 @@ export class BookingRepositoryImpl implements BookingRepository {
     
         return result;
     }
+
+
+    async getWorkerRevenue(workerId: string, startDate: Date, endDate: Date, groupBy: string) {
+        let dateFormat: any = {};
+
+        if (groupBy === "daily") dateFormat = { year: "$year", month: "$month", day: "$day" };
+        else if (groupBy === "weekly") dateFormat = { year: "$year", week: "$week" };
+        else if (groupBy === "monthly") dateFormat = { year: "$year", month: "$month" };
+        else if (groupBy === "yearly") dateFormat = { year: "$year" };
+
+        return await BookingModel.aggregate([
+            {
+                $match: {
+                    workerId: new mongoose.Types.ObjectId(workerId),
+                    workStatus: "completed",
+                    createdAt: { $gte: startDate, $lte: endDate }
+                }
+            },
+            {
+                $project: {
+                    advancePayment: 1,
+                    balancePayment: 1,
+                    totalPayment: { $add: ["$advancePayment", "$balancePayment"] },
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" },
+                    week: { $week: "$createdAt" },
+                    day: { $dayOfMonth: "$createdAt" }
+                }
+            },
+            {
+                $group: {
+                    _id: dateFormat,
+                    totalRevenue: { $sum: "$totalPayment" }
+                }
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
+        ]);
+    }
 }
 
 

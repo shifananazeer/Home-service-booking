@@ -61,46 +61,57 @@ export class WalletRepositoryImpl implements WalletRepository {
   async getRevenueByWorker(workerId: string, timeFrame: string): Promise<{ _id: string; totalRevenue: number }[]> {
     console.log(`Fetching revenue for workerId: ${workerId} with timeFrame: ${timeFrame}`);
 
-    const matchCriteria: any = {
-        userId: new Types.ObjectId(workerId),
-        "transactions.type": "credit",
-    };
-
     const currentDate = new Date();
     let startDate: Date;
-    let endDate: Date;
+    let endDate: Date = new Date(); // Default to today
 
-    // Set date range based on time frame
-    if (timeFrame === 'monthly') {
-        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-        matchCriteria["transactions.date"] = { $gte: startDate, $lte: endDate };
-    } else if (timeFrame === 'weekly') {
-        startDate = new Date(currentDate);
-        startDate.setDate(startDate.getDate() - 6);
-        matchCriteria["transactions.date"] = { $gte: startDate };
+    if (timeFrame === 'weekly') {
+        // Get the start of the current week (last 6 days + today)
+        startDate = new Date();
+        startDate.setDate(currentDate.getDate() - currentDate.getDay()); // Start from Sunday
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+
     } else if (timeFrame === 'yearly') {
-        startDate = new Date(currentDate.getFullYear(), 0, 1);
-        endDate = new Date(currentDate.getFullYear() + 1, 0, 0);
-        matchCriteria["transactions.date"] = { $gte: startDate, $lte: endDate };
+        const currentYear = currentDate.getFullYear();
+        startDate = new Date(currentYear - 2, 0, 1); // Start from 2 years ago
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // End of current year
+
+    } else {
+        // Default to monthly revenue
+        const currentYear = currentDate.getFullYear();
+        startDate = new Date(currentYear, 0, 1); // Start of the year
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // End of the year
     }
 
     const results = await WalletModel.aggregate([
-        { $match: matchCriteria },
         { $unwind: "$transactions" },
         {
+            $match: {
+                userId: new Types.ObjectId(workerId),
+                "transactions.type": "credit",
+                "transactions.date": { $gte: startDate, $lte: endDate }
+            }
+        },
+        {
             $group: {
-                _id: timeFrame === 'weekly' ? { $dateToString: { format: "%Y-%m-%d", date: "$transactions.date" } } :
-                    timeFrame === 'monthly' ? { $month: "$transactions.date" } :
-                    { $year: "$transactions.date" },
+                _id: timeFrame === 'weekly'
+                    ? { day: { $dayOfWeek: "$transactions.date" } }  // Group by day (1=Sunday, 7=Saturday)
+                    : timeFrame === 'yearly'
+                    ? { year: { $year: "$transactions.date" } }  // Group by year
+                    : { month: { $month: "$transactions.date" } }, // Group by month
                 totalRevenue: { $sum: "$transactions.amount" },
             },
         },
-        { $sort: { _id: 1 } },
+        { $sort: { "_id": 1 } },
     ]);
 
     return results.map(item => ({
-        _id: item._id as string,  // Ensure _id is treated as a string
+        _id: timeFrame === 'weekly' 
+            ? item._id.day.toString()  // Convert day number to string
+            : timeFrame === 'yearly' 
+            ? item._id.year.toString()  // Convert year number to string
+            : String(item._id.month).padStart(2, '0'), // Convert month to string (01, 02, etc.)
         totalRevenue: item.totalRevenue,
     }));
 }
@@ -110,7 +121,7 @@ async getworkerWallet(workerId: string): Promise<Wallet> {
   if (!wallet) {
     throw new Error('Wallet not found for this user');
   }
-  console.log("wallet" , wallet)
+  console.log("wallet..............." , wallet)
   return wallet;
 }
 }

@@ -6,7 +6,6 @@ import errorHandler from "../utils/errorHandler";
 import { fetchServices } from "./adminService";
 import { Message } from "../components/ChatModel";
 import { Reaction } from "../components/worker/ChatList";
-import { format } from "date-fns";
 
 
 
@@ -423,32 +422,3 @@ export const getWalletDetails  = async (workerId:string) => {
 }
 
 
-export const getRevenueData = async (workerId: string, start: Date, end: Date) => {
-    try {
-      const response = await axiosInstance.get(`/workers/revenue/${workerId}`, {
-        params: {
-          start: format(start, "yyyy-MM-dd"),
-          end: format(end, "yyyy-MM-dd"),
-        },
-      })
-      return response.data
-    } catch (error) {
-      console.error("Error fetching revenue data:", error)
-      throw error
-    }
-  }
-  
-  export const getBookingsData = async (workerId: string, start: Date, end: Date) => {
-    try {
-      const response = await axiosInstance.get(`/workers/bookings/${workerId}`, {
-        params: {
-          start: format(start, "yyyy-MM-dd"),
-          end: format(end, "yyyy-MM-dd"),
-        },
-      })
-      return response.data
-    } catch (error) {
-      console.error("Error fetching bookings data:", error)
-      throw error
-    }
-  }

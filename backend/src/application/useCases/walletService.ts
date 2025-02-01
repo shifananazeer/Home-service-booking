@@ -36,23 +36,20 @@ export class WalletService {
 
     if (timeFrame === 'weekly') {
         const dayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        
+        // Get current week start (Sunday) and map to correct revenue data
         const weeklyRevenueData = dayLabels.map((label, index) => {
-            const dayOfWeek = new Date();
-            dayOfWeek.setDate(dayOfWeek.getDate() - (dayOfWeek.getDay() - index)); // Adjust to current day index
-
-            const dateString = dayOfWeek.toISOString().split('T')[0];
-
-            const dayRevenueData = rawRevenueData.find((data) => data._id === dateString);
+            const dayRevenueData = rawRevenueData.find((data) => Number(data._id) === index + 1);
 
             return {
                 label: label,
-                revenue: dayRevenueData ? dayRevenueData.totalRevenue : 0, // Ensure default 0
+                revenue: dayRevenueData ? dayRevenueData.totalRevenue : 0, // Default to 0 if no data
             };
         });
 
         return weeklyRevenueData;
-    } 
-    
+    }
+
     if (timeFrame === 'monthly') {
         const monthNames = [
             "January", "February", "March", "April", "May", "June",
@@ -75,23 +72,22 @@ export class WalletService {
     }
 
     if (timeFrame === 'yearly') {
-      // Get the current year and look back 5 years
-      const currentYear = new Date().getFullYear();
-      const years = Array.from({ length: 5 }, (_, i) => currentYear - i).reverse();
+        const currentYear = new Date().getFullYear();
+        const years = [currentYear - 2, currentYear - 1, currentYear]; // Last 2 years + current year
 
-      // Create a map of revenue data for years
-      const revenueMap = rawRevenueData.reduce((acc, data) => {
-          acc[Number(data._id)] = data.totalRevenue;
-          return acc;
-      }, {} as Record<number, number>);
+        // Create a map of revenue data for years
+        const revenueMap = rawRevenueData.reduce((acc, data) => {
+            acc[Number(data._id)] = data.totalRevenue;
+            return acc;
+        }, {} as Record<number, number>);
 
-      const fullRevenueData = years.map((year) => ({
-          label: year.toString(),
-          revenue: revenueMap[year] || 0,
-      }));
+        const fullRevenueData = years.map((year) => ({
+            label: year.toString(),
+            revenue: revenueMap[year] || 0,
+        }));
 
-      return fullRevenueData;
-  }
+        return fullRevenueData;
+    }
 
     return [];
 }

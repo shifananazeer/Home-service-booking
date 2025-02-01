@@ -154,6 +154,48 @@ export class BookingService {
         
             return [];
         }
+
+
+        public async getWorkerRevenue(workerId: string, timeFrame: string) {
+            let startDate = new Date();
+            let endDate = new Date();
+            let groupBy = "daily";
+    
+            switch (timeFrame) {
+                case 'daily':
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    groupBy = "daily";
+                    break;
+                case 'weekly':
+                    startDate.setDate(startDate.getDate() - 7);
+                    groupBy = "weekly";
+                    break;
+                case 'monthly':
+                    startDate.setMonth(startDate.getMonth() - 1);
+                    groupBy = "monthly";
+                    break;
+                case 'yearly':
+                    startDate.setFullYear(startDate.getFullYear() - 1);
+                    groupBy = "yearly";
+                    break;
+                default:
+                    throw new Error('Invalid time frame. Use daily, weekly, monthly, or yearly.');
+            }
+    
+            const revenueData = await this.bookingRepository.getWorkerRevenue(workerId, startDate, endDate, groupBy);
+    
+            const labels = revenueData.map((data: any) => {
+                if (groupBy === "daily") return `${data._id.day}/${data._id.month}`;
+                if (groupBy === "weekly") return `Week ${data._id.week}, ${data._id.year}`;
+                if (groupBy === "monthly") return `${data._id.month}/${data._id.year}`;
+                if (groupBy === "yearly") return `${data._id.year}`;
+            });
+    
+            const revenueValues = revenueData.map((data: any) => data.totalRevenue);
+    
+            return { labels, revenueValues };
+        }
 }
 
 

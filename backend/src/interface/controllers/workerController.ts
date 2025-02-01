@@ -692,7 +692,7 @@ class WorkerController   {
 
             async getWallet (req:Request , res:Response) {
                 const {workerId} = req.params ;
-                console.log("id" , workerId)
+                
                 try{
                     const walletDetails = await walletService.getWalletDetails(workerId);
                     res.status(200).json(walletDetails);
@@ -705,3 +705,4 @@ class WorkerController   {
     export const workerController  = new WorkerController();
 
 
+ 

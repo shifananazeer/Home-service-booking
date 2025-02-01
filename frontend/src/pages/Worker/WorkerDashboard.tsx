@@ -1,29 +1,20 @@
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import WorkerNavbar from "./WorkerNavbar"
 import WorkerSidebar from "./WorkerSidebar"
+import { useNavigate } from "react-router-dom"
 import WorkerProfile from "../../components/worker/WorkerProfile"
 import AvailabilityManagement from "../../components/worker/AvailabilityManagement"
 import WorkerBookings from "../../components/worker/bookings"
 import WorkerTodayBookings from "../../components/worker/todaysBooking"
 import ChatList from "../../components/worker/ChatList"
-import { getWorkerRatings, getBookingsData, getRevenueData } from "../../services/workerService"
+import { getWorkerRatings, numberOfBookings, revenueDataForWorker } from "../../services/workerService"
 import RevenueChart from "../../components/worker/RevenueChart"
 import BookingCountChart from "../../components/worker/BookingsCountChart"
 import WorkerRatingsAndReviews from "../../components/worker/RatingsandReview"
 import WorkerWalletPage from "../../components/worker/WalletAndRevenue"
 import RevenueAnalyticsPage from "../../components/worker/RevenuePage"
-import {
-  startOfDay,
-  startOfWeek,
-  startOfMonth,
-  startOfYear,
-  endOfDay,
-  endOfWeek,
-  endOfMonth,
-  endOfYear,
-} from "date-fns"
+
 
 interface Review {
   userId: { _id: string; firstName: string; lastName: string }
@@ -37,19 +28,16 @@ interface RatingsAndReviews {
   reviews: Review[]
 }
 
-interface ChartData {
-  labels: string[]
-  data: number[]
-}
+  
 
-const WorkerDashboard: React.FC = () => {
+const WorkerDashboard = () => {
   const navigate = useNavigate()
-  const [revenueData, setRevenueData] = useState<ChartData>({ labels: [], data: [] })
-  const [bookingData, setBookingData] = useState<ChartData>({ labels: [], data: [] })
-  const [timeFrame, setTimeFrame] = useState<"daily" | "weekly" | "monthly" | "yearly">("daily")
+  const [revenueData, setRevenueData] = useState<{ label: string; revenue: number }[]>([])
+  const [bookingData, setBookingData] = useState<{ label: string; count: number }[]>([])
+  const [timeFrame, setTimeFrame] = useState<"weekly" | "monthly" | "yearly">("monthly")
   const [currentComponent, setCurrentComponent] = useState("dashboard")
   const [ratingsAndReviews, setRatingsAndReviews] = useState<RatingsAndReviews>({ ratings: [], reviews: [] })
-
+  
   const workerId = localStorage.getItem("workerId")
 
   useEffect(() => {
@@ -64,46 +52,31 @@ const WorkerDashboard: React.FC = () => {
       if (!workerId) return
 
       try {
-        const now = new Date()
-        let start: Date
-        let end: Date
-
-        switch (timeFrame) {
-          case "daily":
-            start = startOfDay(now)
-            end = endOfDay(now)
-            break
-          case "weekly":
-            start = startOfWeek(now)
-            end = endOfWeek(now)
-            break
-          case "monthly":
-            start = startOfMonth(now)
-            end = endOfMonth(now)
-            break
-          case "yearly":
-            start = startOfYear(now)
-            end = endOfYear(now)
-            break
-        }
-
-        const revenue = await getRevenueData(workerId, start, end)
+        const revenue = await revenueDataForWorker(workerId, timeFrame)
         setRevenueData(revenue)
-        const bookings = await getBookingsData(workerId, start, end)
+        const bookings = await numberOfBookings(workerId, timeFrame)
         setBookingData(bookings)
-
-        const ratings = await getWorkerRatings(workerId)
-        setRatingsAndReviews(ratings)
       } catch (error) {
         console.error("Error fetching data:", error)
       }
     }
 
+    const fetchRatingsAndReviews = async () => {
+        if (!workerId) return
+        try{
+     const ratings = await getWorkerRatings(workerId)
+     setRatingsAndReviews(ratings)
+        }catch (error) {
+            console.error("Error fetching ratings and reviews:", error)
+        }
+    }
+   
     fetchData()
+    fetchRatingsAndReviews()
   }, [workerId, timeFrame])
 
   const handleTimeFrameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTimeFrame(e.target.value as "daily" | "weekly" | "monthly" | "yearly")
+    setTimeFrame(e.target.value as "weekly" | "monthly" | "yearly")
   }
 
   const renderComponent = () => {
@@ -119,9 +92,9 @@ const WorkerDashboard: React.FC = () => {
       case "chats":
         return <ChatList />
       case "walletAndRevenue":
-        return <WorkerWalletPage />
-      case "revenue":
-        return <RevenueAnalyticsPage />
+        return<WorkerWalletPage/>
+      case 'revenue' :
+        return <RevenueAnalyticsPage/>  
       case "dashboard":
         return (
           <div className="space-y-6">
@@ -137,7 +110,6 @@ const WorkerDashboard: React.FC = () => {
                 value={timeFrame}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
-                <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
