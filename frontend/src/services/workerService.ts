@@ -421,4 +421,14 @@ export const getWalletDetails  = async (workerId:string) => {
     }
 }
 
+export const getSkillsCount = async (workerId:string) => {
+    const token = localStorage.getItem('worker_accessToken');
+    try{
+      const response = await axiosInstance.get(`/workers/skills/${workerId}`)
+      console.log("respo" , response.data)
+   return response.data
+    }catch (error) {
 
+    }
+
+}

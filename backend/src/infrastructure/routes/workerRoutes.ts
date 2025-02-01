@@ -37,4 +37,5 @@ router.get ('/revenue/:workerId'  , workerController.getRevenue)
 router.get('/bookingsCount/:workerId' , workerController.getBookingCount)
 router.get('/ratings/:workerId', workerController.getRatingsAndReview)
 router.get('/wallet/:workerId' , workerController.getWallet)
+router.get('/skills/:workerId' , workerController.skillBasedBooking)
 export default router;

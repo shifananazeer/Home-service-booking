@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Booking } from "../../../domain/entities/Booking";
 import { BookingRepository } from "../../../domain/repositories/bookingRepository";
 import BookingModel from "../models/bookingModel";
@@ -204,6 +204,24 @@ export class BookingRepositoryImpl implements BookingRepository {
             },
             { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
         ]);
+    }
+
+    async getBookedSkillsByWorker(workerId: string): Promise<{ skill: string; count: number }[]> {
+        const results = await BookingModel.aggregate([
+            { $match: { workerId: new Types.ObjectId(workerId) } }, // Filter by worker
+            {
+                $group: {
+                    _id: "$serviceName", // Group by skill
+                    count: { $sum: 1 } // Count occurrences of each skill
+                }
+            },
+            { $sort: { count: -1 } } // Sort by most booked skill
+        ]);
+    
+        return results.map(item => ({
+            skill: item._id,
+            count: item.count
+        }));
     }
 }
 

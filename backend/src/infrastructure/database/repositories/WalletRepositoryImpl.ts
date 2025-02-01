@@ -74,14 +74,14 @@ export class WalletRepositoryImpl implements WalletRepository {
 
     } else if (timeFrame === 'yearly') {
         const currentYear = currentDate.getFullYear();
-        startDate = new Date(currentYear - 2, 0, 1); // Start from 2 years ago
-        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // End of current year
+        startDate = new Date(currentYear - 2, 0, 1); 
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); 
 
     } else {
-        // Default to monthly revenue
+       
         const currentYear = currentDate.getFullYear();
-        startDate = new Date(currentYear, 0, 1); // Start of the year
-        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // End of the year
+        startDate = new Date(currentYear, 0, 1); 
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); 
     }
 
     const results = await WalletModel.aggregate([
@@ -108,10 +108,10 @@ export class WalletRepositoryImpl implements WalletRepository {
 
     return results.map(item => ({
         _id: timeFrame === 'weekly' 
-            ? item._id.day.toString()  // Convert day number to string
+            ? item._id.day.toString()  
             : timeFrame === 'yearly' 
-            ? item._id.year.toString()  // Convert year number to string
-            : String(item._id.month).padStart(2, '0'), // Convert month to string (01, 02, etc.)
+            ? item._id.year.toString()  
+            : String(item._id.month).padStart(2, '0'), 
         totalRevenue: item.totalRevenue,
     }));
 }

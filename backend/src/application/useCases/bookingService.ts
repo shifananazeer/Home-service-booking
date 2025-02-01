@@ -196,6 +196,11 @@ export class BookingService {
     
             return { labels, revenueValues };
         }
+
+       public async getBookedSkills(workerId: string): Promise<{ skill: string; count: number }[]> {
+            const bookedSkills = await this.bookingRepository.getBookedSkillsByWorker(workerId);
+            return bookedSkills;
+        }
 }
 
 

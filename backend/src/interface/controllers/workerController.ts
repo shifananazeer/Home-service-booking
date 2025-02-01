@@ -700,6 +700,18 @@ class WorkerController   {
                     
                 }
             }
+
+            async skillBasedBooking   (req:Request , res:Response) {
+                const {workerId} = req.params;
+                try {
+                    const bookedSkills = await bookingService.getBookedSkills(workerId);
+                    res.json(bookedSkills);
+                } catch (error) {
+                    console.error("Error fetching booked skills:", error);
+                    res.status(500).json({ message: 'Internal Server Error' });
+                }
+
+            }
     }
 
     export const workerController  = new WorkerController();

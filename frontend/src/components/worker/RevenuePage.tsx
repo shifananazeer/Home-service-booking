@@ -23,7 +23,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js"
-import { getBookings } from "../../services/workerService"
+import { getBookings, getWalletDetails } from "../../services/workerService"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -36,52 +36,64 @@ interface Booking {
   workStatus: string
 }
 
+interface Transaction {
+  amount: number
+  type: "credit" | "debit"
+  date: string
+}
+
 const RevenueAnalyticsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [walletTransactions, setWalletTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timeFrame, setTimeFrame] = useState<"daily" | "weekly" | "monthly" | "yearly">("daily")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  
-
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchBookingsAndWallet = async () => {
       setIsLoading(true)
       try {
         const workerId = localStorage.getItem("workerId")
         if (!workerId) {
           throw new Error("Worker ID not found")
         }
+
         const response = await getBookings(workerId, currentPage, 10)
         setBookings(response.data.bookings)
         setTotalPages(Math.ceil(response.data.total / 10))
+
+        const data = await getWalletDetails(workerId)
+        setWalletTransactions(data.transactions)
       } catch (err) {
-        setError("Failed to fetch bookings. Please try again later.")
-        console.error("Error fetching bookings:", err)
+        setError("Failed to fetch data. Please try again later.")
+        console.error("Error fetching data:", err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchBookings()
-  }, [currentPage, timeFrame, getBookings]) // Added getBookings to dependencies
+    fetchBookingsAndWallet()
+  }, [currentPage])
 
   const calculateRevenue = (start: Date, end: Date) => {
-    return bookings
-      .filter((booking) => {
-        const bookingDate = new Date(booking.date)
-        return isWithinInterval(bookingDate, { start, end })
-      })
+    const bookingRevenue = bookings
+      .filter((booking) => isWithinInterval(new Date(booking.date), { start, end }))
       .reduce((sum, booking) => sum + booking.totalPayment, 0)
+
+    const walletRevenue = walletTransactions
+      .filter(
+        (transaction) => transaction.type === "credit" && isWithinInterval(new Date(transaction.date), { start, end }),
+      )
+      .reduce((sum, transaction) => sum + transaction.amount, 0)
+
+    return bookingRevenue + walletRevenue
   }
 
   const getChartData = () => {
     const now = new Date()
-    let start: Date
-    let end: Date
-    let dateFormat: string
+    let start: Date, end: Date, dateFormat: string
 
     switch (timeFrame) {
       case "daily":
@@ -106,10 +118,10 @@ const RevenueAnalyticsPage: React.FC = () => {
         break
     }
 
-    const filteredBookings = bookings.filter((booking) => {
-      const bookingDate = new Date(booking.date)
-      return isWithinInterval(bookingDate, { start, end })
-    })
+    const filteredBookings = bookings.filter((booking) => isWithinInterval(new Date(booking.date), { start, end }))
+    const filteredWalletTransactions = walletTransactions.filter(
+      (transaction) => transaction.type === "credit" && isWithinInterval(new Date(transaction.date), { start, end }),
+    )
 
     const labels = []
     const data = []
@@ -117,12 +129,18 @@ const RevenueAnalyticsPage: React.FC = () => {
 
     while (currentDate <= end) {
       labels.push(format(currentDate, dateFormat))
-      const dayRevenue = filteredBookings
-        .filter((booking) => {
-          const bookingDate = new Date(booking.date)
-          return isWithinInterval(bookingDate, { start: currentDate, end: endOfDay(currentDate) })
-        })
-        .reduce((sum, booking) => sum + booking.totalPayment, 0)
+      const dayRevenue =
+        filteredBookings
+          .filter((booking) =>
+            isWithinInterval(new Date(booking.date), { start: currentDate, end: endOfDay(currentDate) }),
+          )
+          .reduce((sum, booking) => sum + booking.totalPayment, 0) +
+        filteredWalletTransactions
+          .filter((transaction) =>
+            isWithinInterval(new Date(transaction.date), { start: currentDate, end: endOfDay(currentDate) }),
+          )
+          .reduce((sum, transaction) => sum + transaction.amount, 0)
+
       data.push(dayRevenue)
       currentDate = new Date(currentDate.getTime() + 86400000) // +1 day
     }
@@ -139,7 +157,6 @@ const RevenueAnalyticsPage: React.FC = () => {
   }
 
   const { labels, data } = getChartData()
-
   const chartData = {
     labels,
     datasets: [
@@ -152,6 +169,26 @@ const RevenueAnalyticsPage: React.FC = () => {
     ],
   }
 
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 0,
+          minRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 10,
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+  }
+
   const now = new Date()
   const dailyRevenue = calculateRevenue(startOfDay(now), endOfDay(now))
   const weeklyRevenue = calculateRevenue(startOfWeek(now), endOfWeek(now))
@@ -162,9 +199,9 @@ const RevenueAnalyticsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Revenue Analytics</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { title: "Daily Revenue", amount: dailyRevenue },
               { title: "Weekly Revenue", amount: weeklyRevenue },
@@ -178,7 +215,7 @@ const RevenueAnalyticsPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6 mb-8 md:col-span-2">
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Revenue Chart</h2>
               <select
@@ -192,38 +229,38 @@ const RevenueAnalyticsPage: React.FC = () => {
                 <option value="yearly">Yearly</option>
               </select>
             </div>
-            <div className="h-64">
-              <Line data={chartData} options={{ maintainAspectRatio: false }} />
+            <div className="h-64 md:h-80">
+              {" "}
+              {/* Adjust the height here */}
+              <Line data={chartData} options={chartOptions} />
             </div>
           </div>
         </div>
 
-        <div className="md:col-span-1">
+        <div className="space-y-8">
           <div className="bg-white shadow overflow-hidden sm:rounded-lg">
             <div className="px-4 py-5 sm:px-6">
               <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Bookings</h3>
             </div>
-            <div className="border-t border-gray-200">
-              <ul className="divide-y divide-gray-200">
-                {bookings.map((booking) => (
-                  <li key={booking._id} className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <p className="text-sm font-medium text-indigo-600 truncate">{booking.serviceName}</p>
-                        <p className="text-sm text-gray-500">{format(new Date(booking.date), "PPP")}</p>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <p className="text-sm font-medium text-gray-900">₹{booking.totalPayment.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">{booking.workStatus}</p>
-                      </div>
+            <ul className="divide-y divide-gray-200">
+              {bookings.map((booking) => (
+                <li key={booking._id} className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p className="text-sm font-medium text-indigo-600 truncate">{booking.serviceName}</p>
+                      <p className="text-sm text-gray-500">{format(new Date(booking.date), "PPP")}</p>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    <div className="flex flex-col items-end">
+                      <p className="text-sm font-medium text-gray-900">₹{booking.totalPayment.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">{booking.workStatus}</p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="flex justify-center">
             <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
