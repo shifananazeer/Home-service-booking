@@ -26,4 +26,5 @@ router.get('/revenue', adminController.getRevenue)
 router.get('/bookingCount' , adminController.getBookingCount)
 router.get('/popularService' , adminController.getPopularService)
 router.get('/topWorkers' , adminController.topWorkers)
+router.get('/wallet' , adminController.getWallet)
 export default router;

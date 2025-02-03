@@ -250,6 +250,15 @@ class AdminController {
                         res.status(500).json({ message: "Error fetching most booked workers", error });
                       }
                 }
+
+                async getWallet (req:Request , res:Response) {
+                    try{
+                   const walletDetails = await walletService.getAdminWallet()
+                   res.status(200).json(walletDetails)
+                    }catch (error) {
+
+                    }
+                }
 }
 
 

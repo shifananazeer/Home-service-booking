@@ -11,6 +11,7 @@ interface Booking {
   userId: {
     _id: string;
     email: string;
+    
   };
   date: string;
   slotId: string;
@@ -19,6 +20,7 @@ interface Booking {
   serviceImage: string;
   serviceName: string;
   paymentStatus: string;
+  workStatus:string;
   workLocation: {
     address: string;
     latitude: number;
@@ -132,6 +134,7 @@ export default function AdminBookings() {
               <th className="px-4 py-2 text-left">Slot</th>
               <th className="px-4 py-2 text-left">Location</th>
               <th className="px-4 py-2 text-left">Payment Status</th>
+              <th className="px-4 py-2 text-left">Work Status</th>
             </tr>
           </thead>
           <tbody>
@@ -150,10 +153,25 @@ export default function AdminBookings() {
                 <td className="px-4 py-2">{booking.slotId}</td>
                 <td className="px-4 py-2">{booking.workLocation.address}</td>
                 <td className="px-4 py-2">
+                   <span className={`px-2 py-1 rounded ${
+                     booking.paymentStatus === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
+                     booking.paymentStatus === 'advance_paid' ? 'bg-blue-200 text-blue-800' :
+                     booking.paymentStatus === 'balance_paid' ? 'bg-green-200 text-green-800' :
+                     booking.paymentStatus === 'Cancelled' ? 'bg-red-200 text-red-800' :
+                    'bg-gray-200 text-gray-800' // Default case
+                   }`}>
+                  {booking.paymentStatus}
+                  </span>
+                 </td>
+
+                <td className="px-4 py-2">
                   <span className={`px-2 py-1 rounded ${
-                    booking.paymentStatus === 'Pending' ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'
+                    booking.workStatus === 'Pending' ? 'bg-yellow-200 text-yellow-800' : 
+                    booking.workStatus === 'not_started' ? 'bg-blue-200 text-blue-800':
+                    booking.workStatus ==='completed' ? 'bg-green-200 text-green-800':
+                    'bg-gray-200 text-gray-800' // Default case
                   }`}>
-                    {booking.paymentStatus}
+                    {booking.workStatus}
                   </span>
                 </td>
               </tr>

@@ -240,3 +240,13 @@ export const getTopWorkers = async () => {
     const response = await axiosInstance.get('/admin/topWorkers')
     return response.data;
 }
+
+
+export const getWalletDetails = async () => {
+    try{
+    const response = await axiosInstance.get('/admin/wallet')
+    return response.data;
+    }catch (error) {
+
+    }
+}

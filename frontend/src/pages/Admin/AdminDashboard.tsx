@@ -12,6 +12,7 @@ import RevenueChart from "../../components/worker/RevenueChart"
 import BookingCountChart from "../../components/worker/BookingsCountChart"
 import SkillPieChart from "../../components/worker/SkillPieChart"
 import TopWorker from "../../components/admin/TopWorkers"
+import AdminWallet from "../../components/admin/AdminWallet"
 
 
 const AdminDashboard = () => {
@@ -82,6 +83,8 @@ const AdminDashboard = () => {
         return <ServiceManagement />
       case "bookings":
         return <AdminBookings />
+      case 'wallet':
+        return <AdminWallet/>
       case "dashboard":
         return (
           <>
