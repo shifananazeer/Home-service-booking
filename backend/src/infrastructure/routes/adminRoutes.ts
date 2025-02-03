@@ -24,4 +24,6 @@ router.delete('/service/delete/:serviceId',authenticateAdmin, authorizeRole(['ad
 router.get('/bookings' ,authenticateAdmin, authorizeRole(['admin']), adminController.getAllBookings)
 router.get('/revenue', adminController.getRevenue)
 router.get('/bookingCount' , adminController.getBookingCount)
+router.get('/popularService' , adminController.getPopularService)
+router.get('/topWorkers' , adminController.topWorkers)
 export default router;

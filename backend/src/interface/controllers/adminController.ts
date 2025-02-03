@@ -227,6 +227,29 @@ class AdminController {
                         res.status(500).json({ message: "Internal Server Error" });
                     }
                 }
+
+                async getPopularService (req:Request , res:Response){
+                    try {
+                        const limit = Number(req.query.limit) || 5; // Default to top 5
+                        const popularServices = await bookingService.getMostBookedServices(limit);
+                
+                        res.status(200).json({ success: true, data: popularServices });
+                    } catch (error) {
+                        console.error("Error fetching popular services:", error);
+                        res.status(500).json({ success: false, message: "Server error", error });
+                    }
+                }
+
+
+                async topWorkers (req:Request , res:Response) {
+                    try {
+                        const workers = await adminService.getMostBookedWorkers();
+                        res.status(200).json({ data: workers });
+                      } catch (error) {
+                        console.error("Error fetching most booked workers:", error);
+                        res.status(500).json({ message: "Error fetching most booked workers", error });
+                      }
+                }
 }
 
 

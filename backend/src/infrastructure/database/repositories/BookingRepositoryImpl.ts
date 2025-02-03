@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 import { Booking } from "../../../domain/entities/Booking";
-import { BookingRepository } from "../../../domain/repositories/bookingRepository";
+import { BookingRepository, WorkerBookingCount } from "../../../domain/repositories/bookingRepository";
 import BookingModel from "../models/bookingModel";
 
 export class BookingRepositoryImpl implements BookingRepository {
@@ -252,7 +252,45 @@ export class BookingRepositoryImpl implements BookingRepository {
         return result;
     }
 
+    async getMostBookServices(limit: number = 5): Promise<{ skill: string; count: number }[]> {
+        const popularServices = await BookingModel.aggregate([
+            {
+                $group: {
+                    _id: "$serviceName", // Group by service name
+                    count: { $sum: 1 } // Count how many times each service appears
+                }
+            },
+            { $sort: { count: -1 } }, // Sort in descending order
+            { $limit: limit } // Get top X results
+        ]);
 
+        return popularServices.map((service: { _id: any; count: any; }) => ({
+            skill: service._id, // _id contains the service name
+            count: service.count
+        }));
+    }
+
+    async getMostBookedWorkers(limit: number = 5): Promise<WorkerBookingCount[]> {
+        const workers = await BookingModel.aggregate([
+          {
+            $group: {
+              _id: "$workerId",
+              count: { $sum: 1 },
+              workerName: { $first: "$workerName" },
+              serviceImage: { $first: "$serviceImage" }
+            },
+          },
+          { $sort: { count: -1 } }, // Sort by highest bookings
+          { $limit: limit } // Limit results
+        ]);
+    
+        return workers.map(worker => ({
+          workerId: worker._id.toString(),
+          workerName: worker.workerName,
+          serviceImage: worker.serviceImage,
+          bookingsCount: worker.count
+        }));
+      }
 }
 
 

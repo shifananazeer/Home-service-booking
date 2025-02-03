@@ -239,6 +239,10 @@ export class BookingService {
         
             return [];
         }
+        async getMostBookedServices(limit: number = 5) {
+            return  await this.bookingRepository.getMostBookServices(limit);
+           
+        }
 }
 
 

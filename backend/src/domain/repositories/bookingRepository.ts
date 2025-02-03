@@ -1,5 +1,10 @@
 import { Booking } from "../entities/Booking";
-
+export interface WorkerBookingCount {
+    workerId: string;
+    workerName: string;
+    // serviceImage: string;
+    bookingsCount: number;
+  }
 export interface BookingRepository {
     bookingDetailsUpdate(userDetails:Booking) : Promise <Booking | null>;
     getBookingsForUser(userId:string , page: number, limit: number) :Promise <Booking[]|[]>;
@@ -11,5 +16,5 @@ export interface BookingRepository {
     getAllBookings(params: { page: number; limit: number; search: string }): Promise<{ bookings: Booking[]; total: number }>;
     getBookingById (bookigId:string):Promise<Booking |null>
     updatePayment (bookingId:string , status:string):Promise<void>
-    
+    getMostBookedWorkers(limit: number): Promise<WorkerBookingCount[]>;
 }

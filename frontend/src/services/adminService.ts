@@ -230,3 +230,13 @@ export const numberOfBookings = async (timeFrame:string) => {
     const respo = await axiosInstance.get(`/admin/bookingCount?timeFrame=${timeFrame}`)
     return respo.data;
 }
+
+export const getPopular = async () => {
+    const response = await axiosInstance.get('/admin/popularService')
+    return response.data
+}
+
+export const getTopWorkers = async () => {
+    const response = await axiosInstance.get('/admin/topWorkers')
+    return response.data;
+}

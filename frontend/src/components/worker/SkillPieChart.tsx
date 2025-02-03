@@ -5,7 +5,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 interface SkillPieChartProps {
-  data: { skill: string; count: number }[]
+  data: { skill : string; count: number }[]
   width?: number
   height?: number
 }
