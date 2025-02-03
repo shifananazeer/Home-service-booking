@@ -628,3 +628,23 @@ export const updateWallet = async (walletData: WalletData, bookingId: string) =>
     console.error("Error updating wallet:", error.response?.data || error.message);
   }
 };
+
+
+export const fetchReview = async (workerId:string) => {
+try{
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    console.error("No access token found in localStorage");
+    return;
+  }
+  const response = await axiosInstance.get(`/auth/review/${workerId}`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  return response.data
+}catch (error) {
+
+}
+}

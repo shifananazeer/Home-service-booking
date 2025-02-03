@@ -821,6 +821,17 @@ class UserController  {
           res.status(500).json({ success: false, message: "Error updating wallets", error: error.message })
         }
       }
+      async getReviewForWorker (req:Request , res:Response) {
+        const {workerId} = req.params
+        try{
+         const review = await ratingService.getWorkerRatings(workerId)
+         console.log("rrrrrr",review)
+       res.status(200).json(review)
+        }catch (error) {
+            console.error("Error fetching worker ratings:", error);
+            res.status(500).json({ message: 'Error fetching ratings', error });
+        }
+      }
 }
 
 

@@ -50,4 +50,5 @@ router.post('/ratings' , authenticateUser, userController.addRatings)
 router.get('/unreadNotifications/:userId' ,  authenticateUser,userController.unreadNotification)
 router.patch('/markTrue/:userId' , authenticateUser, userController.markTrue)
 router.post('/update-wallet' ,  authenticateUser,userController.updateWallet)
+router.get('/review/:workerId' , userController.getReviewForWorker)
 export default router;

@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FaUserTie } from "react-icons/fa"
 import { Star } from "lucide-react"
-import WorkerProfile from "../../components/worker/WorkerProfile"
 
 interface Worker {
   _id: string
@@ -14,7 +13,7 @@ interface Worker {
   hourlyRate?: number
   status: string
   isAvailable?: boolean
-  averageRating:number;
+  averageRating: number
 }
 interface Slot {
   workerId: string
@@ -41,10 +40,9 @@ const BookingPage: React.FC = () => {
   const navigate = useNavigate()
   const { serviceName, serviceImage, serviceDescription } = location.state || {}
   const mapRef = useRef<HTMLDivElement | null>(null)
- 
+
   const mapInstance = useRef<google.maps.Map | null>(null)
   const markerRef = useRef<google.maps.Marker | null>(null)
- 
 
   const [error, setError] = useState<string | null>(null)
   const [userAddress, setUserAddress] = useState<string | null>(null)
@@ -60,8 +58,8 @@ const BookingPage: React.FC = () => {
   const [slots, setSlots] = useState<Slot[]>([])
   const [dateInput, setDateInput] = useState<string>("") // Added state for date input
   const userId = localStorage.getItem("user_Id")
-  const autocompleteRef = useRef<HTMLInputElement | null>(null);
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const autocompleteRef = useRef<HTMLInputElement | null>(null)
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const toRadians = (deg: number) => (deg * Math.PI) / 180
@@ -71,6 +69,16 @@ const BookingPage: React.FC = () => {
 
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  }
+
+  const resetDateAndWorkers = () => {
+    setSelectedDate(null)
+    setDateInput("")
+    const resetWorkers = sortedWorkers.map((worker) => ({
+      ...worker,
+      isAvailable: false,
+    }))
+    setSortedWorkers(resetWorkers)
   }
 
   useEffect(() => {
@@ -227,51 +235,54 @@ const BookingPage: React.FC = () => {
   }, [userLocation, mapLoaded])
 
   useEffect(() => {
-  // Load Google Maps script
-  const loadScript = () => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.onload = () => initializeAutocomplete();
-    document.body.appendChild(script);
-  };
+    let autocomplete: google.maps.places.Autocomplete | null = null
 
-  const initializeAutocomplete = () => {
-    if (autocompleteRef.current) {
-      const google = window.google;
-      const autocomplete = new google.maps.places.Autocomplete(autocompleteRef.current);
+    const initializeAutocomplete = () => {
+      if (autocompleteRef.current && window.google) {
+        autocomplete = new window.google.maps.places.Autocomplete(autocompleteRef.current, {
+          types: ["geocode"],
+          fields: ["address_components", "geometry", "name", "formatted_address"],
+        })
 
-      // Listen for place selection
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
+        autocomplete.addListener("place_changed", handlePlaceSelect)
+      }
+    }
+
+    const handlePlaceSelect = () => {
+      if (autocomplete) {
+        const place = autocomplete.getPlace()
         if (place.geometry && place.geometry.location) {
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
+          const formattedAddress = place.formatted_address || place.name || ""
+          const lat = place.geometry.location.lat()
+          const lng = place.geometry.location.lng()
 
-          // Ensure lat and lng are defined before updating state
           if (lat !== undefined && lng !== undefined) {
-            const location = {
-              lat: lat,
-              lng: lng,
-            };
-
-            setUserLocation(location); // This ensures proper type matching
-            console.log("Selected location:", place.formatted_address, location);
+            setSearchQuery(formattedAddress)
+            setUserLocation({ lat, lng })
+            setLocationSource("search")
+            updateWorkerDistances({ lat, lng })
+            resetDateAndWorkers()
           }
         }
-      });
+      }
     }
-  };
 
-  if (!window.google) {
-    loadScript();
-  } else {
-    initializeAutocomplete();
-  }
-}, []);
+    if (window.google) {
+      initializeAutocomplete()
+    } else {
+      const script = document.createElement("script")
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
+      script.async = true
+      script.onload = initializeAutocomplete
+      document.body.appendChild(script)
+    }
 
-
-
+    return () => {
+      if (autocomplete) {
+        window.google.maps.event.clearInstanceListeners(autocomplete)
+      }
+    }
+  }, [apiKey, updateWorkerDistances, resetDateAndWorkers, sortedWorkers, setSortedWorkers])
 
   const handleCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -314,6 +325,21 @@ const BookingPage: React.FC = () => {
     } catch (error) {
       console.error("Error searching location:", error)
       toast.error("Failed to search location.")
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    if (e.target.value === "") {
+      setUserLocation(null)
+      setLocationSource(null)
+      // Re-initialize autocomplete
+      if (window.google && autocompleteRef.current) {
+        new window.google.maps.places.Autocomplete(autocompleteRef.current, {
+          types: ["geocode"],
+          fields: ["address_components", "geometry", "name", "formatted_address"],
+        })
+      }
     }
   }
 
@@ -362,20 +388,11 @@ const BookingPage: React.FC = () => {
     }
   }
 
-
-  const resetDateAndWorkers = () => {
-    setSelectedDate(null)
-    setDateInput("")
-    const resetWorkers = sortedWorkers.map((worker) => ({
-      ...worker,
-      isAvailable: false,
-    }))
-    setSortedWorkers(resetWorkers)
+  const handleManualSearch = () => {
+    if (searchQuery) {
+      handleSearchLocation()
+    }
   }
-
-
-   
-
 
   if (loading) {
     return (
@@ -451,7 +468,7 @@ const BookingPage: React.FC = () => {
                         locationSource === "database" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
                       }`}
                     >
-                      Use Address from Database
+                      Use Address from Profile
                     </button>
                     <button
                       onClick={handleCurrentLocation}
@@ -461,28 +478,27 @@ const BookingPage: React.FC = () => {
                     >
                       Use Current Location
                     </button>
-                    <div className="flex gap-2">
+                    <div className="relative">
                       <input
-                       ref={autocompleteRef}
+                        ref={autocompleteRef}
                         type="text"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder="Search location"
-                        className="p-2 border border-gray-300 rounded-lg flex-grow"
-                      />  {userLocation && (
-                        <p className="mt-2 text-green-500">
-                          Selected Location: Latitude: {userLocation.lat}, Longitude: {userLocation.lng}
-                        </p>
-                      )}
+                        className="p-2 border border-gray-300 rounded-lg flex-grow w-full"
+                      />
                       <button
-                        onClick={handleSearchLocation}
-                        className={`px-4 py-2 rounded-lg ${
-                          locationSource === "search" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
-                        }`}
+                        onClick={handleManualSearch}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                       >
                         Search
                       </button>
                     </div>
+                    {userLocation && (
+                      <p className="mt-2 text-green-500">
+                        Selected Location: Latitude: {userLocation.lat}, Longitude: {userLocation.lng}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div ref={mapRef} className="w-full h-96 rounded-lg shadow-inner mb-4 bg-gray-800" />
@@ -539,9 +555,8 @@ const BookingPage: React.FC = () => {
                           <p className="text-gray-400 text-sm">
                             Rate: <span className="text-gray-200 font-bold">₹{worker.hourlyRate || "N/A"}/hr</span>
                           </p>
-                          
+
                           <div className="flex items-center">
-                        
                             {[1, 2, 3, 4, 5].map((star) => (
                               <Star
                                 key={star}
