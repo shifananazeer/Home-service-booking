@@ -10,17 +10,45 @@ import WorkerManagement from "../../components/admin/WorkerManagement";
 import ServiceManagement from "../../components/admin/ServiceManagement";
 import AdminBookings from "../../components/admin/bookings";
 
+import { numberOfBookings, revenueForAdmin } from "../../services/adminService";
+import RevenueChart from "../../components/worker/RevenueChart";
+import BookingCountChart from "../../components/worker/BookingsCountChart";
+
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem('admin_Id')
+    const adminId = localStorage.getItem('admin_Id')
     const [currentComponent, setCurrentComponent] = useState("dashboard"); 
-
+    const [timeFrame, setTimeFrame] = useState<"weekly" | "monthly" | "yearly">("monthly")
+    const [revenueData, setRevenueData] = useState<{ label: string; revenue: number }[]>([])
+     const [bookingData, setBookingData] = useState<{ label: string; count: number }[]>([])
     useEffect(() => {
-        if (!token) {
+        if (!adminId) {
             navigate('/admin/login');
           
         }
     }, [ navigate]);
+
+    useEffect (() => {
+        const fetchData = async () => {
+          if(!adminId) return
+          try{
+            const revenue = await revenueForAdmin(timeFrame)
+            setRevenueData(revenue.revenue)
+            const bookings = await numberOfBookings(timeFrame)
+            setBookingData(bookings)
+
+          }  catch(error) {
+            
+          }
+        }
+        fetchData()
+        
+    } ,[timeFrame])
+
+
+    const handleTimeFrameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setTimeFrame(e.target.value as "weekly" | "monthly" | "yearly")
+      }
 
    
     const renderComponent = () => {
@@ -38,6 +66,31 @@ const AdminDashboard = () => {
                     <>
                         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
                         <p className="mt-4">Welcome to your admin dashboard!</p>
+                        <div className="flex items-center space-x-4 mb-6">
+            <label htmlFor="timeframe" className="text-sm font-medium text-gray-700">
+              Select Timeframe:
+            </label>
+            <select
+              id="timeframe"
+              onChange={handleTimeFrameChange}
+              value={timeFrame}
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            >
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white p-4 rounded-lg shadow-md">
+              <h2 className="text-lg font-semibold mb-2">Revenue</h2>
+                <RevenueChart data={revenueData} />
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-2">Booking Count</h2>
+                <BookingCountChart data={bookingData} />
+              </div>
+                    </div>
                     </>
                 );
             default:

@@ -22,4 +22,6 @@ router.get('/services',authenticateAdmin, authorizeRole(['admin']),adminControll
 router.put('/service/edit/:serviceId',authenticateAdmin,authorizeRole(['admin']),upload.single('image'),adminController.updateService)
 router.delete('/service/delete/:serviceId',authenticateAdmin, authorizeRole(['admin']), adminController.deleteService)
 router.get('/bookings' ,authenticateAdmin, authorizeRole(['admin']), adminController.getAllBookings)
+router.get('/revenue', adminController.getRevenue)
+router.get('/bookingCount' , adminController.getBookingCount)
 export default router;

@@ -788,14 +788,14 @@ class UserController  {
           })
     
 
-          await notificationService.saveNotification({
-            userId: userId,
-            userType: "worker",
-            bookingId: bookingId,
-            message: `Your wallet has been credited with ₹${workerShare}`,
-            isRead: false,
-            timestamp: new Date(),
-        });
+        //   await notificationService.saveNotification({
+        //     userId: userId,
+        //     userType: "worker",
+        //     bookingId: bookingId,
+        //     message: `Your wallet has been credited with ₹${workerShare}`,
+        //     isRead: false,
+        //     timestamp: new Date(),
+        // });
           // Update admin's wallet
           let adminWallet = await walletService.getAdminWallet()
           if (!adminWallet) {

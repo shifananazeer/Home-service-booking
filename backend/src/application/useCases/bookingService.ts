@@ -201,6 +201,44 @@ export class BookingService {
             const bookedSkills = await this.bookingRepository.getBookedSkillsByWorker(workerId);
             return bookedSkills;
         }
+
+
+
+        public async getCountByAdmin( timeFrame: string) {
+            const result = await this.bookingRepository.getFullCount( timeFrame);
+        
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        
+            const currentYear = new Date().getFullYear();
+        
+            if (timeFrame === "weekly") {
+                return dayNames.map((day, index) => {
+                    const foundData = result.find((data: { _id: number }) => data._id === index + 1);
+                    return { label: day, count: foundData ? foundData.totalCount : 0 };
+                });
+            }
+        
+            if (timeFrame === "monthly") {
+                return monthNames.map((month, index) => {
+                    const foundData = result.find((data: { _id: number }) => data._id === index + 1);
+                    return { label: month, count: foundData ? foundData.totalCount : 0 };
+                });
+            }
+        
+            if (timeFrame === "yearly") {
+                return result.map((data: { _id: number; totalCount: number }) => ({
+                    label: `${data._id}`,
+                    count: data.totalCount
+                }));
+            }
+        
+            return [];
+        }
 }
 
 

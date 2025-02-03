@@ -145,7 +145,7 @@ export class BookingRepositoryImpl implements BookingRepository {
     
         const matchCriteria: any = {
             workerId: workerObjectId,
-            status: { $ne: "cancelled" } 
+            paymentStatus: { $ne: "Cancelled" } 
         };
     
         const currentDate = new Date();
@@ -223,6 +223,36 @@ export class BookingRepositoryImpl implements BookingRepository {
             count: item.count
         }));
     }
+
+
+    async getFullCount( timeFrame: string) {
+       
+    
+        const matchCriteria: any = {
+            paymentStatus: { $ne: "Cancelled" } 
+        };
+    
+        const currentDate = new Date();
+        let groupStage: any = {};
+    
+        if (timeFrame === "weekly") {
+            groupStage = { _id: { $dayOfWeek: "$createdAt" }, totalCount: { $sum: 1 } };
+        } else if (timeFrame === "monthly") {
+            groupStage = { _id: { $month: "$createdAt" }, totalCount: { $sum: 1 } };
+        } else if (timeFrame === "yearly") {
+            groupStage = { _id: { $year: "$createdAt" }, totalCount: { $sum: 1 } };
+        }
+    
+        const result = await BookingModel.aggregate([
+            { $match: matchCriteria },
+            { $group: groupStage },
+            { $sort: { _id: 1 } }
+        ]);
+    
+        return result;
+    }
+
+
 }
 
 

@@ -81,7 +81,7 @@ export class WalletRepositoryImpl implements WalletRepository {
     if (timeFrame === 'weekly') {
       
         startDate = new Date();
-        startDate.setDate(currentDate.getDate() - currentDate.getDay()); 
+        startDate.setDate(currentDate.getDate() - 6); 
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
 
@@ -137,4 +137,97 @@ async getworkerWallet(workerId: string): Promise<Wallet> {
   console.log("wallet..............." , wallet)
   return wallet;
 }
+
+
+// async getAdminRevenue(startDate: Date, endDate: Date): Promise<number> {
+//   try {
+//       // Find the admin wallet (assuming there's only one admin wallet)
+//       const adminWallet = await WalletModel.findOne({ userId: null });
+
+//       if (!adminWallet) {
+//           return 0; // Return 0 if no admin wallet exists
+//       }
+
+//       // Filter transactions within the date range
+//       const filteredTransactions = adminWallet.transactions.filter(transaction => {
+//           const transactionDate = new Date(transaction.date);
+//           return transaction.type === "credit" && transactionDate >= startDate && transactionDate <= endDate;
+//       });
+
+//       // Sum up the revenue from the filtered transactions
+//       const totalRevenue = filteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+//       return totalRevenue;
+//   } catch (error) {
+//       console.error("Error fetching admin revenue:", error);
+//       throw new Error("Failed to fetch admin revenue");
+//   }
+// }
+
+// Get count of bookings within the specified timeframe
+// static async getBookingCount(startDate: Date, endDate: Date) {
+//   return await Booking.countDocuments({ createdAt: { $gte: startDate, $lte: endDate } });
+// }
+
+async getRevenueByAdmin( timeFrame: string): Promise<{ _id: string; totalRevenue: number }[]> {
+ 
+  const currentDate = new Date();
+    let startDate: Date;
+    let endDate: Date = new Date();
+
+    if (timeFrame === "weekly") {
+        startDate = new Date();
+        startDate.setDate(currentDate.getDate() - 6); 
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+    } else if (timeFrame === "yearly") {
+        const currentYear = currentDate.getFullYear();
+        startDate = new Date(currentYear - 2, 0, 1);
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+    } else {
+        const currentYear = currentDate.getFullYear();
+        startDate = new Date(currentYear, 0, 1);
+        endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+    }
+
+    // ✅ Find Admin Wallet where admin: true
+    const adminWallet = await WalletModel.findOne({ isAdmin: true });
+    if (!adminWallet) {
+        throw new Error("Admin wallet not found.");
+    }
+
+    const results = await WalletModel.aggregate([
+        { $unwind: "$transactions" },
+        {
+            $match: {
+                _id: new Types.ObjectId(adminWallet._id), // ✅ Match Admin Wallet ID
+                "transactions.type": "credit",
+                "transactions.date": { $gte: startDate, $lte: endDate },
+            },
+        },
+        {
+            $group: {
+                _id:
+                    timeFrame === "weekly"
+                        ? { day: { $dayOfWeek: "$transactions.date" } }
+                        : timeFrame === "yearly"
+                        ? { year: { $year: "$transactions.date" } }
+                        : { month: { $month: "$transactions.date" } },
+                totalRevenue: { $sum: "$transactions.amount" },
+            },
+        },
+        { $sort: { "_id": 1 } },
+    ]);
+
+    return results.map((item) => ({
+        _id:
+            timeFrame === "weekly"
+                ? item._id.day.toString()
+                : timeFrame === "yearly"
+                ? item._id.year.toString()
+                : String(item._id.month).padStart(2, "0"),
+        totalRevenue: item.totalRevenue,
+    }));
+}
+
 }

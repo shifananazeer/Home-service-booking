@@ -8,4 +8,6 @@ export interface WalletRepository {
     updateOrCreateWallet(userId: string | null, amount: number, transactionDetails: any, isAdmin: boolean): Promise<Wallet>;
     getRevenueByWorker(workerId: string , timeFrame: string):Promise<{ _id: string, totalRevenue: number }[]> ; 
     getworkerWallet(workerId:string) : Promise<Wallet>;
+    // getAdminRevenue(startDate: Date, endDate: Date): Promise<number>;
+    getRevenueByAdmin( timeFrame: string):Promise<{ _id: string, totalRevenue: number }[]> ; 
 }

@@ -13,11 +13,13 @@ import { HttpStatus } from "../../utils/httpStatus";
 import { Messages } from "../../utils/message";
 import {BookingRepositoryImpl} from "../../infrastructure/database/repositories/BookingRepositoryImpl";
 import { BookingService } from "../../application/useCases/bookingService";
+import { WalletService } from "../../application/useCases/walletService";
 const adminService = new AdminService();
 const userService = new UserService();
 const workerService = new WorkerService();
 const serviceManagement = new ServiceManagement();
 const bookingService = new BookingService();
+const walletService = new WalletService();
 
  
 class AdminController {
@@ -196,6 +198,35 @@ class AdminController {
             }
         }
     }
+
+    async getRevenue  (req:Request , res:Response):Promise<void> {
+        try {
+            const timeFrame: string | undefined = req.query.timeFrame as string;
+      
+            const validTimeFrame = timeFrame || 'monthly';
+            const revenue = await walletService.getAdminRevenue( validTimeFrame);
+      
+            res.status(200).json({ success: true, revenue });
+          } catch (error: any) {
+            console.error("Error fetching revenue and bookings:", error);
+            res.status(500).json({ success: false, message: error.message });
+          }
+    }
+
+         async getBookingCount(req: Request, res: Response) {
+                    try {
+                      
+                        const timeFrame: string | undefined = req.query.timeFrame as string;
+                
+                        const validTimeFrame = timeFrame || 'monthly';
+                
+                        const count = await bookingService.getCountByAdmin( validTimeFrame);
+                        res.status(200).json(count);
+                    } catch (error) {
+                        console.error("Error fetching booking count:", error);
+                        res.status(500).json({ message: "Internal Server Error" });
+                    }
+                }
 }
 
 

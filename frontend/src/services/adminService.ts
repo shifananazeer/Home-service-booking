@@ -219,3 +219,14 @@ export const updateService = async (serviceId: string, formData:FormData) => {
         throw error; 
     }
 };
+
+export const revenueForAdmin = async (timeFrame:string) => {
+    const respo  = await axiosInstance.get(`/admin/revenue?timeFrame=${timeFrame}`)
+    console.log("admin" , respo)
+    return respo.data ;
+}
+
+export const numberOfBookings = async (timeFrame:string) => {
+    const respo = await axiosInstance.get(`/admin/bookingCount?timeFrame=${timeFrame}`)
+    return respo.data;
+}
