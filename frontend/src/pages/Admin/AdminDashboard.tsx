@@ -13,6 +13,8 @@ import BookingCountChart from "../../components/worker/BookingsCountChart"
 import SkillPieChart from "../../components/worker/SkillPieChart"
 import TopWorker from "../../components/admin/TopWorkers"
 import AdminWallet from "../../components/admin/AdminWallet"
+import WorkerProfile from "../../components/admin/workerProfile"
+
 
 
 const AdminDashboard = () => {
@@ -24,6 +26,7 @@ const AdminDashboard = () => {
   const [bookingData, setBookingData] = useState<{ label: string; count: number }[]>([])
   const [bookedService, setBookedService] = useState<{ skill: string; count: number }[]>([])
   const [topWorker, setTopWorker] = useState<any>(null)
+  const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null); 
 
   useEffect(() => {
     if (!adminId) {
@@ -85,6 +88,8 @@ const AdminDashboard = () => {
         return <AdminBookings />
       case 'wallet':
         return <AdminWallet/>
+        case "workerProfile":
+      return selectedWorkerId ? <WorkerProfile workerId={selectedWorkerId} /> : <h1>No Worker Selected</h1>;  
       case "dashboard":
         return (
           <>
@@ -116,7 +121,7 @@ const AdminDashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <SkillPieChart data={bookedService} />
-              {topWorker && <TopWorker worker={topWorker} />}
+              {topWorker && <TopWorker worker={topWorker } setCurrentComponent={setCurrentComponent} setSelectedWorkerId={setSelectedWorkerId}  />}
             </div>
           </>
         )

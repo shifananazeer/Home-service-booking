@@ -259,6 +259,16 @@ class AdminController {
 
                     }
                 }
+
+               async  workerProfile  (req:Request , res:Response) {
+                try{
+                  const {workerId} = req.params;
+                  const worker  = await workerService.findWorkerById(workerId)
+                  res.status(200).json(worker)
+                }catch (error) {
+
+                }
+               }
 }
 
 

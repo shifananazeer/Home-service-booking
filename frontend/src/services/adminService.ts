@@ -250,3 +250,9 @@ export const getWalletDetails = async () => {
 
     }
 }
+
+
+export const getWorkerProfile = async(workerId:string) => {
+const response = await axiosInstance.get(`/admin/workerprofile/${workerId}`)
+return response.data;
+}

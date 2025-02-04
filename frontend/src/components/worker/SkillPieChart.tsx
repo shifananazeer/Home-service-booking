@@ -40,7 +40,7 @@ const SkillPieChart: React.FC<SkillPieChartProps> = ({ data, width = 300, height
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-2">Booked Skills</h2>
+      <h2 className="text-lg font-semibold mb-2">Booked Services</h2>
       <div style={{ width, height }}>
         <Pie data={chartData} options={options} />
       </div>

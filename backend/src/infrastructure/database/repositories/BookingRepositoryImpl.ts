@@ -270,27 +270,43 @@ export class BookingRepositoryImpl implements BookingRepository {
         }));
     }
 
-    async getMostBookedWorkers(limit: number = 5): Promise<WorkerBookingCount[]> {
+    async getMostBookedWorkers(limit: number = 5): Promise<WorkerBookingCount[]> { 
         const workers = await BookingModel.aggregate([
-          {
-            $group: {
-              _id: "$workerId",
-              count: { $sum: 1 },
-              workerName: { $first: "$workerName" },
-              serviceImage: { $first: "$serviceImage" }
+            {
+                $group: {
+                    _id: "$workerId",
+                    count: { $sum: 1 },
+                    workerName: { $first: "$workerName" }
+                },
             },
-          },
-          { $sort: { count: -1 } }, // Sort by highest bookings
-          { $limit: limit } // Limit results
+            {
+                $lookup: {
+                    from: "workers", // The collection name in MongoDB
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "workerInfo"
+                }
+            },
+            {
+                $unwind: "$workerInfo" // Convert the array into an object
+            },
+            { $sort: { count: -1 } }, // Sort by highest bookings
+            { $limit: limit }, // Limit results
+            {
+                $project: {
+                    workerId: "$_id",
+                    workerName: 1,
+                    profilePic: "$workerInfo.profilePic", // Get profile picture from Worker collection
+                    bookingsCount: "$count"
+                }
+            }
         ]);
     
         return workers.map(worker => ({
-          workerId: worker._id.toString(),
-          workerName: worker.workerName,
-          serviceImage: worker.serviceImage,
-          bookingsCount: worker.count
+            workerId: worker.workerId.toString(),
+            workerName: worker.workerName,
+            profilePic: worker.profilePic, // Replacing serviceImage with profilePic
+            bookingsCount: worker.bookingsCount
         }));
-      }
-}
-
-
+    }
+}    
