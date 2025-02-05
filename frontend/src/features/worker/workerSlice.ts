@@ -28,8 +28,8 @@ const getStoredWorkerData = (): WorkerData | null => {
     }
 };
 
-const accessTokenFromStorage = localStorage.getItem('accessToken');
-const refreshTokenFromStorage = localStorage.getItem('refreshToken');
+const accessTokenFromStorage = localStorage.getItem('worker_accessToken');
+const refreshTokenFromStorage = localStorage.getItem('worker_refreshToken');
 
 const initialState: WorkerState = {
     isLoading: false,
@@ -117,15 +117,11 @@ const workerSlice = createSlice({
             state.success = false;
         },
         logout: (state) => {
-            state.accessToken = null; 
-            state.refreshToken = null; 
-            state.success = false; 
-            state.isVerified = false; 
-            localStorage.removeItem('workerData');
-            localStorage.removeItem('worker_accessToken'); 
-            localStorage.removeItem('worker_refreshToken'); 
-            localStorage.removeItem('workerId')
-            localStorage.removeItem('email')
+            state.accessToken = null;
+            state.refreshToken = null;
+            state.success = false;
+            state.isVerified = false;
+            state.workerData = null; // Clear worker data
         },
     },
 });

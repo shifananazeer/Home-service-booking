@@ -16,6 +16,13 @@ import AdminWallet from "../../components/admin/AdminWallet"
 import WorkerProfile from "../../components/admin/workerProfile"
 
 
+interface Worker {
+  workerId: string;
+  workerName: string;
+  profilePic: string;
+  bookingsCount: number;
+}
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate()
@@ -25,7 +32,7 @@ const AdminDashboard = () => {
   const [revenueData, setRevenueData] = useState<{ label: string; revenue: number }[]>([])
   const [bookingData, setBookingData] = useState<{ label: string; count: number }[]>([])
   const [bookedService, setBookedService] = useState<{ skill: string; count: number }[]>([])
-  const [topWorker, setTopWorker] = useState<any>(null)
+const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null); 
 
   useEffect(() => {
@@ -60,7 +67,7 @@ const AdminDashboard = () => {
       try {
         const topWorkersData = await getTopWorkers()
         if (topWorkersData.data && topWorkersData.data.length > 0) {
-          setTopWorker(topWorkersData.data[0])
+          setTopWorkers(topWorkersData.data)
         }
       } catch (error) {
         console.error("Error fetching top workers:", error)
@@ -121,7 +128,7 @@ const AdminDashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <SkillPieChart data={bookedService} />
-              {topWorker && <TopWorker worker={topWorker } setCurrentComponent={setCurrentComponent} setSelectedWorkerId={setSelectedWorkerId}  />}
+              {topWorkers && <TopWorker workers={topWorkers} setCurrentComponent={setCurrentComponent} setSelectedWorkerId={setSelectedWorkerId} />}
             </div>
           </>
         )

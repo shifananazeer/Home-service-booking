@@ -13,6 +13,8 @@ interface UserState {
     userData: UserData | null;
     loading: boolean;
     error: string | null;
+    accessToken: string | null;   
+    refreshToken: string | null; 
 }
 
 
@@ -26,10 +28,15 @@ const getStoredUserData = (): UserData | null => {
     }
 };
 
+const accessTokenFromStorage = localStorage.getItem('accessToken');
+const refreshTokenFromStorage = localStorage.getItem('refreshToken');
+
 const initialState: UserState = {
     userData: getStoredUserData(), 
     loading: false,
     error: null,
+    accessToken: accessTokenFromStorage, 
+    refreshToken: refreshTokenFromStorage,
 };
 
 
@@ -66,15 +73,17 @@ const userSlice = createSlice({
             state.userData = null;
             state.error = null;
             state.loading = false;
+            state.accessToken = null;
+            state.refreshToken = null;
 
-            try {
-             localStorage.removeItem('userData');
-                localStorage.removeItem('user_Id')
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('refreshToken')
-            } catch (error) {
-                console.error('Error removing data from localStorage during logout:', error);
-            }
+            // try {
+            //  localStorage.removeItem('userData');
+            //     localStorage.removeItem('user_Id')
+            //     localStorage.removeItem('accessToken')
+            //     localStorage.removeItem('refreshToken')
+            // } catch (error) {
+            //     console.error('Error removing data from localStorage during logout:', error);
+            // }
         },
 
         

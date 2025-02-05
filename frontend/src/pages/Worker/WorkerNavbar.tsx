@@ -2,6 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { logout } from '../../features/worker/workerSlice';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosInstance';
 
 const WorkerNavbar = () => {
 
@@ -9,11 +10,22 @@ const WorkerNavbar = () => {
     const navigate = useNavigate()
 
     const handleLogout = () => {
+        // 1️⃣ Clear Redux state
         dispatch(logout()); 
-        navigate('/worker/login'); 
-        console.log("Logging out...");
+    
+        // 2️⃣ Remove authentication data from localStorage
+        localStorage.removeItem('workerData');
+        localStorage.removeItem('worker_accessToken'); 
+        localStorage.removeItem('worker_refreshToken'); 
+        localStorage.removeItem('workerId')
+        localStorage.removeItem('email')
+    
+        // 3️⃣ Clear Axios headers to prevent old token usage
+        delete axiosInstance.defaults.headers.common["Authorization"];
+    
+        // 4️⃣ Reload the page to fully reset authentication state
+        window.location.href = "/worker/login"; 
     };
-
     return (
         <nav className="fixed top-0 left-0 w-full h-16 bg-gray-800 text-white flex justify-between items-center p-2 shadow-md">
             <div className="flex items-center">

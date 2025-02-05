@@ -308,7 +308,7 @@ const ChatList: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {selectedChat ? (
           <>
-            <div className="bg-white p-4 border-b border-gray-200 sticky top-[64px] z-20">
+            <div className="bg-white p-4 border-b border-gray-200 sticky top-[0px] z-20">
               {" "}
               {/* Update 1 */}
               <div className="flex items-center">

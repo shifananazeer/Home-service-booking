@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getBookingDetails, updateBookingStatus, updateWallet } from '../../services/userService';
 import { CheckCircle, Calendar, Clock, DollarSign, User, Briefcase } from 'lucide-react';
@@ -22,51 +22,49 @@ const BookingSuccessPage: React.FC = () => {
   
   const query = new URLSearchParams(location.search);
   const bookingId = query.get('bookingId');
-
+  const hasUpdatedWallet = useRef(false);
   useEffect(() => {
     const fetchBookingDetails = async () => {
-      setLoading(true); // Ensure loading state is set before fetching data
-      try {
-        if (bookingId) {
-          const details = await getBookingDetails(bookingId);
-          setBookingDetails(details);
-          console.log("details", details);
-          console.log("dddd" , details.workerId)
-          console.log("ddd" , details.advancePayment)
-          console.log("boo" , bookingId)
-          
-          if (details?.workerId && details?.advancePayment) {
-            // Update booking status
-            console.log('Updating booking status...');
-            const response = await updateBookingStatus(bookingId, 'advance_paid');
-            console.log("Booking status updated!", response);
-            
-            const walletData = {
-              userId: details.workerId,
-              amount: details.advancePayment,
-              transactionDetails: {
-                type: 'credit',
-                description: 'Advance payment for booking',
-                relatedBookingId: bookingId,
-              },
-            };
-            console.log("walletdata" , walletData)
-            console.log("Sending request to update wallet:", walletData);
-            const walletResponse = await updateWallet(walletData , bookingId);
-            console.log("Wallet API Response:", walletResponse);
-          } else {
-            console.error('Invalid booking details:', details);
-          }
+        if (hasUpdatedWallet.current) return; // Prevent multiple calls
+        hasUpdatedWallet.current = true; // Mark as called
+
+        setLoading(true);
+        try {
+            if (bookingId) {
+                const details = await getBookingDetails(bookingId);
+                setBookingDetails(details);
+
+                if (details?.workerId && details?.advancePayment) {
+                    console.log('Updating booking status...');
+                    const response = await updateBookingStatus(bookingId, 'advance_paid');
+                    console.log("Booking status updated!", response);
+
+                    const walletData = {
+                        userId: details.workerId,
+                        amount: details.advancePayment,
+                        transactionDetails: {
+                            type: 'credit',
+                            description: 'Advance payment for booking',
+                            relatedBookingId: bookingId,
+                        },
+                    };
+
+                    console.log("Sending request to update wallet:", walletData);
+                    const walletResponse = await updateWallet(walletData, bookingId);
+                    console.log("Wallet API Response:", walletResponse);
+                } else {
+                    console.error('Invalid booking details:', details);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch booking details:', error);
+        } finally {
+            setLoading(false);
         }
-      } catch (error) {
-        console.error('Failed to fetch booking details:', error);
-      } finally {
-        setLoading(false); // Set loading to false after fetch completes
-      }
     };
-  
+
     fetchBookingDetails();
-  }, [bookingId]);
+}, [bookingId]);
   
 
   if (loading) {
@@ -132,15 +130,15 @@ const BookingSuccessPage: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Total Amount:</span>
-              <span className="font-semibold text-gray-900">${bookingDetails.totalPayment.toFixed(2)}</span>
+              <span className="font-semibold text-gray-900">₹{bookingDetails.totalPayment.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Advance Payment:</span>
-              <span className="font-semibold text-green-600">${bookingDetails.advancePayment.toFixed(2)}</span>
+              <span className="font-semibold text-green-600">₹{bookingDetails.advancePayment.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Balance Due:</span>
-              <span className="font-semibold text-red-600">${bookingDetails.balancePayment.toFixed(2)}</span>
+              <span className="font-semibold text-red-600">₹{bookingDetails.balancePayment.toFixed(2)}</span>
             </div>
           </div>
         </div>

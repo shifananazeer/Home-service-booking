@@ -285,6 +285,7 @@ export const getWorkerLocation = async (workerId :string) => {
 
   export const fetchChats = async (workerId:string) => {
     const token = localStorage.getItem('worker_accessToken');
+    console.log("Access Token:", token);
     const response = await axiosInstance.get(`/workers/chat/${workerId}`,{
         headers : {
             'Authorization':`Bearer ${token}`,
@@ -390,6 +391,7 @@ export const numberOfBookings  = async (workerId:string , timeFrame:string) => {
     try{
      const response = await axiosInstance.get(`/workers/bookingsCount/${workerId}?timeFrame=${timeFrame}` ,{
         headers: {
+            'Authorization': `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
      })
@@ -406,6 +408,7 @@ export const getWorkerRatings = async (workerId: string) => {
     try {
         const response = await axiosInstance.get(`/workers/ratings/${workerId}` ,{
             headers: {
+                'Authorization': `Bearer ${token}`,
                 "Content-Type": "multipart/form-data",
               },
         });
@@ -423,6 +426,7 @@ export const getWalletDetails  = async (workerId:string) => {
     try{
    const response = await axiosInstance.get(`/workers/wallet/${workerId}` ,{
     headers: {
+        'Authorization': `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
    })
@@ -438,6 +442,7 @@ export const getSkillsCount = async (workerId:string) => {
     try{
       const response = await axiosInstance.get(`/workers/skills/${workerId}` ,{
         headers: {
+            'Authorization': `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
       })

@@ -221,30 +221,80 @@ export const updateService = async (serviceId: string, formData:FormData) => {
 };
 
 export const revenueForAdmin = async (timeFrame:string) => {
-    const respo  = await axiosInstance.get(`/admin/revenue?timeFrame=${timeFrame}`)
-    console.log("admin" , respo)
-    return respo.data ;
+    const token = localStorage.getItem('admin_accessToken');
+    try{
+        const respo  = await axiosInstance.get(`/admin/revenue?timeFrame=${timeFrame}` ,{
+            headers: {
+             
+                'Authorization': `Bearer ${token}`, 
+            }, 
+        })
+        console.log("admin" , respo)
+        return respo.data ;
+    }catch (error) {
+
+    }
+    
 }
 
 export const numberOfBookings = async (timeFrame:string) => {
-    const respo = await axiosInstance.get(`/admin/bookingCount?timeFrame=${timeFrame}`)
-    return respo.data;
+    const token = localStorage.getItem('admin_accessToken');
+    try{
+        const respo = await axiosInstance.get(`/admin/bookingCount?timeFrame=${timeFrame}` ,{
+            headers: {
+             
+                'Authorization': `Bearer ${token}`, 
+            }, 
+        })
+        return respo.data;
+    }catch (error) {
+
+    }
+   
 }
 
 export const getPopular = async () => {
-    const response = await axiosInstance.get('/admin/popularService')
-    return response.data
+    const token = localStorage.getItem('admin_accessToken');
+    try{
+        const response = await axiosInstance.get('/admin/popularService' ,{
+            headers: {
+                 
+                'Authorization': `Bearer ${token}`, 
+            },  
+        })
+        return response.data
+    }catch(error) {
+
+    }
+   
 }
 
 export const getTopWorkers = async () => {
-    const response = await axiosInstance.get('/admin/topWorkers')
-    return response.data;
+    const token = localStorage.getItem('admin_accessToken');
+    try{
+        const response = await axiosInstance.get('/admin/topWorkers' ,{
+            headers: {
+                     
+                'Authorization': `Bearer ${token}`, 
+            },  
+        })
+        return response.data;
+    }catch (error) {
+
+    }
+    
 }
 
 
 export const getWalletDetails = async () => {
+    const token = localStorage.getItem('admin_accessToken');
     try{
-    const response = await axiosInstance.get('/admin/wallet')
+    const response = await axiosInstance.get('/admin/wallet' ,{
+        headers: {
+                     
+            'Authorization': `Bearer ${token}`, 
+        },  
+    })
     return response.data;
     }catch (error) {
 
@@ -253,6 +303,17 @@ export const getWalletDetails = async () => {
 
 
 export const getWorkerProfile = async(workerId:string) => {
-const response = await axiosInstance.get(`/admin/workerprofile/${workerId}`)
-return response.data;
+    const token = localStorage.getItem('admin_accessToken');
+    try{
+        const response = await axiosInstance.get(`/admin/workerprofile/${workerId}` ,{
+            headers: {
+                     
+                'Authorization': `Bearer ${token}`, 
+            },  
+        })
+        return response.data;
+    
+    }catch (error) {
+        
+}
 }

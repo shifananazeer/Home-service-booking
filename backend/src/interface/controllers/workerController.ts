@@ -582,12 +582,15 @@ class WorkerController   {
                     
                             if (chats.length === 0) {
                                  res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NOT_FOUNT });
+                                 return 
                             }
                     
                             res.status(200).json(chats);
+                            return 
                         } catch (error: any) {
                             console.error('Error fetching chats:', error); // Log error for debugging
                             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: Messages.INTERNAL_SERVER_ERROR, error: error.message });
+                            return
                         }
                     }
                async addReaction (req:Request , res:Response) {

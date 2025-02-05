@@ -5,6 +5,7 @@ import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
 import { FaSignOutAlt, FaUser, FaUserTie } from 'react-icons/fa'; 
 import socket from '../utils/socket'
+import axiosInstance from '../utils/axiosInstance'
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -18,6 +19,7 @@ const Navbar: React.FC = () => {
 
   const handleLoginClick = () => {
     navigate('/login')
+   
   }
 
   const handleSignupClick = () => {
@@ -26,6 +28,13 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout())
+    localStorage.removeItem('userData');
+            localStorage.removeItem('user_Id')
+              localStorage.removeItem('accessToken')
+             localStorage.removeItem('refreshToken')
+             localStorage.removeItem('email')
+
+             delete axiosInstance.defaults.headers.common["Authorization"];
     navigate('/')
   }
 

@@ -78,17 +78,11 @@ const RevenueAnalyticsPage: React.FC = () => {
   }, [currentPage])
 
   const calculateRevenue = (start: Date, end: Date) => {
-    const bookingRevenue = bookings
-      .filter((booking) => isWithinInterval(new Date(booking.date), { start, end }))
-      .reduce((sum, booking) => sum + booking.totalPayment, 0)
-
-    const walletRevenue = walletTransactions
+    return walletTransactions
       .filter(
         (transaction) => transaction.type === "credit" && isWithinInterval(new Date(transaction.date), { start, end }),
       )
       .reduce((sum, transaction) => sum + transaction.amount, 0)
-
-    return bookingRevenue + walletRevenue
   }
 
   const getChartData = () => {
@@ -129,17 +123,11 @@ const RevenueAnalyticsPage: React.FC = () => {
 
     while (currentDate <= end) {
       labels.push(format(currentDate, dateFormat))
-      const dayRevenue =
-        filteredBookings
-          .filter((booking) =>
-            isWithinInterval(new Date(booking.date), { start: currentDate, end: endOfDay(currentDate) }),
-          )
-          .reduce((sum, booking) => sum + booking.totalPayment, 0) +
-        filteredWalletTransactions
-          .filter((transaction) =>
-            isWithinInterval(new Date(transaction.date), { start: currentDate, end: endOfDay(currentDate) }),
-          )
-          .reduce((sum, transaction) => sum + transaction.amount, 0)
+      const dayRevenue = filteredWalletTransactions
+        .filter((transaction) =>
+          isWithinInterval(new Date(transaction.date), { start: currentDate, end: endOfDay(currentDate) }),
+        )
+        .reduce((sum, transaction) => sum + transaction.amount, 0)
 
       data.push(dayRevenue)
       currentDate = new Date(currentDate.getTime() + 86400000) // +1 day
@@ -161,7 +149,7 @@ const RevenueAnalyticsPage: React.FC = () => {
     labels,
     datasets: [
       {
-        label: "Revenue",
+        label: "Wallet Revenue",
         data,
         borderColor: "rgb(75, 192, 192)",
         tension: 0.1,
@@ -203,10 +191,10 @@ const RevenueAnalyticsPage: React.FC = () => {
         <div className="lg:col-span-2 space-y-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { title: "Daily Revenue", amount: dailyRevenue },
-              { title: "Weekly Revenue", amount: weeklyRevenue },
-              { title: "Monthly Revenue", amount: monthlyRevenue },
-              { title: "Yearly Revenue", amount: yearlyRevenue },
+              { title: "Daily Wallet Revenue", amount: dailyRevenue },
+              { title: "Weekly Wallet Revenue", amount: weeklyRevenue },
+              { title: "Monthly Wallet Revenue", amount: monthlyRevenue },
+              { title: "Yearly Wallet Revenue", amount: yearlyRevenue },
             ].map((item, index) => (
               <div key={index} className="bg-white overflow-hidden shadow rounded-lg p-5">
                 <dt className="text-sm font-medium text-gray-500 truncate">{item.title}</dt>
@@ -217,7 +205,7 @@ const RevenueAnalyticsPage: React.FC = () => {
 
           <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Revenue Chart</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Wallet Revenue Chart</h2>
               <select
                 value={timeFrame}
                 onChange={(e) => setTimeFrame(e.target.value as "daily" | "weekly" | "monthly" | "yearly")}
@@ -230,8 +218,6 @@ const RevenueAnalyticsPage: React.FC = () => {
               </select>
             </div>
             <div className="h-64 md:h-80">
-              {" "}
-            
               <Line data={chartData} options={chartOptions} />
             </div>
           </div>

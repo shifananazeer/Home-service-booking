@@ -148,19 +148,19 @@ console.log("balance" , balanceAmount)
                 <div className="w-full md:w-1/2 bg-gray-300 p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4">Payment Details</h2>
                     <p>
-                        <strong>Hourly Rate:</strong> ${workerRate.toFixed(2)}
+                        <strong>Hourly Rate:</strong> ₹{workerRate.toFixed(2)}
                     </p>
                     <p>
-                        <strong>Total Amount:</strong> ${totalAmount.toFixed(2)}
+                        <strong>Total Amount:</strong> ₹{totalAmount.toFixed(2)}
                     </p>
                     <p>
-                        <strong>Platform Charge (10%):</strong> ${platformCharge.toFixed(2)}
+                        <strong>Platform Charge (10%):</strong> ₹{platformCharge.toFixed(2)}
                     </p>
                     <p>
-                        <strong>Total Amount (with Platform Charge):</strong> $ {finalAmount.toFixed(2)}
+                        <strong>Total Amount (with Platform Charge):</strong> ₹ {finalAmount.toFixed(2)}
                     </p>
                     <p>
-                        <strong>Advance Payment (50%):</strong> ${advancePayment.toFixed(2)}
+                        <strong>Advance Payment (30%):</strong> ₹{advancePayment.toFixed(2)}
                     </p>
                 </div>
             </div>
@@ -177,7 +177,7 @@ console.log("balance" , balanceAmount)
                         making the advance payment, the advance amount will not be refunded.
                     </li>
                     <li>
-                        <strong>Payment in Advance:</strong> 50% of the total
+                        <strong>Payment in Advance:</strong> 30% of the total
                         amount is required in advance to secure the booking.
                     </li>
                 </ul>

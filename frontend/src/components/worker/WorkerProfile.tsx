@@ -16,6 +16,7 @@ const WorkerProfile = () => {
     const [workerAddress, setWorkerAddress] = useState<Address | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const workerId = localStorage.getItem('workerId')
 
     useEffect(() => {
         const fetchProfile = async () => {

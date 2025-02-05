@@ -32,14 +32,14 @@ const BalancePaymentSuccessPage: React.FC = () => {
            await updateBookingStatus(bookingId, 'balance_paid');
            const walletData = {
                       userId: details.workerId,
-                      amount: details.advancePayment,
+                      amount: details.balancePayment,
                       transactionDetails: {
                         type: 'credit',
                         description: 'Balance payment for booking',
                         relatedBookingId: bookingId, // Ensure you're referencing the correct field
                       },
                     }
-                    await updateWallet(walletData);
+                    await updateWallet(walletData , bookingId);
           
                     console.log('Wallet updated successfully!');
                      
@@ -118,15 +118,15 @@ const BalancePaymentSuccessPage: React.FC = () => {
            <div className="space-y-2">
              <div className="flex justify-between items-center">
                <span className="text-gray-600">Total Amount:</span>
-               <span className="font-semibold text-gray-900">${bookingDetails.totalPayment.toFixed(2)}</span>
+               <span className="font-semibold text-gray-900">₹{bookingDetails.totalPayment.toFixed(2)}</span>
              </div>
              <div className="flex justify-between items-center">
                <span className="text-gray-600">Advance Payment:</span>
-               <span className="font-semibold text-blue-600">${bookingDetails.advancePayment.toFixed(2)}</span>
+               <span className="font-semibold text-blue-600">₹{bookingDetails.advancePayment.toFixed(2)}</span>
              </div>
              <div className="flex justify-between items-center">
                <span className="text-gray-600">Balance Paid:</span>
-               <span className="font-semibold text-blue-600">${bookingDetails.balancePayment.toFixed(2)}</span>
+               <span className="font-semibold text-blue-600">₹{bookingDetails.balancePayment.toFixed(2)}</span>
              </div>
            </div>
          </div>

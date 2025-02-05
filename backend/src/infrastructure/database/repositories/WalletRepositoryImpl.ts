@@ -44,33 +44,43 @@ export class WalletRepositoryImpl implements WalletRepository {
     amount: number,
     transactionDetails: any,
     isAdmin: boolean,
-  ): Promise<Wallet> {
-    const wallet = isAdmin ? await WalletModel.findOne({ isAdmin: true }) : await WalletModel.findOne({ userId })
-    console.log("wallet", wallet)
+): Promise<Wallet> {
+    const wallet = isAdmin ? await WalletModel.findOne({ isAdmin: true }) : await WalletModel.findOne({ userId });
+
+    console.log("wallet", wallet);
 
     if (wallet) {
-      wallet.balance += amount
-      wallet.transactions.push(transactionDetails)
-      await wallet.save()
+        // Check if a similar transaction already exists
+        const existingTransaction = wallet.transactions.find(
+            (t) => t.relatedBookingId === transactionDetails.relatedBookingId && t.description === transactionDetails.description
+        );
 
+        if (existingTransaction) {
+            console.log("Duplicate transaction detected. Skipping...");
+            return wallet.toObject(); // Prevent duplicate insertion
+        }
 
-      const io = getIo();
-      if (userId) {
-        io.to(userId).emit("receive-notification", {
-          message: `A new wallet has been created for you with an initial balance of: ${amount}`,
-          timestamp: new Date().toISOString(),
-          transactionDetails,
-        });
-      }
+        // If no duplicate, proceed with updating the wallet
+        wallet.balance += amount;
+        wallet.transactions.push(transactionDetails);
+        await wallet.save();
 
+        const io = getIo();
+        if (userId) {
+            io.to(userId).emit("receive-notification", {
+                message: `A new wallet has been created for you with an initial balance of: ${amount}`,
+                timestamp: new Date().toISOString(),
+                transactionDetails,
+            });
+        }
 
-      return wallet.toObject()
+        return wallet.toObject();
     } else {
-      const createdWallet = await this.createWallet(userId, amount, isAdmin, transactionDetails)
-      console.log("createdWallet", createdWallet)
-      return createdWallet
+        const createdWallet = await this.createWallet(userId, amount, isAdmin, transactionDetails);
+        console.log("createdWallet", createdWallet);
+        return createdWallet;
     }
-  }
+}
   async getRevenueByWorker(workerId: string, timeFrame: string): Promise<{ _id: string; totalRevenue: number }[]> {
     console.log(`Fetching revenue for workerId: ${workerId} with timeFrame: ${timeFrame}`);
 
