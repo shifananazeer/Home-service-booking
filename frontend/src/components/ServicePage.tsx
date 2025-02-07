@@ -21,6 +21,17 @@ export default function ServicesPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [limit] = useState<number>(8);
+
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = localStorage.getItem("user_Id");
+
+    if (!accessToken || !userId) {
+      navigate("/login");
+    }
+  }, [navigate]);
+  
   useEffect(() => {
     async function loadServices() {
       try {

@@ -3,9 +3,9 @@ import { adminController } from '../../interface/controllers/adminController'
 import { userController } from '../../interface/controllers/userController'
 import { workerController } from '../../interface/controllers/workerController'
 import multer from 'multer'
-import { authenticateAdmin } from '../../middleware/adminAuthentication'
+
 import { authorizeRole } from '../../middleware/autherizeRole'
-import { authenticateUser } from '../../middleware/auth'
+import { authenticateAdmin, authenticateUser } from '../../middleware/auth'
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router()
 

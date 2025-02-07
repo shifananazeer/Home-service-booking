@@ -29,10 +29,12 @@ export class WorkerService {
         console.log("password", password);
         console.log("email", email);
         const user = await this.workerRepository.findByEmail(email);
+        console.log("Retrieved user from database:", user);
         console.log("role....", user?.role);
         if (!user) throw new Error('Invalid Email Or Password');
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) throw new Error('Invalid Password');
+        console.log("user role" , user.role)
         const accessToken = jwt.sign(
             { email: user.email, role: user.role },
             process.env.ACCESS_TOKEN_SECRET as string,
@@ -40,7 +42,7 @@ export class WorkerService {
         );
         const refreshToken = jwt.sign(
             { email: user.email, role: user.role },
-            process.env.REFRESH_TOKEN_SECRET as string,
+            process.env.WORKER_REFRESH_TOKEN_SECRET as string,
             { expiresIn: '7d' }
         );
         return { accessToken, refreshToken, workerId: user._id.toString() , workerName:user.name , workerEmail:user.email , workerRole:user.role };

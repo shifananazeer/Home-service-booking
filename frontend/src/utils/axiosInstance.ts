@@ -1,5 +1,3 @@
-
-
 import axios from 'axios';
 import { adminRefreshAccessToken, userRefreshAccessToken, workerRefreshAccessToken } from './auth'; 
 
@@ -11,16 +9,15 @@ const axiosInstance = axios.create({
 });
 
 let isRefreshing = false; 
-type PendingRequestCallback = (token: string) => void;
-let pendingRequests: PendingRequestCallback[] = []; 
+let pendingRequests: any[] = []; 
 
 const onRefreshed = (token: string) => {
-    pendingRequests.forEach((callback) => callback(token)); 
-    pendingRequests = []; 
+    pendingRequests.forEach((callback) => callback(token));
+    pendingRequests = [];
 };
 
-const addPendingRequest = (callback: PendingRequestCallback) => {
-    pendingRequests.push(callback); 
+const addPendingRequest = (callback: (token: any) => void) => {
+    pendingRequests.push(callback);
 };
 
 axiosInstance.interceptors.response.use(
@@ -29,53 +26,59 @@ axiosInstance.interceptors.response.use(
         const originalRequest = error.config;
 
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            const refreshToken = 
-                localStorage.getItem('refreshToken') || 
-                localStorage.getItem('worker_refreshToken') || 
-                localStorage.getItem('admin_refreshToken'); // Retrieve refresh token from storage
+            let refreshToken = null;
+            let setAccessToken = null;
+
+            if (originalRequest.url.includes('/workers')) {
+                refreshToken = localStorage.getItem('worker_refreshToken');
+                setAccessToken = workerRefreshAccessToken;
+            } else if (originalRequest.url.includes('/admin')) {
+                refreshToken = localStorage.getItem('admin_refreshToken');
+                setAccessToken = adminRefreshAccessToken;
+            } else {
+                refreshToken = localStorage.getItem('refreshToken');
+                setAccessToken = userRefreshAccessToken;
+            }
 
             if (refreshToken) {
                 if (!isRefreshing) {
-                    isRefreshing = true; 
+                    isRefreshing = true;
 
                     try {
-                        let newAccessToken: string | null = null;
-                        
-                        // Determine the request type (user, worker, or admin)
-                        if (originalRequest.url.includes('/workers')) {
-                            newAccessToken = await workerRefreshAccessToken(refreshToken); 
-                        } else if (originalRequest.url.includes('/admin')) {
-                            newAccessToken = await adminRefreshAccessToken(refreshToken); 
-                        } else {
-                            newAccessToken = await userRefreshAccessToken(refreshToken); 
-                        }
+                        const newAccessToken = await setAccessToken(refreshToken);
 
                         if (newAccessToken) {
+                            localStorage.setItem('accessToken', newAccessToken);
                             originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                            onRefreshed(newAccessToken); 
-                            return axios(originalRequest); 
+                            onRefreshed(newAccessToken);
+                            return axios(originalRequest);
                         }
                     } catch (refreshError) {
-                        console.error('Token refresh error:', refreshError); 
+                        console.error('Token refresh error:', refreshError);
+                        pendingRequests = [];
+                        localStorage.removeItem('accessToken'); // Clear invalid token
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('worker_refreshToken');
+                        localStorage.removeItem('admin_refreshToken');
+                        window.location.href = '/login'; // Redirect to login if refresh fails
                     } finally {
-                        isRefreshing = false; 
+                        isRefreshing = false;
                     }
                 }
-              
+
                 return new Promise((resolve) => {
-                    addPendingRequest((token: string) => {
+                    addPendingRequest((token) => {
                         originalRequest.headers['Authorization'] = `Bearer ${token}`;
-                        resolve(axios(originalRequest)); 
+                        resolve(axios(originalRequest));
                     });
                 });
             } else {
-                // Handle case where refresh token is missing (e.g., redirect to login)
                 console.log('No refresh token found, redirecting to login...');
-                // Optionally redirect to login page here
+                window.location.href = '/login'; // Redirect if refresh token is missing
             }
         }
 
-        return Promise.reject(error); 
+        return Promise.reject(error);
     }
 );
 

@@ -185,7 +185,7 @@ class AdminController {
         }
         try {
             const type = 'admin';
-            const accessToken = await refreshAccessToken(refreshToken, type);
+            const accessToken = await refreshAccessToken(refreshToken ,type);
             res.status(HttpStatus.OK).json({ accessToken });
         } catch (error: any) {
             console.error("Error refreshing access token:", error.message);

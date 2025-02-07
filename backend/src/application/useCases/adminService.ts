@@ -53,7 +53,7 @@ export class AdminService {
                 email: admin.email,
                 role: admin.role,
             },
-            process.env.REFRESH_TOKEN_SECRET as string,
+            process.env.ADMIN_REFRESH_TOKEN_SECRET as string,
             { expiresIn: '7d' }
         );
 

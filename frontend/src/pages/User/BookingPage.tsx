@@ -494,11 +494,11 @@ const BookingPage: React.FC = () => {
                         Search
                       </button>
                     </div>
-                    {userLocation && (
+                    {/* {userLocation && (
                       <p className="mt-2 text-green-500">
                         Selected Location: Latitude: {userLocation.lat}, Longitude: {userLocation.lng}
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div ref={mapRef} className="w-full h-96 rounded-lg shadow-inner mb-4 bg-gray-800" />
