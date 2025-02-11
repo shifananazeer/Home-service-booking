@@ -14,6 +14,8 @@ import SkillPieChart from "../../components/worker/SkillPieChart"
 import TopWorker from "../../components/admin/TopWorkers"
 import AdminWallet from "../../components/admin/AdminWallet"
 import WorkerProfile from "../../components/admin/workerProfile"
+import { FaTachometerAlt } from "react-icons/fa"
+
 
 
 interface Worker {
@@ -39,7 +41,7 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
     if (!adminId) {
       navigate("/admin/login")
     }
-  }, [navigate, adminId]) // Added adminId to dependencies
+  }, [navigate, adminId]) 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +79,7 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
     fetchData()
     fetchService()
     fetchTopWorkers()
-  }, [timeFrame, adminId]) // Added adminId to dependencies
+  }, [timeFrame, adminId]) 
 
   const handleTimeFrameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTimeFrame(e.target.value as "weekly" | "monthly" | "yearly")
@@ -100,7 +102,7 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
       case "dashboard":
         return (
           <>
-            <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+            <h1 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink">Admin Dashboard </h1>
             <div className="flex items-center space-x-4 mb-6">
               <label htmlFor="timeframe" className="text-sm font-medium text-gray-700">
                 Select Timeframe:

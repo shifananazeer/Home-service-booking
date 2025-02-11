@@ -10,8 +10,8 @@ interface WorkerState {
     workerData:WorkerData | null;
 }
 interface WorkerData {
-    name: string;
-    email: string;
+    name: string|null;
+    email: string|null;
     accessToken: string;   
     refreshToken: string; 
     role?: string; 
@@ -65,12 +65,35 @@ const workerSlice = createSlice({
             state.accessToken = null; 
             state.refreshToken = null; 
         },
-        otpVerifySuccess: (state, action: PayloadAction<string>) => {
-            state.accessToken = action.payload; 
+        otpVerifySuccess: (
+            state, 
+            action: PayloadAction<{ accessToken: string; refreshToken: string; role: string; userId: string; }>
+        ) => {
+            state.isLoading = false;
             state.success = true;
-            state.isVerified = true; 
+            state.isVerified = true;
+        
+            // Destructure values from the action payload
+            const { accessToken, refreshToken, role, userId, } = action.payload;
+        
+            // Update state with worker data
+            state.workerData = {
+                name: null,
+                email: null,
+                role: role,
+                accessToken,
+                refreshToken,
+            };
+        
+            // Store in localStorage
+            localStorage.setItem('worker_accessToken', accessToken);
+            localStorage.setItem('worker_refreshToken', refreshToken);
+            localStorage.setItem('workerId', userId);
+            localStorage.setItem('workerData', JSON.stringify({
+                
+                role: role,
+            }));
         },
-
         loginStart: (state) => {
             state.isLoading = true;
             state.error = null;

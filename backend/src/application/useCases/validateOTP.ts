@@ -26,8 +26,11 @@ export const validateOtp = async (
             throw new Error("OTP has expired");
         }
         await OTPModel.deleteOne({ _id: otpEntry._id });
+
         let userRole: string;
         let userId: string;
+
+        console.log("Type:", person);
 
         // For User
         if (person === 1) {
@@ -58,13 +61,17 @@ export const validateOtp = async (
         }
 
         const secretKey = process.env.ACCESS_TOKEN_SECRET;
-        const refreshSecretKey = process.env.REFRESH_TOKEN_SECRET;
+        const refreshSecretKey = person === 1 
+            ? process.env.REFRESH_TOKEN_SECRET  // Use this for users
+            : process.env.WORKER_REFRESH_TOKEN_SECRET; // Use this for workers
 
         if (!secretKey || !refreshSecretKey) {
             throw new Error("JWT secret keys are not defined");
         }
+
         const accessToken = jwt.sign({ email, role: userRole }, secretKey, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ email, role: userRole }, refreshSecretKey, { expiresIn: "7d" });
+
         return { valid: true, role: userRole, accessToken, refreshToken, userId };
     } catch (error: any) {
         throw new Error(error.message);

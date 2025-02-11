@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getBookings, getWorkerLocation } from '../../services/workerService';
 import { refreshAccessToken } from '../../utils/auth';
 import { useNavigate } from 'react-router-dom';
+import { FaCalendarCheck } from 'react-icons/fa';
 
 interface WorkLocation {
   address: string;
@@ -21,6 +22,8 @@ interface Booking {
   serviceImage: string;
   serviceName: string;
   paymentStatus: string;
+  workStatus:string;
+  
 }
 
 interface WorkerLocation {
@@ -113,7 +116,7 @@ console.log("workk",workerLocation)
   return (
     <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8 text-white">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-100 mb-8 text-center">Your Bookings</h1>
+        <h1 className="text-4xl text-gray-900  font-bold text-center mb-4 flex items-center justify-center">Your Bookings <FaCalendarCheck className="text-3xl ml-2" /></h1>
         <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
           <ul className="divide-y divide-gray-700">
             {bookings.map((booking) => (
@@ -122,12 +125,15 @@ console.log("workk",workerLocation)
                   <img src={booking.serviceImage || '/placeholder.svg?height=80&width=80'} alt={booking.serviceName} className="w-20 h-20 object-cover rounded-lg" />
                   <div className="flex-1">
                     <h3 className="text-lg font-medium text-gray-100">{booking.customerName}</h3>
-                    <p className="mt-1 text-sm text-gray-400">{booking.serviceName}</p>
-                    <p className="mt-1 text-sm text-gray-400">{booking.workLocation.address}</p>
+                    <p className="mt-1 text-sm text-gray-400">Service: {booking.serviceName}</p>
+                    <p className="mt-1 text-sm text-gray-400">Location: {booking.workLocation.address}</p>
+                    <p className="mt-1 text-sm text-gray-400">Work Description: {booking.workDescription}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-300">{new Date(booking.date).toLocaleDateString()}</p>
                     <p className="mt-1 text-sm text-gray-400">{booking.slotId}</p>
+                    <p className="mt-1 text-sm text-gray-400">payment: {booking.paymentStatus}</p>
+                    <p className="mt-1 text-sm text-gray-400">work: {booking.workStatus}</p>
                     <button
                       onClick={() => renderMap(booking)}
                       className="mt-2 text-blue-400 hover:text-blue-300 transition duration-150 ease-in-out"

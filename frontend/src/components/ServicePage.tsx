@@ -63,12 +63,18 @@ const handlePageChange = (page: number) => {
     setCurrentPage(page);
 };
 
-  if (loading) return <div className="text-center p-8">Loading services...</div>
+if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+    </div>
+  );
+}
   if (error) return <div className="text-center text-red-500 p-8">{error}</div>
 
   return (
     <div className="container mx-auto px-4 py-12">
-    <h1 className="text-4xl font-bold text-center mb-4 flex items-center justify-center blink">
+    <h1 className="text-4xl font-bold text-center mb-4 flex items-center justify-center blink  ">
         What We Offer <FaUserTie className="text-3xl ml-2" />
       </h1>
       <style >{`

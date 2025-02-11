@@ -7,6 +7,9 @@ import { Address } from '../../interfaces/addressInterface';
 import ChangePasswordModal from './ChangePasswordModel';
 import { refreshAccessToken } from '../../utils/auth';
 import toast from 'react-hot-toast';
+import { logout } from '../../features/user/userSlice.';
+import axiosInstance from '../../utils/axiosInstance';
+import { useDispatch } from 'react-redux';
 
 export interface UserProfileResponse {
     user: UserProfileInterface;
@@ -23,6 +26,7 @@ const UserProfile = () => {
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
    const userId = localStorage.getItem('user_Id')
+   const dispatch = useDispatch()
     useEffect(() => {
         const fetchUnreadNotifications = async () => {
             if(!userId){
@@ -87,10 +91,26 @@ const UserProfile = () => {
         }
       };
 
+      const handleLogout = () => {
+        dispatch(logout())
+        localStorage.removeItem('userData');
+                localStorage.removeItem('user_Id')
+                  localStorage.removeItem('accessToken')
+                 localStorage.removeItem('refreshToken')
+                 localStorage.removeItem('email')
+    
+                 delete axiosInstance.defaults.headers.common["Authorization"];
+        navigate('/')
+      }
+
       
-    if (loading) {
-        return <ProfileSkeleton />;
-    }
+      if (loading) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+          </div>
+        );
+      }
 
     if (error) {
         return (
@@ -158,7 +178,9 @@ const UserProfile = () => {
                                 >
                                     Edit Profile
                                 </button>
-                                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                <button 
+                                 onClick={handleLogout}
+                                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                                     Logout
                                 </button>
                             </div>

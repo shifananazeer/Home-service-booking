@@ -14,6 +14,7 @@ export const Messages = {
 
     BOOKING_RETRIVED:"Bookings retrieved successfully",
     FAILED_RETRIVED:"Failed to retrieve bookings",
+    NO_BOOKINGS_FOUND:"No bookings ",
 
    ERRROR_FETCHING_MESSAGES:'error fetchingMessage',
    ERROR_IN_ADDING_REACTION:"error adding reaction",

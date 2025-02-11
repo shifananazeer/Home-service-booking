@@ -139,13 +139,12 @@ export class WalletRepositoryImpl implements WalletRepository {
     }));
 }
 
-async getworkerWallet(workerId: string): Promise<Wallet> {
+async getworkerWallet(workerId: string): Promise<Wallet|null> {
   const wallet = await WalletModel.findOne({ userId:workerId });
-  if (!wallet) {
-    throw new Error('Wallet not found for this user');
-  }
-  console.log("wallet..............." , wallet)
-  return wallet;
+  console.log("Wallet fetched from DB:", wallet);
+
+  // Return null if no wallet is found
+  return wallet || null;
 }
 
 

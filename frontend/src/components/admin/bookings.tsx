@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchAllBookings } from '../../services/adminService';
 import debounce from 'lodash.debounce';
+import { FaRegClipboard } from 'react-icons/fa';
 
 interface Booking {
   _id: string;
@@ -103,7 +104,7 @@ export default function AdminBookings() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Bookings</h1>
+      <h1 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink"> Bookings <FaRegClipboard className="text-3xl ml-2" /></h1>
 
       <div className="flex items-center mb-4">
         <input

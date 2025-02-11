@@ -430,7 +430,7 @@ export const getWalletDetails  = async (workerId:string) => {
         "Content-Type": "multipart/form-data",
       },
    })
-   console.log("respo" , response.data)
+   console.log("respo wallet" , response.data)
    return response.data
     }catch (error) {
 

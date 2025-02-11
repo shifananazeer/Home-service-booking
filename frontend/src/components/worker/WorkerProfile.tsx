@@ -8,6 +8,7 @@ import { refreshAccessToken } from '../../utils/auth'
 import { logout } from '../../features/worker/workerSlice'
 import { useDispatch } from 'react-redux'
 import { Star } from 'lucide-react'
+import axiosInstance from '../../utils/axiosInstance'
 
 const WorkerProfile = () => {
     const navigate = useNavigate()
@@ -37,8 +38,18 @@ const WorkerProfile = () => {
     }, [])
      const handleLogout = () => {
             dispatch(logout()); 
-            navigate('/worker/login'); 
-            console.log("Logging out...");
+
+             // Remove authentication data from localStorage
+        localStorage.removeItem('workerData');
+        localStorage.removeItem('worker_accessToken'); 
+        localStorage.removeItem('worker_refreshToken'); 
+        localStorage.removeItem('workerId')
+        localStorage.removeItem('email')
+        
+         delete axiosInstance.defaults.headers.common["Authorization"];
+    
+     
+         window.location.href = "/worker/login"; 
         };
     
 

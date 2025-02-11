@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { refreshAccessToken } from '../../utils/adminAthendication';
 import ManagementTable from './Table';
+import { FaUserAlt, FaUserAstronaut, FaUserCircle, FaUserNinja, FaUserSecret } from 'react-icons/fa';
 
 interface User {
     _id: string;
@@ -118,7 +119,23 @@ const UserManagement = () => {
     }
     return (
         <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">User Management</h2>
+           <h2 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink ">User Management<FaUserAlt className="text-3xl ml-2" /></h2>
+           {/* <style >{`
+        @keyframes blink {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
+        }
+        .blink {
+          animation: blink 1.5s infinite;
+        }
+            .text-shadow {
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  }
+      `}</style> */}
           <div className="flex items-center mb-4">
             <input
               type="text"

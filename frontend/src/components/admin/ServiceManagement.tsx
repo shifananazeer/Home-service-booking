@@ -5,6 +5,7 @@ import ServiceModal from "./ServiceModel";
 import Swal from 'sweetalert2';
 import { useNavigate } from "react-router-dom";
 import { refreshAccessToken } from "../../utils/adminAthendication";
+import { FaHandshake } from "react-icons/fa";
 
 export interface Service {
     _id?: string;
@@ -166,7 +167,7 @@ const handleDelete = async (serviceId: string) => {
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Service Management</h1>
+                    <h1 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink">Service Management <FaHandshake className="text-3xl ml-2" /></h1>
                     <button
                         onClick={() => handleOpenModal()}
                         className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors"

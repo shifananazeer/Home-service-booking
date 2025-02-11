@@ -53,9 +53,9 @@ const WorkerOtp = () => {
             const response = await WorkerVerifyOtp(otp, email);
             console.log('Response:', response);
 
-            const { accessToken, refreshToken } = response.data;
+            const { accessToken, refreshToken, role, userId } = response.data;
            
-            dispatch(otpVerifySuccess(accessToken));
+            dispatch(otpVerifySuccess({accessToken , refreshToken ,role, userId, }));
             toast.success('OTP Verified Successfully');
             navigate('/worker/dashboard');
         } catch (error: any) {
@@ -90,7 +90,7 @@ const WorkerOtp = () => {
                     </p>
                     <button
                         onClick={handleResendOtp}
-                        disabled={isResending}
+                        disabled={timer > 60 || isResending} 
                         className={`mt-2 text-blue-500 hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isResending ? 'Resending...' : 'Resend OTP'}

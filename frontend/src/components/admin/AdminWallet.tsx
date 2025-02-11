@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { getWalletDetails } from '../../services/adminService';
+import { FaWallet } from 'react-icons/fa';
 
 interface Transaction {
   _id: string;
@@ -55,7 +56,7 @@ const AdminWallet: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Admin Wallet</h1>
+      <h1 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink">Admin Wallet <FaWallet className="text-3xl ml-2" /></h1>
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 className="text-2xl font-semibold mb-2">Current Balance</h2>
         <p className="text-4xl font-bold text-green-600">₹{walletData.balance.toFixed(2)}</p>

@@ -10,20 +10,14 @@ const WorkerNavbar = () => {
     const navigate = useNavigate()
 
     const handleLogout = () => {
-        // 1️⃣ Clear Redux state
+      
         dispatch(logout()); 
-    
-        // 2️⃣ Remove authentication data from localStorage
         localStorage.removeItem('workerData');
         localStorage.removeItem('worker_accessToken'); 
         localStorage.removeItem('worker_refreshToken'); 
         localStorage.removeItem('workerId')
         localStorage.removeItem('email')
-    
-        // 3️⃣ Clear Axios headers to prevent old token usage
         delete axiosInstance.defaults.headers.common["Authorization"];
-    
-        // 4️⃣ Reload the page to fully reset authentication state
         window.location.href = "/worker/login"; 
     };
     return (

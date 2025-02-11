@@ -470,8 +470,9 @@ class WorkerController   {
                 const parsedPage = parseInt(page as string, 10)||1;
                 const parsedLimit = parseInt(limit as string, 10)||1;
                 const result = await bookingService.getBookingsByWorkerId(workerId, parsedPage, parsedLimit);
-                if (!result.bookings || result.bookings.length === 0) {
-                    res.status(HttpStatus.NOT_FOUND).json({ message:Messages.NOT_FOUNT });
+                if (!result || !result.bookings || result.bookings.length === 0) {
+                    // You may want to return a 204 No Content if no bookings exist instead of 404
+                    res.status(HttpStatus.NO_CONTENT).json({ message: Messages.NO_BOOKINGS_FOUND });
                     return;
                 }
               console.log("result" , result)
@@ -691,14 +692,30 @@ class WorkerController   {
                 }
             }
 
-            async getWallet (req:Request , res:Response) {
-                const {workerId} = req.params ;
+            async getWallet(req: Request, res: Response) {
+                const { workerId } = req.params;
+                console.log("Wallet request for worker ID:", workerId);
                 
-                try{
+                try {
+                    // Fetch wallet details from the service
                     const walletDetails = await walletService.getWalletDetails(workerId);
-                    res.status(200).json(walletDetails);
-                }catch (error) {
+                    console.log("Wallet details fetched:", walletDetails);
                     
+                    // Check if wallet details exist
+                    if (!walletDetails || Object.keys(walletDetails).length === 0) {
+                        res.status(HttpStatus.NO_CONTENT).json({ message: "No wallet found for this worker." });
+                        return;
+                    }
+                    
+                    // Respond with wallet details if found
+                    res.status(200).json(walletDetails);
+                    
+                } catch (error) {
+                    // Log the error for debugging
+                    console.error("Error fetching wallet details:", error);
+                    
+                    // Send an internal server error response
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while fetching wallet details." });
                 }
             }
 

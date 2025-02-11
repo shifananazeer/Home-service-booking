@@ -22,6 +22,7 @@ export default {
         "fade-in": "fadeIn 0.5s ease-out forwards",
         "fade-in-up": "fadeInUp 0.5s ease-out forwards",
       },
+    
     },
   },
   plugins: [

@@ -4,6 +4,7 @@ import { blockWorker, fetchWorkers, unblockWorker } from "../../services/adminSe
 import { useNavigate } from "react-router-dom";
 import { refreshAccessToken } from "../../utils/adminAthendication";
 import ManagementTable from "./Table";
+import { FaUserTie } from "react-icons/fa";
 
 
 
@@ -128,7 +129,7 @@ const WorkerManagement = () => {
     }
     return (
         <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Worker Management</h2>
+         <h2 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink ">Worker Management <FaUserTie className="text-3xl ml-2" /></h2>
           <div className="flex items-center mb-4">
             <input
               type="text"
