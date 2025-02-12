@@ -53,12 +53,16 @@ const BookingPage: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false)
   const [locationSource, setLocationSource] = useState<string | null>(null) // Added state for location source
   const [searchQuery, setSearchQuery] = useState("") // Added state for search query
+  const [sortType, setSortType] = useState("");
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([])
+  // const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([])
   const [slots, setSlots] = useState<Slot[]>([])
+  const [workerSearchQuery, setWorkerSearchQuery] = useState("");
+
   const [dateInput, setDateInput] = useState<string>("") // Added state for date input
   const userId = localStorage.getItem("user_Id")
   const autocompleteRef = useRef<HTMLInputElement | null>(null)
+
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -394,6 +398,18 @@ const BookingPage: React.FC = () => {
     }
   }
 
+  const filteredWorkers = sortedWorkers.filter((worker) =>
+    worker.name.toLowerCase().includes(workerSearchQuery.toLowerCase())
+  ) .sort((a, b) => {
+    if (sortType === "rating") {
+      return b.averageRating - a.averageRating; // Sort by highest rating first
+    } else if (sortType === "rate") {
+      return (a.hourlyRate ?? Infinity) - (b.hourlyRate ?? Infinity);  // Sort by lowest rate first
+    }
+    return 0; // Default: No sorting
+  });
+ 
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -512,30 +528,55 @@ const BookingPage: React.FC = () => {
           {/* Right side: Worker List */}
           <div className="lg:w-1/2">
             <h2 className="text-3xl font-bold mb-6 text-gray-900">Available Workers</h2>
-            <div className="mb-4 flex items-center">
-              {" "}
-              {/* Updated date picker */}
+            <div className="mb-6 space-y-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="date"
+                  value={dateInput}
+                  onChange={handleDateInputChange}
+                  className="p-2 border border-gray-300 rounded-lg flex-grow"
+                />
+                <button
+                  onClick={handleDateChange}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  Search
+                </button>
+              </div>
               <input
-                type="date"
-                value={dateInput}
-                onChange={handleDateInputChange}
-                className="p-2 border border-gray-300 rounded-lg mr-2"
+                type="text"
+                value={workerSearchQuery}
+                onChange={(e) => setWorkerSearchQuery(e.target.value)}
+                placeholder="Search by worker name..."
+                className="p-2 border border-gray-300 rounded-lg w-full"
               />
-              <button
-                onClick={handleDateChange}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Search
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setSortType("rating")}
+                  className={`px-4 py-2 rounded-lg ${
+                    sortType === "rating" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  Sort by Rating
+                </button>
+                <button
+                  onClick={() => setSortType("rate")}
+                  className={`px-4 py-2 rounded-lg ${
+                    sortType === "rate" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  Sort by Rate
+                </button>
+              </div>
             </div>
 
-            {sortedWorkers.length === 0 ? (
+            {filteredWorkers.length === 0 ? (
               <div className="text-center text-gray-400 bg-black p-8 rounded-xl shadow-md">
                 No workers available for this service in your area.
               </div>
             ) : (
               <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-4">
-                {sortedWorkers.map((worker) => (
+            {filteredWorkers.map((worker) => (
                   <div
                     key={worker._id}
                     className="bg-black shadow-lg rounded-xl overflow-hidden transition duration-300 hover:bg-gray-800"
