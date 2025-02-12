@@ -39,7 +39,8 @@ export default function WorkerTodayBookings() {
           throw new Error('Invalid workerId');
         }
         const data = await todaysBooking(workerId);
-        setBookings(data.bookings);
+        console.log("today booking " , data)
+        setBookings(data.bookings|| []);
       } catch (err) {
         setError("Failed to load today's bookings");
       } finally {
@@ -124,8 +125,8 @@ export default function WorkerTodayBookings() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Today's Works</h1>
-      {bookings.length === 0 ? (
-        <p className="text-center text-white">No bookings for today.</p>
+      {bookings && bookings.length === 0 ? (
+        <p className="text-center text-gray-500">No bookings for today.</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {bookings.map((booking) => (

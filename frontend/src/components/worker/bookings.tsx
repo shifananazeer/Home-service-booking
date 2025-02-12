@@ -52,6 +52,11 @@ const WorkerBookings: React.FC = () => {
         }
         const response = await getBookings(workerId, currentPage, limit);
         console.log("Bookings response:", response);
+        if (response.status === 204 || !response.data || !response.data.bookings || response.data.bookings.length === 0) {
+          setBookings([]);
+          setTotalPages(1);
+          return;
+        }
         setBookings(response.data.bookings);
         
       
@@ -118,6 +123,11 @@ console.log("workk",workerLocation)
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl text-gray-900  font-bold text-center mb-4 flex items-center justify-center">Your Bookings <FaCalendarCheck className="text-3xl ml-2" /></h1>
         <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        {bookings.length === 0 ? (
+    <div className="p-6 text-center text-gray-400">
+      <p>No bookings available at the moment.</p>
+    </div>
+  ) : (
           <ul className="divide-y divide-gray-700">
             {bookings.map((booking) => (
               <li key={booking.bookingId} className="px-6 py-5 hover:bg-gray-700 transition duration-150 ease-in-out">
@@ -145,6 +155,7 @@ console.log("workk",workerLocation)
               </li>
             ))}
           </ul>
+           )}
         </div>
 
         {selectedBooking && workerLocation && (
