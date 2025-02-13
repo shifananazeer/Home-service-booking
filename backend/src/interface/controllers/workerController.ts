@@ -471,7 +471,7 @@ class WorkerController   {
                 const parsedLimit = parseInt(limit as string, 10)||1;
                 const result = await bookingService.getBookingsByWorkerId(workerId, parsedPage, parsedLimit);
                 if (!result || !result.bookings || result.bookings.length === 0) {
-                    // You may want to return a 204 No Content if no bookings exist instead of 404
+                  
                     res.status(HttpStatus.NO_CONTENT).json({ message: Messages.NO_BOOKINGS_FOUND });
                     return;
                 }

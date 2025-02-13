@@ -33,6 +33,7 @@ import RatingsModel from "../../infrastructure/database/models/ratingsModel";
 import { RatingService } from "../../application/useCases/ratingservice";
 import { WalletService } from "../../application/useCases/walletService";
 import { Types } from "mongoose";
+import { generateInvoicePDF } from "../../infrastructure/services/invoice";
 const addressRepository = new AddressRepositoryImpl();
 
 const addressService = new AddressService();
@@ -832,6 +833,23 @@ class UserController  {
             res.status(500).json({ message: 'Error fetching ratings', error });
         }
       }
+      async  downloadInvoice  (req: Request, res: Response) {
+        try {
+          const {bookingId} = req.params;
+          console.log("booh" , bookingId)
+          const booking = await bookingService.getBookingById(bookingId)
+           console.log("boo" , booking)
+          if (!booking) {
+             res.status(404).json({ message: "Booking not found" });
+             return
+          }
+      
+          await generateInvoicePDF(booking, res);
+        } catch (error) {
+          console.error("Error generating invoice:", error);
+          res.status(500).json({ message: "Internal Server Error" });
+        }
+}
 }
 
 

@@ -51,4 +51,6 @@ router.get('/unreadNotifications/:userId' ,  authenticateUser,userController.unr
 router.patch('/markTrue/:userId' , authenticateUser, userController.markTrue)
 router.post('/update-wallet' ,  authenticateUser,userController.updateWallet)
 router.get('/review/:workerId' , userController.getReviewForWorker)
+router.get('/invoice/:bookingId', userController.downloadInvoice);
+
 export default router;

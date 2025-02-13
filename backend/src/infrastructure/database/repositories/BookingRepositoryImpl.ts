@@ -94,6 +94,21 @@ export class BookingRepositoryImpl implements BookingRepository {
         console.log("details" , details)
         return details;
     }
+    async getBookingByIdForInvoice (bookingId:string) : Promise<Booking | null> {
+        const details = await BookingModel.findOne({ bookingId })
+            .populate({
+                path: "userId",
+                select: "firstName email",
+            })
+            .lean(); // Returns plain JS object
+    
+        if (!details) {
+            return null;
+        }
+    
+        // Explicitly casting the plain object to the `Booking` type if necessary
+        return details as Booking; 
+    }
 
     async updatePayment (bookingId:string , status:string) : Promise<void> {
         await BookingModel.findOneAndUpdate({bookingId},{paymentStatus:status}, { new: true })
@@ -122,6 +137,7 @@ export class BookingRepositoryImpl implements BookingRepository {
          return [];
         }
     }
+
     async findBalanceAmount (bookingId:string) :Promise < number| null> {
         const booking = await BookingModel.findOne({ bookingId : bookingId});
         if (!booking) {

@@ -82,7 +82,7 @@ export class BookingService {
 
         public async getBookingById (bookingId:string) : Promise< Booking | null>{
          try{
-          const bookingDetails = await this.bookingRepository.getBookingById(bookingId)
+          const bookingDetails = await this.bookingRepository.getBookingByIdForInvoice(bookingId)
           return bookingDetails;
          }catch (error) {
             console.error("Error fetching bookings:", error);

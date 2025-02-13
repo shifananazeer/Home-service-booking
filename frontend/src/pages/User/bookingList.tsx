@@ -1,7 +1,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { addRatings, cancelBooking, createCheckoutSession, fetchBookigs } from "../../services/userService"
+import { addRatings, cancelBooking, createCheckoutSession, downloadInvoice, fetchBookigs } from "../../services/userService"
 import Swal from "sweetalert2"
 import { Calendar, Clock, User, Briefcase, X } from "lucide-react"
 import RatingModal from "../../components/RatingModel"
@@ -149,6 +149,14 @@ const BookingList: React.FC = () => {
     }
   }
 
+  const handleDownloadInvoice = async (bookingId:string) => {
+    try {
+      await downloadInvoice(bookingId);
+    } catch (error) {
+      alert("Failed to download invoice. Please try again.");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -278,6 +286,15 @@ const BookingList: React.FC = () => {
                           Add Ratings
                         </button>
                       ))}
+
+{booking.paymentStatus === "balance_paid" && booking.workStatus === "completed" && (
+  <button
+    onClick={() => handleDownloadInvoice(booking.bookingId)}
+    className="px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+  >
+    Download Invoice
+  </button>
+)}
                   </div>
                 </div>
               </div>

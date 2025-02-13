@@ -648,3 +648,25 @@ try{
 
 }
 }
+
+export const downloadInvoice = async (bookingId: string) => {
+  try {
+    const response = await axiosInstance.get(`/auth/invoice/${bookingId}`, {
+      responseType: "blob", // Ensure Axios treats response as a binary blob
+    });
+
+    const blob = response.data; // Axios stores response data in `.data`
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary link to trigger download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `invoice-${bookingId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("Error downloading invoice:", error);
+    throw error; // You can handle this error in the component
+  }
+};
