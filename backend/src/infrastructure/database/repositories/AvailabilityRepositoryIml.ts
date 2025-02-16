@@ -7,6 +7,7 @@ import moment from "moment";
 
 export class AvailabilityRepositoryImpl implements AvailabilityRepository {
     async createAvailability(workerId: string, date: Date, slots: any[]): Promise<Availability> {
+        console.log("Slots before saving:", slots);
         const availability = await AvailabilityModel.create({ workerId, date, slots });
         console.log("availability", availability);
         return availability.toObject();

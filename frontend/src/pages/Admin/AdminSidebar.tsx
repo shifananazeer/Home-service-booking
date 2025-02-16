@@ -3,21 +3,33 @@ import React from "react";
 
 
 interface AdminSidebarProps {
-    setCurrentComponent: (component: string) => void; 
-}
+    isOpen: boolean;
+    toggleSidebar: () => void;
+    setCurrentComponent: (component: string) => void;
+    
+  }
 
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, toggleSidebar, setCurrentComponent }) => {
+    const handleComponentChange = (component: string) => {
+        setCurrentComponent(component);
+        toggleSidebar(); // Close sidebar when changing components
+    };
     return (
-        <div className="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-gray-800 text-white flex flex-col z-40">
-            <div className="p-4 border-b border-gray-700">
+        <div
+        className={`fixed top-16 left-0 h-full bg-gray-800 text-white w-64 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-300 ease-in-out z-50`}
+      >
+           <div className="p-4 flex justify-between items-center border-b border-gray-700">
                 <h2 className="text-lg font-bold">Admin Menu</h2>
+                <button className="text-white md:hidden" onClick={toggleSidebar}>X</button>
             </div>
             <nav className="flex-1 p-4">
                 <ul className="space-y-2">
                     <li>
                             <button 
-                             onClick={() => setCurrentComponent("dashboard")}
+                             onClick={() => handleComponentChange("dashboard")}
                             className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Dashboard
                             </button>
@@ -25,7 +37,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     <li>
                         
                             <button
-                             onClick={() => setCurrentComponent("userManagement")}
+                             onClick={() => handleComponentChange("userManagement")}
                             className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 User Management
                             </button>
@@ -34,7 +46,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     <li>
                        
                             <button 
-                              onClick={() => setCurrentComponent("workerManagement")}
+                              onClick={() => handleComponentChange("workerManagement")}
                             className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Worker Management
                             </button>
@@ -43,7 +55,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     <li>
                         
                             <button
-                               onClick={() => setCurrentComponent("bookings")}
+                               onClick={() => handleComponentChange("bookings")}
                                 className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Booking List
                             </button>
@@ -52,7 +64,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     <li>
                       
                             <button 
-                              onClick={() => setCurrentComponent("serviceManagement")}
+                              onClick={() => handleComponentChange("serviceManagement")}
                             className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                                 Service Management
                             </button>
@@ -62,7 +74,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ setCurrentComponent }) => {
                     <li>
                       
                       <button 
-                        onClick={() => setCurrentComponent("wallet")}
+                        onClick={() => handleComponentChange("wallet")}
                       className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md">
                           Wallet
                       </button>

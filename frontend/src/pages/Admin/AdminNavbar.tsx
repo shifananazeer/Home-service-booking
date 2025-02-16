@@ -4,7 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../features/admin/adminSlice";
 import { useDispatch } from "react-redux";
 
-const AdminNavbar = () => {
+
+interface AdminNavbarProps {
+    toggleSidebar: () => void; // Accepting toggle function as a prop
+  }
+
+const AdminNavbar : React.FC<AdminNavbarProps> = ({ toggleSidebar }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const handleLogout = () => {
@@ -18,6 +23,10 @@ const AdminNavbar = () => {
 
     return (
         <nav className="fixed top-0 left-0 w-full h-16 bg-gray-800 text-white flex justify-between items-center px-4 shadow-md z-50">
+            {/* Sidebar Toggle Button */}
+      <button onClick={toggleSidebar} className="md:hidden text-white text-2xl">
+        ☰
+      </button>
         <div className="flex items-center">
             <img
                 src="/logo.png"

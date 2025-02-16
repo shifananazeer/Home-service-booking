@@ -39,6 +39,7 @@ const WorkerDashboard = () => {
   const [currentComponent, setCurrentComponent] = useState("dashboard")
   const [ratingsAndReviews, setRatingsAndReviews] = useState<RatingsAndReviews>({ ratings: [], reviews: [] })
   const [bookedSkills, setBookedSkills] = useState<{ skill: string; count: number }[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const workerId = localStorage.getItem("workerId")
 
   useEffect(() => {
@@ -157,15 +158,20 @@ const WorkerDashboard = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      <WorkerNavbar />
+      <WorkerNavbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className="flex flex-1 overflow-hidden">
-        <WorkerSidebar setCurrentComponent={setCurrentComponent} />
-        <main
-          className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6"
-          style={{ marginLeft: "16rem", marginTop: "4rem" }}
-        >
-          {renderComponent()}
-        </main>
+      <WorkerSidebar 
+  isOpen={isSidebarOpen} 
+  toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}  // Add this line
+  setCurrentComponent={setCurrentComponent} 
+/>
+<main
+  className={`flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 transition-all ${
+    isSidebarOpen ? "ml-64" : "ml-16"
+  } pt-16`} // Add pt-16 for top padding
+>
+  {renderComponent()}
+</main>
       </div>
     </div>
   )

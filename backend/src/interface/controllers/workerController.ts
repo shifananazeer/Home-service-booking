@@ -273,6 +273,9 @@ class WorkerController   {
           async  handleCreateAvailability (req: Request, res: Response): Promise<void> {
                 console.log("availability", req.body);
                 const { date, slots } = req.body;
+                console.log("Raw request body:", req.body);
+                console.log("Extracted date:", date);
+                console.log("Extracted slots:", slots);
             
                 if (!date || !Array.isArray(slots) || slots.length === 0) {
                     res.status(400).json({ message: Messages.DATE_SLOT_REQUIRED });

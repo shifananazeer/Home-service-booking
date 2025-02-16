@@ -18,6 +18,7 @@ import { FaTachometerAlt } from "react-icons/fa"
 
 
 
+
 interface Worker {
   workerId: string;
   workerName: string;
@@ -36,6 +37,7 @@ const AdminDashboard = () => {
   const [bookedService, setBookedService] = useState<{ skill: string; count: number }[]>([])
 const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
   const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null); 
+const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   useEffect(() => {
     if (!adminId) {
@@ -81,6 +83,8 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
     fetchTopWorkers()
   }, [timeFrame, adminId]) 
 
+  
+
   const handleTimeFrameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTimeFrame(e.target.value as "weekly" | "monthly" | "yearly")
   }
@@ -101,7 +105,7 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
       return selectedWorkerId ? <WorkerProfile workerId={selectedWorkerId} /> : <h1>No Worker Selected</h1>;  
       case "dashboard":
         return (
-          <>
+          <div className="space-y-6">
             <h1 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink">Admin Dashboard </h1>
             <div className="flex items-center space-x-4 mb-6">
               <label htmlFor="timeframe" className="text-sm font-medium text-gray-700">
@@ -132,7 +136,7 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
               <SkillPieChart data={bookedService} />
               {topWorkers && <TopWorker workers={topWorkers} setCurrentComponent={setCurrentComponent} setSelectedWorkerId={setSelectedWorkerId} />}
             </div>
-          </>
+          </div>
         )
       default:
         return <h1 className="text-2xl font-bold">Component Not Found</h1>
@@ -141,12 +145,18 @@ const [topWorkers, setTopWorkers] = useState<Worker[]>([]);
 
   return (
     <div className="flex flex-col h-screen">
-      <AdminNavbar />
+      <AdminNavbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className="flex flex-1">
-        <AdminSidebar setCurrentComponent={setCurrentComponent} />
-        <div className="flex-1 p-6 bg-gray-100" style={{ marginLeft: "16rem", marginTop: "4rem" }}>
-          {renderComponent()}
-        </div>
+        <AdminSidebar  isOpen={isSidebarOpen} 
+  toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}  // Add this line
+  setCurrentComponent={setCurrentComponent}  />
+       <main
+  className={`flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 transition-all ${
+    isSidebarOpen ? "ml-64" : "ml-16"
+  } pt-16`} // Add pt-16 for top padding
+>
+  {renderComponent()}
+</main>
       </div>
     </div>
   )

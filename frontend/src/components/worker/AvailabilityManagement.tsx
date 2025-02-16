@@ -66,6 +66,7 @@ const navigate = useNavigate()
             date,
             slots: [slot],
           };
+          console.log("payload" , payload)
           await addAvailability(payload);
         }
         Swal.fire({

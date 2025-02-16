@@ -185,7 +185,7 @@ const BookingConfirm: React.FC = () => {
                                 />
                                 <div>
                                     <h2 className="text-2xl font-semibold text-white">{workerName}</h2>
-                                    <p className="text-blue-200">Rate: ${workerRate}/hr</p>
+                                    <p className="text-blue-200">Rate:₹{workerRate}/hr</p>
                                 </div>
                             </div>
                         </div>
