@@ -83,12 +83,12 @@ const Navbar: React.FC = () => {
           <a href="/services" className="text-sm font-medium text-white hover:text-white/80">
             Services
           </a>
-          <a href="/about" className="text-sm font-medium text-white hover:text-white/80">
+          <a href="#how-it-works"  className="text-sm font-medium text-white hover:text-white/80">
             About Us
           </a>
-          <a href="/help" className="text-sm font-medium text-white hover:text-white/80">
+          {/* <a href="/help" className="text-sm font-medium text-white hover:text-white/80">
             Help
-          </a>
+          </a> */}
         </div>
 
         <div className="hidden md:flex items-center space-x-4">

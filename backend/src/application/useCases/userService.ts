@@ -2,6 +2,18 @@ import { UserRepositoryImpl } from "../../infrastructure/database/repositories/U
 import { User } from "../../domain/entities/User";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import admin from "../../config/firbaseAdmin";
+
+export interface UserData {
+    email: string;
+    firstName: string;
+    lastName: string;
+    mobileNumber: string;
+    role: string;
+    googleId: string;
+    password: string;
+    isOnline: boolean;
+}
 
 export class UserService {
     private userRepository: UserRepositoryImpl;
@@ -117,5 +129,16 @@ export class UserService {
         }
         return 'Password reset successfully.';
       }
-     
+      async handleGoogleSignup(uid: string, name: string, email: string, profilePhoto: string): Promise<User> {
+        // Check if the user already exists
+        let user = await this.userRepository.findByEmail(email);
+
+        if (!user) {
+            // If not, create a new user
+            user = await this.userRepository.createUserFromGoogle({ uid, name, email, profilePhoto });
+        }
+
+        return user;
+    }
+
 }

@@ -850,6 +850,46 @@ class UserController  {
           res.status(500).json({ message: "Internal Server Error" });
         }
 }
+async googleSignup(req: Request, res: Response) {
+    console.log('Google signup request received:', req.body);
+    try {
+        // Assuming user data comes from Firebase
+        const { uid, name, email, profilePhoto } = req.body;
+
+        // Call the service to handle the Google signup logic
+        const user = await userService.handleGoogleSignup(uid, name, email, profilePhoto);
+
+        // Generate tokens
+        const accessToken = jwt.sign(
+            { sub: user._id, email: user.email, role: user.role },
+            process.env.ACCESS_TOKEN_SECRET as string,
+            { expiresIn: "15m" }
+        );
+
+        const refreshToken = jwt.sign(
+            { sub: user._id, email: user.email, role: user.role },
+            process.env.REFRESH_TOKEN_SECRET as string,
+            { expiresIn: "7d" }
+        );
+
+        // Set cookies with tokens
+        res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
+        res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
+   console.log("acc" , accessToken)
+   console.log('ref' , refreshToken)
+        res.status(HttpStatus.OK).json({
+            message: Messages.LOGIN, // Adjust the message if needed
+            accessToken,
+            refreshToken,
+            userId: user._id.toString(),
+            userFirstName: user.firstName,
+            userEmail: user.email,
+            userRole: user.role,
+        });
+    } catch (error: any) {
+        res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
+    }
+}
 }
 
 

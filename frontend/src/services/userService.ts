@@ -670,3 +670,12 @@ export const downloadInvoice = async (bookingId: string) => {
     throw error; // You can handle this error in the component
   }
 };
+
+export const googleSignup = async (idToken: any) => {
+  try {
+      const response = await axiosInstance.post('/auth/google-signup', { idToken });
+      return response.data; // Should return { accessToken, refreshToken, userId }
+  } catch (error:any) {
+      throw new Error('Error during Google signup: ' + error.message);
+  }
+};

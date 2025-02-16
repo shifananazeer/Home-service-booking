@@ -115,6 +115,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
 
     try {
       await sendingMessage(messageData, mediaFile);
+      setMessages(prev => [...prev, messageData]);
       setText('');
       setMediaFile(null);
       setMediaPreview(null);

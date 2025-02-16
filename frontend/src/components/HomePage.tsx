@@ -41,7 +41,9 @@ const HomePage = () => {
 </div>
 
       </div>
-      <HowItWorks />
+      <div id="how-it-works">
+    <HowItWorks />
+  </div>
     </div>
   )
 }

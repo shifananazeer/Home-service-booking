@@ -1,13 +1,40 @@
+import { UserData } from "../../../application/useCases/userService";
 import { Service } from "../../../domain/entities/Service";
 import { User } from "../../../domain/entities/User";
 import { UserRepository } from "../../../domain/repositories/userRepository";
 import ServiceModel from "../models/serviceModel";
 import UserModel, { UserDocument } from "../models/userModels";
 
+
+interface GoogleUserData {
+    uid: string;
+    name: string;
+    email: string;
+    profilePhoto: string;
+}
+
 export class UserRepositoryImpl implements UserRepository {
     async createUser(user: User): Promise<User> {
         const createdUser = await UserModel.create(user);
         return createdUser.toObject();
+    }
+     async createUserFromGoogle({ uid, name, email, profilePhoto }: GoogleUserData): Promise<User> {
+        const nameParts = name.split(" ");
+        const firstName = nameParts[0];
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+        const newUser = new UserModel({
+            googleId: uid,
+            firstName,
+            lastName,
+            email,
+            profilePhoto,
+            is_verified: true,
+            role: "user", // Default role, modify as needed
+        });
+
+        await newUser.save();
+        return newUser;
     }
 
     async findByEmail(email: string): Promise<User | null> {
