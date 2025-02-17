@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { loginSuccess, setUserData } from '../../features/user/userSlice.';
-import { googleSignup, registerUser } from '../../services/userService';
+import { loginSuccess } from '../../features/user/userSlice.';
+import { registerUser } from '../../services/userService';
 import { SignupInterface } from '../../interfaces/userInterface';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';

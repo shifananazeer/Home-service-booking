@@ -131,7 +131,7 @@ const RevenueAnalyticsPage: React.FC = () => {
         break
     }
 
-    const filteredBookings = bookings.filter((booking) => isWithinInterval(new Date(booking.date), { start, end }))
+    bookings.filter((booking) => isWithinInterval(new Date(booking.date), { start, end }))
     const filteredWalletTransactions = walletTransactions.filter(
       (transaction) => transaction.type === "credit" && isWithinInterval(new Date(transaction.date), { start, end }),
     )

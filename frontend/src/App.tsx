@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { BrowserRouter as  Router , Routes, Route, useLocation } from "react-router-dom"
 import Register from "./pages/User/Register"
 import Login from "./pages/User/Login";
-import { Toaster } from 'react-hot-toast'; 
 import OTPverification from "./pages/User/OTPverification";
 import ForgotPassword from "./pages/User/ForgotPassword";
 import ResetPassword from "./pages/User/ResetPassword";
@@ -12,16 +11,12 @@ import WorkerSignup from "./pages/Worker/WorkerSignup";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 import WorkerForgotPassword from "./pages/Worker/WorkerForgotPassword";
 import WorkerLogin from "./pages/Worker/WorkerLogin";
-import { WorkerResendOtp } from "./services/workerService";
 import WorkerResetPassword from "./pages/Worker/WorkerResetPassword";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-
-import UserManagement from "./components/admin/UserManagement";
 import UserProfile from "./pages/User/UserProfile";
 import EditUserProfile from "./pages/User/EditUserProfile";
 import WorkerEditProfile from "./pages/Worker/WorkerEditProfile";
-import AvailabilityManagement from "./components/worker/AvailabilityManagement";
 import HomePage from "./components/HomePage";
 import ServicesPage from "./components/ServicePage";
 import BookingPage from "./pages/User/BookingPage";
@@ -36,7 +31,6 @@ import MessageList from "./pages/User/Messages";
 import VideoCallPage from "./pages/User/VideoCall";
 import WorkerVideoCallPage from "./pages/Worker/WorkerVedioCall";
 import { NotificationProvider } from "./NotificationContext";
-import VideoCall from "./pages/User/Vedio";
 import AudioCall from "./pages/User/AudioCall";
 import WorkerAudioCall from "./pages/Worker/WorkerAudioCall";
 import { NotificationProviderUser } from "./NotificationContextForUser";
@@ -47,7 +41,6 @@ import ProtectedRoute from "./components/ProtectRoute";
 import UnauthorizedPage from "./components/Unotherized";
 import ProtectedWorkerRoute from "./components/ProtectWorkerRoute";
 import AdminProtectedRoute from "./components/ProtectAdminRoutes";
-import WorkerProfile from "./components/admin/workerProfile";
 
 
 

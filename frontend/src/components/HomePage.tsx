@@ -1,7 +1,5 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HowItWorks } from './About'
-import { motion } from 'framer-motion'
 
 const HomePage = () => {
   const navigate = useNavigate()

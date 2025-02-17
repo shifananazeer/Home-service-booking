@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { markBookingAsCompleted, todaysBooking } from '../../services/workerService';
-import { useNavigate } from 'react-router-dom';
 import socket from '../../utils/socket';
 
 interface WorkLocation {
@@ -30,7 +29,6 @@ export default function WorkerTodayBookings() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const workerId = localStorage.getItem('workerId');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTodayBookings = async () => {

@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFail } from '../../features/worker/workerSlice';
 import { LoginWorker } from '../../services/workerService'; 
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { RootState } from '../../app/store';
-import { refreshAccessToken } from '../../utils/auth';
-import socket from '../../utils/socket';
 
 
 const WorkerLogin: React.FC = () => {
@@ -15,7 +13,6 @@ const WorkerLogin: React.FC = () => {
    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-   const workerId = localStorage.getItem('workerId')
  
 
     const { isLoading, error, success } = useSelector((state: RootState) => state.worker); 

@@ -1,9 +1,7 @@
 
-import axios from "axios";
 import { SignupWorker } from "../interfaces/workerInterface";
 import axiosInstance from "../utils/axiosInstance";
 import errorHandler from "../utils/errorHandler";
-import { fetchServices } from "./adminService";
 import { Message } from "../components/ChatModel";
 import { Reaction } from "../components/worker/ChatList";
 
@@ -128,7 +126,7 @@ export const getWorkerProfile = async () : Promise <any> => {
 export const  updateWorkerProfile = async (formData : FormData): Promise <{ success: boolean; message: string }> => {
     const token = localStorage.getItem('worker_accessToken');
     try{
-       const response = await axiosInstance.put('/workers/profile/edit',formData,{
+        await axiosInstance.put('/workers/profile/edit',formData,{
         headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`, 

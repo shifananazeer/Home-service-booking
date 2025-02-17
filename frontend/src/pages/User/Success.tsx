@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getBookingDetails, updateBookingStatus, updateWallet } from '../../services/userService';
-import { CheckCircle, Calendar, Clock, DollarSign, User, Briefcase } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, User, Briefcase } from 'lucide-react';
 
 interface BookingDetails {
   serviceName: string;

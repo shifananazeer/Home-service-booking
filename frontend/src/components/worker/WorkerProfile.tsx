@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { WorkerProfileInterface, WorkerProfileResponse } from '../../interfaces/workerInterface'
 import { Address } from '../../interfaces/addressInterface'
 import { getWorkerProfile } from '../../services/workerService'
 import { ProfileSkeleton } from '../ProfileSkelton'
-import { refreshAccessToken } from '../../utils/auth'
 import { logout } from '../../features/worker/workerSlice'
 import { useDispatch } from 'react-redux'
 import { Star } from 'lucide-react'
@@ -17,7 +16,6 @@ const WorkerProfile = () => {
     const [workerAddress, setWorkerAddress] = useState<Address | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const workerId = localStorage.getItem('workerId')
 
     useEffect(() => {
         const fetchProfile = async () => {

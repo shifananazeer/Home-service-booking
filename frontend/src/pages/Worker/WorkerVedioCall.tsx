@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
 import { Mic, MicOff, PhoneOff, Video, VideoOff } from 'lucide-react';
 import socket from "../../utils/socket";
 
@@ -131,7 +130,7 @@ const WorkerVideoCallPage: React.FC = () => {
   };
 
   useEffect(()=>{
-    socket.on("call-disconnected", ({ roomId, userId }) => {
+    socket.on("call-disconnected", ({ roomId }) => {
       if(roomId===roomId){
         setIsConnected(false);
         navigate(-1)

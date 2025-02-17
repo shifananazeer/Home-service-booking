@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
-import { Mic, MicOff, PhoneOff } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { PhoneOff } from "lucide-react";
 import socket from "../../utils/socket";
 
 
@@ -10,7 +8,7 @@ const WorkerAudioCall = () => {
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   
-  const [muted, setMuted] = useState(false);
+  
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [seconds, setSeconds] = useState(0);
   const location = useLocation();
@@ -126,7 +124,7 @@ const WorkerAudioCall = () => {
   };
   
   useEffect(() => {
-    socket.on("call-disconnected", ({ roomId, userId }) => {
+    socket.on("call-disconnected", ({ roomId }) => {
       if (roomId === roomId) {
         setIsConnected(false);
         navigate(-1);

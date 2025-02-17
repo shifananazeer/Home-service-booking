@@ -1,7 +1,6 @@
 import axiosInstance from "../utils/axiosInstance";
-import { SignupInterface, UserProfileInterface } from "../interfaces/userInterface";
+import { SignupInterface } from "../interfaces/userInterface";
 import errorHandler from "../utils/errorHandler";
-import axios from "axios";
 import { Address } from "../interfaces/addressInterface";
 import { Booking } from "../interfaces/bookingInterface";
 import { Reaction } from "../components/ChatModel";
@@ -109,7 +108,7 @@ export const updateUserProfile = async (formData : FormData) : Promise <{ succes
     const token = localStorage.getItem('accessToken');
     console.log("token", token)
 try{
-   const response = await axiosInstance.put('/auth/profile/edit',formData,{
+  await axiosInstance.put('/auth/profile/edit',formData,{
     headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`, 
@@ -537,7 +536,8 @@ export const fetchUnreadMessags = async (userId:string) => {
      console.log("booking respo" , response)
      return response.data
     }catch (error) {
-
+      errorHandler(error);
+      throw error;
     }
   }
 
@@ -575,8 +575,8 @@ export const fetchUnreadMessags = async (userId:string) => {
         }); // Ensure the endpoint URL is correct
         return response.data; 
     } catch (error) {
-        console.error('Error adding rating:', error);
-        throw error; 
+      errorHandler(error);
+      throw error;; 
     }
 };
 
@@ -591,20 +591,22 @@ try{
        });
        return response.data
 }catch (error){
-
+  errorHandler(error);
+  throw error;
 }
 }
 
 export const markTrue =async (userId:string) => {
   const token = localStorage.getItem('accessToken');
   try{
-    const response = await axiosInstance.patch(`/auth/markTrue/${userId}` ,{
+   await axiosInstance.patch(`/auth/markTrue/${userId}` ,{
       headers:{
         'Authorization': `Bearer ${token}`,
       }
     })
   }catch (error) {
-
+    errorHandler(error);
+    throw error;
   }
 
 }
@@ -662,7 +664,8 @@ try{
   })
   return response.data
 }catch (error) {
-
+  errorHandler(error);
+  throw error;
 }
 }
 

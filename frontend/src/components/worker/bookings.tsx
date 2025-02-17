@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getBookings, getWorkerLocation } from '../../services/workerService';
-import { refreshAccessToken } from '../../utils/auth';
-import { useNavigate } from 'react-router-dom';
 import { FaCalendarCheck } from 'react-icons/fa';
 
 interface WorkLocation {
@@ -38,11 +36,10 @@ const WorkerBookings: React.FC = () => {
   const [distance, setDistance] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(5); 
+  const [limit] = useState<number>(5); 
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const workerId = localStorage.getItem('workerId');
-   const navigate = useNavigate()
   useEffect(() => {
     const fetchBookingsAndLocation = async () => {       
       try {

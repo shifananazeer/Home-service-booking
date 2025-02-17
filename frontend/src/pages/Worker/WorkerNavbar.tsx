@@ -1,7 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "../../features/worker/workerSlice";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 
 interface WorkerNavbarProps {
@@ -10,7 +9,6 @@ interface WorkerNavbarProps {
 
 const WorkerNavbar: React.FC<WorkerNavbarProps> = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());

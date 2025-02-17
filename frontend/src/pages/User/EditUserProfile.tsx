@@ -4,7 +4,6 @@ import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Address } from '../../interfaces/addressInterface';
 import axios from 'axios';
-import { updateCoordinates } from '../../services/workerService';
 
 export interface ProfileData {
     firstName: string;

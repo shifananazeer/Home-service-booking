@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { blockWorker, fetchWorkers, unblockWorker } from "../../services/adminService";
 import { useNavigate } from "react-router-dom";
-import { refreshAccessToken } from "../../utils/adminAthendication";
+import { adminRefreshAccessToken } from "../../utils/auth";
 import ManagementTable from "./Table";
 import { FaUserTie } from "react-icons/fa";
 
@@ -28,7 +28,7 @@ const WorkerManagement = () => {
     const [error , setError] = useState<string |null>(null);
     const [loadingStatus , setLoadingStatus] = useState<{ [key: string]: boolean }>({});
      const [currentPage, setCurrentPage] = useState<number>(1);
-     const [totalPages, setTotalPages] = useState<number>(1);
+     const [totalPages] = useState<number>(1);
      const [searchQuery, setSearchQuery] = useState<string>('');
      const [limit] = useState<number>(10); 
      const navigate = useNavigate()
@@ -42,7 +42,7 @@ const WorkerManagement = () => {
                 if(!token){
               
                      if (refreshToken) {
-                          const newAccessToken = await refreshAccessToken();
+                          const newAccessToken = await adminRefreshAccessToken(refreshToken);
                             if (!newAccessToken) {
                                 console.log('Failed to refresh token, redirecting to login...');
                                   navigate('/admin/login');

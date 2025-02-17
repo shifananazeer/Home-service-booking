@@ -14,7 +14,6 @@ import SkillPieChart from "../../components/worker/SkillPieChart"
 import TopWorker from "../../components/admin/TopWorkers"
 import AdminWallet from "../../components/admin/AdminWallet"
 import WorkerProfile from "../../components/admin/workerProfile"
-import { FaTachometerAlt } from "react-icons/fa"
 
 
 

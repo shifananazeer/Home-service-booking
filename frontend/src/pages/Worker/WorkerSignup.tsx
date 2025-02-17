@@ -25,7 +25,7 @@ const WorkerSignup: React.FC = () => {
         password: ''
     });
 
-    const { isLoading, error, success } = useSelector((state: RootState) => state.worker);
+    const { isLoading } = useSelector((state: RootState) => state.worker);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

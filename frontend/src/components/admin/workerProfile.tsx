@@ -30,8 +30,8 @@ const WorkerProfile: React.FC<WorkerProfileProps> = ({ workerId }) => {
   const [worker, setWorker] = useState<Worker | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-   const [workers , setWorkers] = useState<Worker[]>([]);
-   const [loadingStatus , setLoadingStatus] = useState<{ [key: string]: boolean }>({});
+
+   const [ , setLoadingStatus] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const fetchWorkerProfile = async () => {

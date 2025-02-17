@@ -123,7 +123,7 @@ const EditWorkerProfile = () => {
             }
         } catch (error: any) {
             console.error('Error fetching coordinates:', error);
-            const errorMessage = error.response?.data?.error_message || error.message || 'Failed to fetch coordinates.';
+           error.response?.data?.error_message || error.message || 'Failed to fetch coordinates.';
             // toast.error(errorMessage);
         }
     };

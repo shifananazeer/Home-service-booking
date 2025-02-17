@@ -66,7 +66,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       )
     });
    
-    socket.on("offerNotification", ({ roomId, userName, caller, callType, offer }) => {
+    socket.on("offerNotification", ({ roomId, userName, caller, callType }) => {
       console.log("Received offerNotification", { roomId, userName, caller, callType });
    
       if (roomId === workerId) {

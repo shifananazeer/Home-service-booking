@@ -29,7 +29,7 @@ const BookingList: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [totalPages, setTotalPages] = useState<number>(1)
-  const [limit, setLimit] = useState<number>(5)
+  const [limit] = useState<number>(5)
   const navigate = useNavigate()
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)

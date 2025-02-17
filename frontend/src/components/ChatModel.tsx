@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import socket from '../utils/socket';
-import { sendingMessage, sendReaction } from '../services/userService';
+import { sendingMessage } from '../services/userService';
 import { MessageCircle, Send, X, ImageIcon } from 'lucide-react';
 
 export interface Message {
@@ -38,7 +38,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
   onClose, 
   chatId, 
   userId, 
-  workerId,
   workerName, 
   messages: initialMessages 
 }) => {
@@ -168,7 +167,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
   };
 
   const addReaction = (messageId: string, emoji: string) => {
-    const reactionData = { emoji, userModel: 'user' }; 
     // Emit the addReaction event to the server
     socket.emit('addReaction', { messageId, emoji });
    
@@ -177,7 +175,7 @@ const ChatModal: React.FC<ChatModalProps> = ({
   useEffect(() => {
    
     socket.on('reactionUpdated', (data) => {
-      const { messageId, emoji, reactionData } = data;
+      const { messageId, reactionData } = data;
       setMessages(prevMessages =>
         prevMessages.map(msg =>
           msg._id === messageId 

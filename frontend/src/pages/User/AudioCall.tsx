@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
-import { Mic, MicOff, PhoneOff } from "lucide-react";
-import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
+import { PhoneOff } from "lucide-react";
 import { fetchWorkerById } from "../../services/userService";
 
 
@@ -11,7 +10,7 @@ const socket = io("http://localhost:3000");
 const AudioCall = () => {
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const [muted, setMuted] = useState(false);
+ 
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [seconds, setSeconds] = useState(0);
   const [worker, setWorker] = useState<any>(null);
@@ -140,7 +139,7 @@ const AudioCall = () => {
   };
 
   useEffect(()=>{
-       socket.on("call-disconnected", ({ roomId, userId }) => {
+       socket.on("call-disconnected", ({ roomId }) => {
          if(roomId===roomId){
            setIsConnected(false);
            navigate(`/user/messages`, {
@@ -150,7 +149,7 @@ const AudioCall = () => {
      });
      },[])
      useEffect(()=>{
-      socket.on("call-decline", ({ roomId, userId }) => {
+      socket.on("call-decline", ({ roomId }) => {
         if(roomId===roomId){
           setIsConnected(false);
           navigate(`/user/messages`, {

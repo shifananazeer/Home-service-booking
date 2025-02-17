@@ -1,6 +1,6 @@
 // src/components/AdminNavbar.jsx
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../features/admin/adminSlice";
 import { useDispatch } from "react-redux";
 
