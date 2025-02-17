@@ -118,7 +118,7 @@ const UserManagement = () => {
           );
     }
     return (
-        <div className="p-4">
+        <div className="p-4 ">
            <h2 className="text-4xl font-serif font-bold text-center mb-4 flex items-center justify-center blink ">User Management<FaUserAlt className="text-3xl ml-2" /></h2>
            {/* <style >{`
         @keyframes blink {

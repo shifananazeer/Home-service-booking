@@ -240,7 +240,7 @@ const ChatList: React.FC = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-100 ">
+    <div className="flex  py-8 px-4 h-[calc(100vh-64px)] bg-gray-100   ">
       <div className="w-1/3 bg-white border-r border-gray-200 overflow-y-auto">
         <div className="p-4 sticky top-[20px]  bg-white z-10 border-b border-gray-200">
           <h2 className="text-2xl font-bold">Chats</h2>

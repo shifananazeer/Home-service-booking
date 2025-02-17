@@ -145,7 +145,7 @@ const Navbar: React.FC = () => {
             <a href="/services" className="block px-3 py-2 text-white hover:text-white/80">
               Services
             </a>
-            <a href="/about" className="block px-3 py-2 text-white hover:text-white/80">
+            <a href="#how-it-works" className="block px-3 py-2 text-white hover:text-white/80">
               About Us
             </a>
             {/* <a href="/help" className="block px-3 py-2 text-white hover:text-white/80">

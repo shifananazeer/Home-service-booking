@@ -9,7 +9,9 @@ interface WorkerSidebarProps {
   const WorkerSidebar: React.FC<WorkerSidebarProps> = ({ isOpen, toggleSidebar, setCurrentComponent }) => {
     const handleComponentChange = (component: string) => {
         setCurrentComponent(component);
-        toggleSidebar(); // Close sidebar when changing components
+        if (window.innerWidth < 768) { // Close sidebar only on small screens
+            toggleSidebar();
+        }
     };
     return (
         <div

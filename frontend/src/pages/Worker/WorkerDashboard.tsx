@@ -111,7 +111,7 @@ const WorkerDashboard = () => {
         return <RevenueAnalyticsPage/>  
       case "dashboard":
         return (
-          <div className="space-y-6">
+          <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-800">Worker Dashboard</h1>
           <p className="text-lg text-gray-600">Welcome to your Worker dashboard!</p>
           <div className="flex items-center space-x-4 mb-6">

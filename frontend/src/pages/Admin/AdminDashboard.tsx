@@ -150,11 +150,12 @@ const [isSidebarOpen, setIsSidebarOpen] = useState(true)
         <AdminSidebar  isOpen={isSidebarOpen} 
   toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}  // Add this line
   setCurrentComponent={setCurrentComponent}  />
-       <main
+      <main
   className={`flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 transition-all ${
-    isSidebarOpen ? "ml-64" : "ml-16"
-  } pt-16`} // Add pt-16 for top padding
+    isSidebarOpen ? "md:ml-64 ml-16" : "ml-16"
+  } pt-16`}
 >
+
   {renderComponent()}
 </main>
       </div>

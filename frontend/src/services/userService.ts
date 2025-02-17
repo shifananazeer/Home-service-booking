@@ -225,7 +225,11 @@ export const fetchBookigs = async (userId: string,currentPage:number , limit: nu
     if(!token) {
       throw new Error('Authentication token is missing');
     }
-    const response = await axiosInstance.post(`/auth/cancelBooking/${bookingId}`)
+    const response = await axiosInstance.post(`/auth/cancelBooking/${bookingId}` ,{
+      headers: {
+        Authorization: `Bearer ${token}`, 
+      },
+    })
     return response.data;
   }
 
@@ -363,7 +367,13 @@ export const fetchChat = async (userId:string , workerId:string) => {
    const response = await axiosInstance.post('/auth/chat',{
     userId ,
     workerId
-   })
+   },
+   {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+  )
    return response.data
   }catch (error) {
   console.log("error",error)
@@ -373,7 +383,13 @@ export const fetchChat = async (userId:string , workerId:string) => {
 export const fetchMessages= async(chatId:string) => {
   const token = localStorage.getItem('accessToken');
   try{
-    const response = await axiosInstance.get(`/auth/messages/${chatId}`)
+    const response = await axiosInstance.get(`/auth/messages/${chatId}` ,{
+      
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      
+    })
     return response.data;
   }catch (error) {
     console.log("error",error)
@@ -389,6 +405,7 @@ mediaUrl?:string
 }
 
 export const  sendingMessage = async (messageData :MessageData , mediaFile:File| null) => {
+  const token = localStorage.getItem('accessToken');
   try{
 
     const formData = new FormData();
@@ -407,6 +424,7 @@ export const  sendingMessage = async (messageData :MessageData , mediaFile:File|
   }
        const response = await axiosInstance.post('/auth/message' ,formData ,{
         headers: {
+          'Authorization': `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
        })
@@ -610,10 +628,9 @@ export const updateWallet = async (walletData: WalletData, bookingId: string) =>
       return;
     }
 
-    // Include bookingId in walletData
     const dataToSend = {
       ...walletData,
-      bookingId, // Add bookingId here
+      bookingId,
     };
 
     const response = await axiosInstance.post("/auth/update-wallet", dataToSend, {
@@ -651,14 +668,18 @@ try{
 
 export const downloadInvoice = async (bookingId: string) => {
   try {
+    const token = localStorage.getItem("accessToken");
     const response = await axiosInstance.get(`/auth/invoice/${bookingId}`, {
-      responseType: "blob", // Ensure Axios treats response as a binary blob
+      responseType: "blob",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
-    const blob = response.data; // Axios stores response data in `.data`
+    const blob = response.data; 
     const url = window.URL.createObjectURL(blob);
 
-    // Create a temporary link to trigger download
+    
     const a = document.createElement("a");
     a.href = url;
     a.download = `invoice-${bookingId}.pdf`;
@@ -667,7 +688,7 @@ export const downloadInvoice = async (bookingId: string) => {
     document.body.removeChild(a);
   } catch (error) {
     console.error("Error downloading invoice:", error);
-    throw error; // You can handle this error in the component
+    throw error; 
   }
 };
 
