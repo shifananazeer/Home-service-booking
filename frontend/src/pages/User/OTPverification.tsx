@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resendOtp, verifyOtp } from '../../services/userService';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../../features/user/userSlice.';
 
 const OTPverification = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [otp, setOtp] = useState<string>('');
     const [timer, setTimer] = useState<number>(300);
     const [isResending, setIsResending] = useState(false);
     const [email, setEmail] = useState<string>(() => {
-      const storedEmail = localStorage.getItem('email') || ''; // Example using localStorage
-      console.log('Retrieved email:', storedEmail); // Debugging line
+      const storedEmail = localStorage.getItem('email') || ''; 
+      console.log('Retrieved email:', storedEmail); 
       return storedEmail;
   });
     useEffect(() => {
@@ -44,9 +47,18 @@ const OTPverification = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await verifyOtp(otp, email);
+        const response = await  verifyOtp(otp, email );
+           console.log("response", response)
             toast.success('OTP Verified Successfully');
-            navigate('/');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            console.log("signupUserdata", userData)
+            dispatch(setUserData(userData));
+
+            if (response.role === 'worker') {
+                navigate('/dashboard/worker');
+            } else {
+                navigate('/')
+            }
         } catch (error: any) {
             console.log(error.response?.data?.message);
             toast.error('Verification failed');
@@ -64,11 +76,11 @@ const OTPverification = () => {
                         onChange={(e) => setOtp(e.target.value)}
                         placeholder="Enter OTP"
                         required
-                        className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-gray-600"
                     />
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
+                        className="bg-gray-900 text-white py-2 rounded hover:bg-gray-600 transition duration-200"
                     >
                         Verify
                     </button>
@@ -79,8 +91,8 @@ const OTPverification = () => {
                     </p>
                     <button
                         onClick={handleResendOtp}
-                        disabled={isResending}
-                        className={`mt-2 text-blue-600 hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={timer > 60 || isResending} // Disable if timer > 0 or already resending
+                        className={`mt-2 text-blue-500 hover:underline ${timer > 0 || isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isResending ? 'Resending...' : 'Resend OTP'}
                     </button>

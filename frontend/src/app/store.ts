@@ -1,9 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook , useDispatch , useSelector } from "react-redux";
 import userReducer from '../features/user/userSlice.'
+import workerReducer from '../features/worker/workerSlice'
+import adminReducer from '../features/admin/adminSlice'
 export const store = configureStore({
     reducer: {
         user: userReducer,
+        worker: workerReducer,
+        admin:adminReducer,
     },
 })
 

@@ -1,31 +1,31 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
-// Load environment variables
+
 dotenv.config();
 
-// Create transporter object
+
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: false, // Use true for 465, false for other ports
+    secure: false, 
     requireTLS: true,
     auth: {
-        user: process.env.EMAIL_USER, // Your Gmail address
-        pass: process.env.EMAIL_PASS, // Your App Password
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS, 
     },
     tls: {
-        rejectUnauthorized: false, // Accept self-signed certificates (if necessary)
+        rejectUnauthorized: false, 
     },
-    debug: true, // Enable debug output
+    debug: true, 
 });
 
-// Function to send OTP email
+
 export const sendOtpEmail = async (to: string, otp: string): Promise<void> => {
     try {
         console.log("Sending OTP...");
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Your Gmail address
+            from: process.env.EMAIL_USER, 
             to,
             subject: "OTP Verification from ServiceHub",
             html: `
@@ -42,7 +42,7 @@ export const sendOtpEmail = async (to: string, otp: string): Promise<void> => {
         await transporter.sendMail(mailOptions);
         console.log('OTP sent successfully to', to);
     } catch (error: any) {
-        console.error("Error sending OTP:", error.message); // Log the error message
+        console.error("Error sending OTP:", error.message); 
         throw new Error("Failed to send OTP");
     }
 };
