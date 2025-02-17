@@ -1,5 +1,4 @@
 import type { FC } from "react"
-import { useNavigate } from "react-router-dom"
 
 interface TopWorkerProps {
   workers: {
@@ -13,7 +12,6 @@ interface TopWorkerProps {
 }
 
 const TopWorker: FC<TopWorkerProps> = ({ workers, setCurrentComponent, setSelectedWorkerId }) => {
-  const navigate = useNavigate()
 
   const handleProfile = (workerId: string) => {
     setSelectedWorkerId(workerId)

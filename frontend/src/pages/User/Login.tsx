@@ -14,7 +14,6 @@ const Login = () => {
     const [password, setPassword] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const token = localStorage.getItem('accessToken')
-    const userId = localStorage.getItem('user_Id');
   
 
   

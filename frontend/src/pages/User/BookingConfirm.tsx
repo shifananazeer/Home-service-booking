@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { createBooking, fetchingSlots } from '../../services/userService';
+import { fetchingSlots } from '../../services/userService';
 import axios from 'axios';
-import {  userRefreshAccessToken } from '../../utils/auth';
 import Swal from 'sweetalert2';
 
 interface Slot {

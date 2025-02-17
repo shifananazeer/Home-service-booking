@@ -1,9 +1,6 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { io } from 'socket.io-client'; // Assuming you're using socket.io
-import axiosInstance from './utils/axiosInstance';
 import NotificationModal from './components/notificationModel'; // Import the modal component
 import socket from './utils/socket';
-import axios from 'axios';
 import { getWorkersIds } from './services/userService';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +20,7 @@ const NotificationContextUser = createContext<NotificationContextType | undefine
 export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ children }) => {
     const [workerIds, setWorkerIds] = useState<string[]>([]);
     const userId = localStorage.getItem('user_Id') || ''; 
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+   
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [currentNotification, setCurrentNotification] = useState<string>(''); 
     const [currentBookingId , setCurrentBookingId] = useState<string>('')

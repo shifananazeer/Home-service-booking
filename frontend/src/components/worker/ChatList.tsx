@@ -1,6 +1,6 @@
 import type React from "react"
 import { useEffect, useState, useRef } from "react"
-import { fetchChats, fetchMessages, fetchUnreadMessags, sendMessages, sendReaction } from "../../services/workerService"
+import { fetchChats, fetchMessages, fetchUnreadMessags, sendMessages } from "../../services/workerService"
 import socket from "../../utils/socket"
 import { Phone } from "lucide-react"
 import { useNavigate } from "react-router-dom"
@@ -211,7 +211,7 @@ const ChatList: React.FC = () => {
 
   useEffect(() => {
     socket.on("reactionUpdated", (data) => {
-      const { messageId, emoji, reactionData } = data
+      const { messageId, reactionData } = data
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg._id === messageId ? { ...msg, reactions: [...(msg.reactions || []), reactionData] } : msg,
@@ -229,10 +229,10 @@ const ChatList: React.FC = () => {
   }
 
   const handleVideoCall = (id: string) => {
-    navigate(`/worker/videocall`) // Replace with your actual route for the video call page
+    navigate(`/worker/videocall/${id}`) // Replace with your actual route for the video call page
   }
   const handleAudioCall = (id: string) => {
-    navigate(`/worker/audioCall`)
+    navigate(`/worker/audioCall/${id}`)
   }
   const formatTime = (isoDate: string) => {
     const date = new Date(isoDate)

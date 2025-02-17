@@ -10,7 +10,7 @@ interface RatingModalProps {
  
 }
 
-const RatingModal: React.FC<RatingModalProps> = ({ isOpen, onClose, onSubmit, bookingId  }) => {
+const RatingModal: React.FC<RatingModalProps> = ({ isOpen, onClose, onSubmit  }) => {
   const [rating, setRating] = useState<number>(0)
   const [review, setReview] = useState<string>("")
 

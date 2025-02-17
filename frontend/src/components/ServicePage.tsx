@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { fetchService } from '../services/workerService'
 
 import { useNavigate } from 'react-router-dom'
 import { FaUserTie } from 'react-icons/fa'

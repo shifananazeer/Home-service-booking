@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
-import { FaSignOutAlt, FaUser, FaUserTie } from 'react-icons/fa'; 
-import socket from '../utils/socket'
+import { FaSignOutAlt, FaUser } from 'react-icons/fa'; 
 import axiosInstance from '../utils/axiosInstance'
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const userData = useAppSelector((state) => state.user.userData)
   const token = localStorage.getItem('accessToken')
-  const userIds = localStorage.getItem('user_Id')
   const dispatch = useDispatch()
   const navigate = useNavigate()
 

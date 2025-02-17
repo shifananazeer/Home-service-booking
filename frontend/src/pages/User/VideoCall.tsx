@@ -6,9 +6,9 @@ import { Mic, MicOff, PhoneOff, Video, VideoOff } from "lucide-react";
 
 const VideoCallPage: React.FC = () => {
   const { workerId } = useParams<{ workerId: string }>();
-  const [callStarted, setCallStarted] = useState(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [callStatus, setCallStatus] = useState("Initializing...");
+  
+  const [, setIsConnected] = useState<boolean>(false);
+ 
   const navigate = useNavigate();
   const [muted, setMuted] = useState(false);
   const [worker, setWorker] = useState<string | null>(null);
@@ -17,7 +17,7 @@ const VideoCallPage: React.FC = () => {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const roomId = workerId || "";
   const userId = localStorage.getItem('user_Id');
-  const [iceCandidates, setIceCandidates] = useState<RTCIceCandidateInit[]>([]);
+  
 const [videoOff, setVideoOff] = useState(false);
   useEffect(() => {
     socket.emit("join-room", roomId);
@@ -124,7 +124,7 @@ const [videoOff, setVideoOff] = useState(false);
   };
 
   useEffect(()=>{
-    socket.on("call-disconnected", ({ roomId, userId }) => {
+    socket.on("call-disconnected", ({ roomId }) => {
       if(roomId===roomId){
         setIsConnected(false);
         navigate(`/user/messages`, {
@@ -135,7 +135,7 @@ const [videoOff, setVideoOff] = useState(false);
   },[])
 
   useEffect(()=>{
-    socket.on("call-decline", ({ roomId, userId }) => {
+    socket.on("call-decline", ({ roomId }) => {
       if(roomId===roomId){
         setIsConnected(false);
         navigate(`/user/messages`, {

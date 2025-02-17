@@ -228,7 +228,7 @@ const MessageList: React.FC = () => {
 
   useEffect(() => {
     socket.on('reactionUpdated', (data) => {
-      const { messageId, emoji, reactionData } = data;
+      const { messageId, reactionData } = data;
       setMessages(prevMessages =>
         prevMessages.map(msg =>
           msg._id === messageId 

@@ -3,8 +3,6 @@ import { PencilIcon, TrashIcon, PlusIcon } from "lucide-react";
 import { createService, fetchServices, updateService, deleteService } from "../../services/adminService";
 import ServiceModal from "./ServiceModel";
 import Swal from 'sweetalert2';
-import { useNavigate } from "react-router-dom";
-import { refreshAccessToken } from "../../utils/adminAthendication";
 import { FaHandshake } from "react-icons/fa";
 
 export interface Service {
@@ -24,7 +22,6 @@ export default function ServiceManagement() {
     const [limit] = useState<number>(5);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
-    const navigate = useNavigate()
     useEffect(() => {
         const loadServices = async () => {
             try {

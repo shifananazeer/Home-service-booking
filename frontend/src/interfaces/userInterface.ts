@@ -1,4 +1,3 @@
-import { Address } from "./addressInterface";
 
 export interface SignupInterface {
     firstName: string;

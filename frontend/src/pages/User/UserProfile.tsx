@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { getUserProfile, resetPassword, resetPasswordFromPassword, unreadNotifications } from '../../services/userService';
-import { ProfileSkeleton } from '../../components/ProfileSkelton';
+import { useEffect, useState } from 'react';
+import { getUserProfile, resetPasswordFromPassword, unreadNotifications } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
 import { UserProfileInterface } from '../../interfaces/userInterface';
 import { Address } from '../../interfaces/addressInterface';
 import ChangePasswordModal from './ChangePasswordModel';
-import { refreshAccessToken } from '../../utils/auth';
 import toast from 'react-hot-toast';
 import { logout } from '../../features/user/userSlice.';
 import axiosInstance from '../../utils/axiosInstance';
@@ -80,7 +78,7 @@ const UserProfile = () => {
             if(!userId) {
                 return null
             }
-          const response = await resetPasswordFromPassword(newPassword , userId)
+           await resetPasswordFromPassword(newPassword , userId)
     
        
           toast.success('Password updated successfully!');

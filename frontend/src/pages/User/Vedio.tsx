@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
-import { Mic, MicOff } from 'lucide-react';
-import { useSelector } from "react-redux";
+import { MicOff } from 'lucide-react';
 import { fetchWorkerById } from "../../services/userService";
 
 declare global {
@@ -19,7 +18,7 @@ const VideoCall = () => {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const [muted, setMuted] = useState<boolean>(false);
   const [worker, setWorker] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [, setIsConnected] = useState<boolean>(false);
   const { id } = useParams();
   const roomId = id as string; // Ensure roomId is a string
   const userId = localStorage.getItem('user_Id');

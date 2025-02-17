@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { createBooking, createCheckoutSession } from '../../services/userService';
 import Swal from 'sweetalert2';
 
@@ -25,10 +25,8 @@ const PaymentPage: React.FC = () => {
     const location = useLocation();
     const {
         bookingDetails = {} as BookingDetails,
-        workerName = 'Worker',
         workerRate = 0,
     } = location.state || {};
-    const navigate = useNavigate();
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [platformCharge, setPlatformCharge] = useState<number>(0);
     const [advancePayment, setAdvancePayment] = useState<number>(0);

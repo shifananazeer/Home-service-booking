@@ -1,12 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { AddAvailability, addAvailability, AvailabilitySlot, AvailabilityWithSlots, deleteAvailability, fetchAvailabilitySlots } from '../../services/workerService';
+import { useEffect, useState } from 'react';
+import { AddAvailability, addAvailability, AvailabilityWithSlots, deleteAvailability, fetchAvailabilitySlots } from '../../services/workerService';
 import moment from 'moment';
 import Modal from './editModel';
 import { Slot } from './editModel';
-import { refreshAccessToken } from '../../utils/auth';
-import { useNavigate } from 'react-router-dom';
-import { RootState } from '../../app/store';
-import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 
 const formatDate = (dateString: string): string => {
@@ -17,7 +13,7 @@ const AvailabilityManagement = () => {
   const [slots, setSlots] = useState<AvailabilityWithSlots[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState('');
+
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [editingSlot, setEditingSlot] = useState<Slot | null>(null);
@@ -25,7 +21,6 @@ const AvailabilityManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState();
 const [selectedDays, setSelectedDays] = useState<string[]>([]); 
-const navigate = useNavigate()
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 

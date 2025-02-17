@@ -29,11 +29,6 @@ export interface WorkerAddress extends Worker {
   location?: { lat: number; lng: number }
 }
 
-interface ServiceDetails {
-  name: string
-  image: string
-  description: string
-}
 
 const BookingPage: React.FC = () => {
   const location = useLocation()
@@ -56,7 +51,7 @@ const BookingPage: React.FC = () => {
   const [sortType, setSortType] = useState("");
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   // const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([])
-  const [slots, setSlots] = useState<Slot[]>([])
+  const [, setSlots] = useState<Slot[]>([])
   const [workerSearchQuery, setWorkerSearchQuery] = useState("");
 
   const [dateInput, setDateInput] = useState<string>("") // Added state for date input

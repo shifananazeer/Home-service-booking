@@ -49,8 +49,8 @@ export const blockUser = async (userId:string) => {
         console.log('Block user response:', response.data); 
         return response.data; 
     } catch (error) {
-        console.error('Error blocking user:', error);
-        throw error; 
+        errorHandler(error);
+        throw error;
     }
 };
 
@@ -68,8 +68,8 @@ export const unblockUser = async (userId:string) => {
         return response.data; 
        
     } catch (error) {
-        console.error('Error unblocking user:', error);
-        throw error; 
+        errorHandler(error);
+        throw error;
     }
 
     
@@ -108,7 +108,7 @@ export const blockWorker = async (workerId: string) => {
         console.log('Block worker response:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error blocking worker:', error);
+        errorHandler(error);
         throw error;
     }
 }
@@ -124,7 +124,7 @@ export const unblockWorker = async (workerId: string) => {
         console.log('Unblock worker response:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error unblocking worker:', error);
+        errorHandler(error);
         throw error;
     }
 }
@@ -153,12 +153,7 @@ export const fetchServices = async (page = 1, limit = 5, search = '') => {
     }
   };
 
-  interface  Service  {
-    _id?: string;
-    name: string;
-    description: string;
-    image: string;
-};
+  
 
 
   export const createService = async (formData:FormData) => {
@@ -195,7 +190,8 @@ export const updateService = async (serviceId: string, formData:FormData) => {
       });
       return response.data; 
     } catch (error) {
-      throw error; 
+        errorHandler(error);
+        throw error;
     }
   };
 
@@ -215,8 +211,8 @@ export const updateService = async (serviceId: string, formData:FormData) => {
         });
         return response.data; 
     } catch (error) {
-        console.error('Error fetching bookings:', error);
-        throw error; 
+        errorHandler(error);
+        throw error;
     }
 };
 
