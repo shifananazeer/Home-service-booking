@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { io } from "socket.io-client";
 import { MicOff } from 'lucide-react';
 import { fetchWorkerById } from "../../services/userService";
+import socket from "../../utils/socket";
 
 declare global {
     interface Window {
@@ -10,7 +10,6 @@ declare global {
     }
   }
 
-const socket = io("http://localhost:3000");
 
 const VideoCall = () => {
   const localVideoRef = useRef<HTMLVideoElement | null>(null);

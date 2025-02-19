@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { io } from "socket.io-client";
 import { PhoneOff } from "lucide-react";
 import { fetchWorkerById } from "../../services/userService";
+import socket from "../../utils/socket";
 
 
-const socket = io("http://localhost:3000");
+
 
 const AudioCall = () => {
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
