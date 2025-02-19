@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAppSelector } from '../app/store'
 import { logout } from '../features/user/userSlice.'
 import { FaSignOutAlt, FaUser } from 'react-icons/fa'; 
@@ -78,9 +78,9 @@ const Navbar: React.FC = () => {
           <a href="/" className="text-sm font-medium text-white hover:text-white/80">
             Home
           </a>
-          <a href="/services" className="text-sm font-medium text-white hover:text-white/80">
+          <Link to="/services" className="text-sm font-medium text-white hover:text-white/80">
             Services
-          </a>
+          </Link>
           <a href="#how-it-works"  className="text-sm font-medium text-white hover:text-white/80">
             About Us
           </a>
