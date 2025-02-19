@@ -99,9 +99,10 @@ const App = () => {
     <Route path="/worker/reset-password" element= { <WorkerResetPassword/>}/>
     <Route path="/admin/login" element={<AdminLogin/>}/>
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
+    <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
 
      <Route element={<ProtectedRoute requiredRole="user" />}> 
-     <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
+   
      <Route path="/register" element={<Register />} />
       <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
       <Route path="/payment" element={<PaymentPage/>}/>
