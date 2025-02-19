@@ -87,8 +87,7 @@ const App = () => {
 
          {/* Public Routes */}
       <Route path="/" element={<NotificationProviderUser><HomePage/></NotificationProviderUser>}/>
-      <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
-      <Route path="/register" element={<Register />} />
+     
     <Route path="/login" element={<Login />} />
     <Route path="/verify-otp" element={<OTPverification />} />
     <Route path="/forgot-password" element={<ForgotPassword/>}/>
@@ -102,6 +101,8 @@ const App = () => {
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
      <Route element={<ProtectedRoute requiredRole="user" />}> 
+     <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
+     <Route path="/register" element={<Register />} />
       <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
       <Route path="/payment" element={<PaymentPage/>}/>
       <Route path="/booking-list" element={<NotificationProviderUser><BookingList/></NotificationProviderUser>}/>
