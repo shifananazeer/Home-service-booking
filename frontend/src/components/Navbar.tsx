@@ -78,9 +78,9 @@ const Navbar: React.FC = () => {
           <a href="/" className="text-sm font-medium text-white hover:text-white/80">
             Home
           </a>
-          <Link to="/services" className="text-sm font-medium text-white hover:text-white/80">
-            Services
-          </Link>
+          <button onClick={() => navigate('/services')} className="text-sm font-medium text-white hover:text-white/80">
+        Services
+      </button>
           <a href="#how-it-works"  className="text-sm font-medium text-white hover:text-white/80">
             About Us
           </a>
