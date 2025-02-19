@@ -20,10 +20,7 @@ const PORT = process.env.PORT as string;
 
 //cors middleware to connect frontend
 app.use(cors({
-  origin: [
-    "https://home-service-booking.vercel.app",
-    "https://home-service-booking-lg943qz1q.vercel.app/"
-  ],
+  origin: process.env.CLIENT_URL , 
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization'],
