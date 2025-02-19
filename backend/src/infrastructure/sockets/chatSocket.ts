@@ -45,7 +45,10 @@ const onlineUsers = new Map();
 export const setupSocket = (httpServer: HttpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL,
+      origin: [
+        "https://home-service-booking.vercel.app",
+        "https://home-service-booking-d687xzzc3.vercel.app"
+      ],
       methods: ['GET', 'POST'],
       credentials: true,
     },
