@@ -5,19 +5,23 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true, // Allows access from different network devices
-    port: 5173, // Ensures consistency
+    host: true,
+    port: 5173,
   },
   build: {
-    outDir: 'dist', // Ensures the build output directory is correct
+    outDir: 'dist',
   },
   resolve: {
     alias: {
-      '@': '/src', // Optional: Allows `@` as a shortcut for `/src`
+      '@': '/src',
     },
   },
-  base: '/', // Ensures correct base path
+  base: '/',
   define: {
-    'process.env': {}, // Helps avoid environment variable issues
+    'process.env': {},
   },
+  // ✅ This ensures React Router works properly on Vercel
+  esbuild: {
+    jsxInject: `import React from 'react'`,
+  }
 })
