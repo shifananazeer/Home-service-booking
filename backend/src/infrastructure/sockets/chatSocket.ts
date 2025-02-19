@@ -47,7 +47,7 @@ export const setupSocket = (httpServer: HttpServer) => {
     cors: {
       origin: [
         "https://home-service-booking.vercel.app",
-        "https://home-service-booking-d687xzzc3.vercel.app"
+        "https://home-service-booking-lg943qz1q.vercel.app/"
       ],
       methods: ['GET', 'POST'],
       credentials: true,

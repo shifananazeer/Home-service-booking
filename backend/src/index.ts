@@ -22,7 +22,7 @@ const PORT = process.env.PORT as string;
 app.use(cors({
   origin: [
     "https://home-service-booking.vercel.app",
-    "https://home-service-booking-d687xzzc3.vercel.app"
+    "https://home-service-booking-lg943qz1q.vercel.app/"
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 
   credentials: true, 
