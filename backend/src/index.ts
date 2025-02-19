@@ -42,7 +42,10 @@ app.use('/api/workers',workerRoutes)
 
 app.use('/api/admin',adminRoutes)
 
-
+// ✅ Add Default Route for Health Check
+app.get('/', (req, res) => {
+  res.send('Backend is running successfully ✅');
+});
 
 
 // Database connection
