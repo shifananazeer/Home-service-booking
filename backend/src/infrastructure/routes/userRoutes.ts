@@ -17,7 +17,7 @@ router.post('/forgot-password',userController.forgotPassword)
 router.get('/reset-password/:token', userController.validateResetToken);
 router.post('/reset-password', userController.resetPassword);
 router.post("/refresh-token", userController.refreshAccessToken);
-router.get('/services',authenticateUser, userController.getServices)
+router.get('/services',userController.getServices)
 router.get("/profile", authenticateUser, userController.getUserProfile); 
 router.put('/profile/edit', authenticateUser ,upload.single('profilePic'),userController.editProfile)
 router.put('/updateLocation',authenticateUser,userController.updateLocation)

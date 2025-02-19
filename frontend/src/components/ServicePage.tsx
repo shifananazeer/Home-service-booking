@@ -22,14 +22,14 @@ export default function ServicesPage() {
   const [limit] = useState<number>(8);
 
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const userId = localStorage.getItem("user_Id");
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem("accessToken");
+  //   const userId = localStorage.getItem("user_Id");
 
-    if (!accessToken || !userId) {
-      navigate("/login");
-    }
-  }, [navigate]);
+  //   if (!accessToken || !userId) {
+  //     navigate("/login");
+  //   }
+  // }, [navigate]);
   
   useEffect(() => {
     async function loadServices() {
