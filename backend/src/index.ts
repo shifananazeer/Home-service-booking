@@ -20,7 +20,7 @@ const PORT = process.env.PORT as string;
 
 //cors middleware to connect frontend
 app.use(cors({
-  origin: process.env.CLIENT_URL , 
+  origin: process.env.CLIENT_URL?.trim() , 
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'], 
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -42,10 +42,7 @@ app.use('/api/workers',workerRoutes)
 
 app.use('/api/admin',adminRoutes)
 
-// ✅ Add Default Route for Health Check
-app.get('/', (req, res) => {
-  res.send('Backend is running successfully ✅');
-});
+
 
 
 // Database connection
