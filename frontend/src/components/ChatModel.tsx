@@ -106,7 +106,8 @@ const ChatModal: React.FC<ChatModalProps> = ({
   const handleSendMessage = async () => {
     if (text.trim() === '' && !mediaFile) return;
   
-    const messageData: Message = {
+    const newMessage: Message = {
+      _id: `temp-${Date.now()}`, // Temporary ID to prevent duplicates
       chatId,
       senderId: userId,
       senderModel: 'user',
@@ -114,17 +115,19 @@ const ChatModal: React.FC<ChatModalProps> = ({
       text: text.trim() || undefined,
     };
   
+    // **Optimistically update UI**
+    setMessages((prev) => [...prev, newMessage]);
+    setText('');
+    setMediaFile(null);
+    setMediaPreview(null);
+    scrollToBottom();
+  
     try {
-      await sendingMessage(messageData, mediaFile);
-      setText('');
-      setMediaFile(null);
-      setMediaPreview(null);
-      scrollToBottom();
+      await sendingMessage(newMessage, mediaFile);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
   };
-
   useEffect(() => {
     const handleSeenStatusUpdate = (seenMessageIds: string[]) => {
       setMessages(prevMessages =>
