@@ -92,7 +92,7 @@ console.log("balance" , balanceAmount)
                     amount: advancePayment * 100,
                     bookingId: response.data.bookingId, 
                     paymentType: 'advance',
-                    successUrl: `http://localhost:5173/booking-success?bookingId=${response.data.bookingId}`, 
+                    successUrl: `${import.meta.env.VITE_FRONTEND_URL}/booking-success?bookingId=${response.data.bookingId}`,
                 });
                 Swal.close();
 
