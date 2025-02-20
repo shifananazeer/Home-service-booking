@@ -72,49 +72,50 @@ const ChatModal: React.FC<ChatModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setMessages(initialMessages);
+      setMessages(prevMessages => {
+        const uniqueMessages = [...new Map([...prevMessages, ...initialMessages].map(msg => [msg._id, msg])).values()];
+        return uniqueMessages;
+      });
       setTimeout(scrollToBottom, 100);
-      socket.emit('joinChat', {chatId});
+      socket.emit('joinChat', { chatId });
       markMessagesAsSeen(initialMessages);
-    
-    
     }
-  }, [isOpen, initialMessages, chatId , markMessagesAsSeen]);
+  }, [isOpen, initialMessages, chatId, markMessagesAsSeen]);
 
   useEffect(() => {
     const handleNewMessage = (message: Message) => {
-      setMessages(prev => [...prev, message]);
+      setMessages(prev => {
+        if (!prev.some(msg => msg._id === message._id)) {
+          return [...prev, message];
+        }
+        return prev;
+      });
       setTimeout(scrollToBottom, 100);
       if (message.senderModel !== 'user') {
         markMessagesAsSeen([message]);
       }
     };
-
+  
     socket.on('newMessage', handleNewMessage);
-    
+  
     return () => {
       socket.off('newMessage', handleNewMessage);
-      socket.emit('leaveChat', chatId);
     };
-  }, [chatId]);
+  }, []);
 
   const handleSendMessage = async () => {
     if (text.trim() === '' && !mediaFile) return;
-
+  
     const messageData: Message = {
       chatId,
       senderId: userId,
       senderModel: 'user',
       timestamp: new Date().toISOString(),
+      text: text.trim() || undefined,
     };
-
-    if (text.trim() !== '') {
-      messageData.text = text.trim();
-    }
-
+  
     try {
       await sendingMessage(messageData, mediaFile);
-      setMessages(prev => [...prev, messageData]);
       setText('');
       setMediaFile(null);
       setMediaPreview(null);
@@ -123,7 +124,6 @@ const ChatModal: React.FC<ChatModalProps> = ({
       console.error('Failed to send message:', error);
     }
   };
-
 
   useEffect(() => {
     const handleSeenStatusUpdate = (seenMessageIds: string[]) => {

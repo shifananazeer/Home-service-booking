@@ -44,6 +44,9 @@ export class AddressRepositoryImpl implements AddressRepository {
 
     async updateLocation(latitude: number, longitude: number, workerId: string): Promise<Address | null> {
         try {
+            if (!workerId) {
+                throw new Error("Invalid workerId");
+            }
             const address = await AddressModel.findOneAndUpdate(
                 { userId: workerId },
                 { $set: { 'location.latitude': latitude, 'location.longitude': longitude } },

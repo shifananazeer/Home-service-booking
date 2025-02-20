@@ -27,12 +27,12 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     dispatch(logout())
     localStorage.removeItem('userData');
-            localStorage.removeItem('user_Id')
-              localStorage.removeItem('accessToken')
-             localStorage.removeItem('refreshToken')
-             localStorage.removeItem('email')
+   localStorage.removeItem('user_Id')
+   localStorage.removeItem('accessToken')
+   localStorage.removeItem('refreshToken')
+   localStorage.removeItem('email')
 
-             delete axiosInstance.defaults.headers.common["Authorization"];
+   delete axiosInstance.defaults.headers.common["Authorization"];
     navigate('/')
   }
 

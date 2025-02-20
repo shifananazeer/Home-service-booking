@@ -87,8 +87,10 @@ class UserController  {
         }
       }
     async validateOtp (req: Request, res: Response)  {
+       
         try {
-            const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(req.body.email, req.body.otp, 1);
+            const { email, otp, firstName } = req.body;
+            const { accessToken, refreshToken, role, valid  , userId} = await validateOtp(email, otp, 1);
         res.cookie("auth_token", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000 }); // 15 minutes
         res.cookie("refresh_token", refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 }); // 7 days
         res.status(HttpStatus.OK).json({
@@ -98,7 +100,10 @@ class UserController  {
             accessToken,
             refreshToken,
             userId,
+            firstName, // Send name from frontend
+            email
         });
+
         } catch (error: any) {
             console.error("Error verifying OTP:", error.message);
             res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
@@ -610,7 +615,8 @@ class UserController  {
                                console.log('Chats for workerId:', userId, '->', chats);
                                            
                                if (chats.length === 0) {
-                                res.status(HttpStatus.NOT_FOUND).json({ message: Messages.NOT_FOUNT  });
+                                res.status(HttpStatus.OK).json({ message: "No chats available", chats: [] });
+                                return
                                        }
                              console.log("chats........." , chats)
                               res.status(HttpStatus.OK).json(chats);

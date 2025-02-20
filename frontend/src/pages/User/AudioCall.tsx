@@ -135,6 +135,7 @@ const AudioCall = () => {
     const offer = await peerConnectionRef.current.createOffer();
     await peerConnectionRef.current.setLocalDescription(offer);
     socket.emit("audio-offer", { roomId, caller: userId, offer });
+    console.log("emit audio call")
     window.currentStream = stream;
   };
 

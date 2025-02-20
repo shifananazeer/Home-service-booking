@@ -111,7 +111,7 @@ const EditUserProfile: React.FC = () => {
         }
     
         try {
-            const response = await updateCoordinatesUser(lat, lng, userId)
+            const response = await updateCoordinatesUser(lat, lng, userId )
             console.log('Coordinates updated successfully:', response.data);
             toast.success('Coordinates updated successfully!');
         } catch (error) {

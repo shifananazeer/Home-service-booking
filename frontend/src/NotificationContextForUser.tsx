@@ -41,50 +41,48 @@ export const NotificationProviderUser: React.FC<NotificationProviderProps> = ({ 
     const fetchWorkerIds = async () => {
         try {
             const response = await getWorkersIds(userId);
-            const workerIds = response?.data.workerIds; 
+            const workerIds = response?.data?.workerIds || []; // Ensure it's always an array
             setWorkerIds(workerIds);
-
-            workerIds.forEach((workerId: string) => joinNotificationRoom(workerId));
+    
+            if (workerIds.length > 0) { // Check if there are any workers before looping
+                workerIds.forEach((workerId: string) => joinNotificationRoom(workerId));
+            }
         } catch (error) {
             console.error('Error fetching worker IDs:', error);
         }
     };
-
+    
     useEffect(() => {
         fetchWorkerIds();
-
+    
         socket.on('receive-notification', (notification: Notification) => {
-            console.log("receive notification")
+            console.log("receive notification");
             setCurrentNotification(notification.message);
-            setCurrentBookingId(notification.bookingId)
-            setIsModalOpen(true); 
+            setCurrentBookingId(notification.bookingId);
+            setIsModalOpen(true);
             console.log('New notification received:', notification);
         });
-
-         // Listen for blockUser event
-         socket.on('blockUser', (blockedUserId: string) => {
+    
+        // Listen for blockUser event
+        socket.on('blockUser', (blockedUserId: string) => {
             if (userId === blockedUserId) {
-                // Clear local storage
                 localStorage.removeItem('userData');
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
-
-                // Redirect to unauthorized page
-                navigate('/unauthorized', {
-                    state: { message: 'You have been blocked by the admin.' },
-                });
+                navigate('/unauthorized', { state: { message: 'You have been blocked by the admin.' } });
             }
         });
-
-
-   
+    
         return () => {
-            socket.off('blockUser'),
-            workerIds.forEach((workerId: string) => leaveNotificationRoom(workerId));
+            socket.off('blockUser');
+            
+            if (workerIds.length > 0) { // Check before looping
+                workerIds.forEach((workerId: string) => leaveNotificationRoom(workerId));
+            }
+            
             socket.disconnect();
         };
     }, []);
-
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
