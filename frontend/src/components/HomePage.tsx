@@ -1,45 +1,16 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HowItWorks } from "./About";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [fade, setFade] = useState(false); // State for fade effect
-
-  const images = [
-    "wp.webp",
-    "noti.jpg",
-    "home.webp",
-   
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFade(true); // Start fade-out effect
-
-      setTimeout(() => {
-        setCurrentImageIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
-        setFade(false); // Start fade-in effect
-      }, 600); // Adjust fade duration here (500ms)
-
-    }, 5000); // Change image every 5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
+  
+  
+ 
   const handleFindService = () => {
     navigate("/services");
   };
 
-  return (
-    <div className="relative min-h-screen bg-black">
-      <div
-        className={`relative h-[900px] w-full bg-cover bg-center bg-no-repeat transition-opacity duration-500 ease-in-out ${fade ? "opacity-30" : "opacity-100"}`}
-        style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("${images[currentImageIndex]}")`,
-        }}
-      >
+  return ( <div className="relative min-h-screen bg-black"> <div className="relative h-[900px] w-full bg-cover bg-center bg-no-repeat " style={{ backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("wp.webp")', }} >
         <div className="absolute inset-0 flex flex-col justify-center px-4 sm:px-6 lg:px-8 -ml-2">
           <div className="max-w-xl mx-auto text-center sm:text-left">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
