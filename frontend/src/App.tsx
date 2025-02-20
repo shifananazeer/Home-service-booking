@@ -101,6 +101,9 @@ const App = () => {
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
     <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
     <Route path="/register" element={<Register />} />
+
+
+    
      <Route element={<ProtectedRoute requiredRole="user" />}> 
    
      
