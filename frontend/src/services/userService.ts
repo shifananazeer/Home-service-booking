@@ -18,13 +18,29 @@ export const registerUser = async (userDetails : SignupInterface) => {
     }
 }
 
-export const verifyOtp = async (otp:string , email:string) : Promise<any> => {
+export const verifyOtp = async (otp:string) : Promise<any> => {
+  const storedUser = localStorage.getItem('userData');
+  const userData = storedUser ? JSON.parse(storedUser) : null;
+
+  if (!userData || !userData.email) {
+      throw new Error("User data not found. Please register again.");
+  }
+
     try{
-        const response = await axiosInstance.post('/auth/verify-otp', {otp , email });
+        const response = await axiosInstance.post('/auth/verify-otp', { otp,
+          email: userData.email,
+          firstName: userData.firstName });
         console.log('Verification Success:', response.data);
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('user_Id',response.data.userId)
+        localStorage.setItem('userData', JSON.stringify({
+          firstName: response.data.firstName,
+          email: response.data.email,
+          role: response.data.role,
+          accessToken:response.data.accessToken,
+          refreshToken:response.data.refreshToken,
+      }));
         return response;
     }catch(error: any) {
         errorHandler(error);

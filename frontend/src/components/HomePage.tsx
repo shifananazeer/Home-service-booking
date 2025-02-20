@@ -9,9 +9,9 @@ const HomePage = () => {
 
   const images = [
     "wp.webp",
-    "hero.webp",
+    "noti.jpg",
     "home.webp",
-    "home-renovation-insurance.jpg",
+   
   ];
 
   useEffect(() => {

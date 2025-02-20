@@ -47,12 +47,14 @@ const OTPverification = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-        const response = await  verifyOtp(otp, email );
+        const response = await  verifyOtp(otp,  );
            console.log("response", response)
             toast.success('OTP Verified Successfully');
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             console.log("signupUserdata", userData)
-            dispatch(setUserData(userData));
+            // dispatch(setUserData(userData));
+            console.log("user data saved")
+        
 
             if (response.role === 'worker') {
                 navigate('/dashboard/worker');

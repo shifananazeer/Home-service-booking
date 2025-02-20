@@ -13,12 +13,12 @@ export interface Address extends Document {
 
 const addressSchema = new Schema<Address>({
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User', unique: true },
-    address: { type: String, required: true },
+    address: { type: String, },
     location: {
         latitude: { type: Number },
         longitude: { type: Number},
     },
-    area: { type: String, required: true },
+    area: { type: String },
 });
 
 const AddressModel = mongoose.model<Address>('Address', addressSchema);

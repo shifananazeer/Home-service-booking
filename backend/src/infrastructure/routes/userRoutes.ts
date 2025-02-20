@@ -38,7 +38,7 @@ router.post("/chat", userController.handleCreateOrfetchChat);
 router.post("/message",upload.single('media'),  userController.handleSendMessage);
 router.get("/messages/:chatId", userController.handleGetMessage);
 router.post('/reaction/:messageId' , authenticateUser ,userController.addReaction)
-router.get('/chat/:userId' , userController.getMessages)
+router.get('/chat/:userId' ,authenticateUser, userController.getMessages)
 router.get("/unread-messages/:userId" ,authenticateUser , userController.getUnreadNotification)
 router.get('/get-workers/:userId'  ,authenticateUser, userController.getWorkersByUserId)
 router.get('/balanceAmount/:bookingId' ,authenticateUser , userController.getBalanceAmount)

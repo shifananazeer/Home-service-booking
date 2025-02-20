@@ -41,14 +41,17 @@ const SignupForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+    
         if (formData.password !== formData.confirmpassword) {
             toast.error('Passwords do not match!');
             return;
         }
+    
         setLoading(true);
         setError({});
+    
         try {
-            const userData = await registerUser({
+           await registerUser({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
@@ -56,19 +59,24 @@ const SignupForm: React.FC = () => {
                 password: formData.password,
                 confirmpassword: ''
             });
-
-            localStorage.setItem('userData', JSON.stringify(userData));
+    
+            // Store name and email in localStorage for OTP verification
+            localStorage.setItem('userData', JSON.stringify({
+                firstName: formData.firstName,
+                email: formData.email
+            }));
+    
             toast.success('Registration successful! Please verify your OTP.');
-            localStorage.setItem('email', formData.email);
             navigate('/verify-otp');
+    
         } catch (error: any) {
             const validationErrors = error.response?.data?.errors || [];
             const errorMap: { [key: string]: string } = {};
-
+    
             validationErrors.forEach((err: { field: string; message: string }) => {
                 errorMap[err.field] = err.message; // Map field names to messages
             });
-
+    
             setError(errorMap);
             toast.error('Signup failed. Please check the errors below.');
         } finally {
