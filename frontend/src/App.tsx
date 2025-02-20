@@ -100,10 +100,13 @@ const App = () => {
     <Route path="/admin/login" element={<AdminLogin/>}/>
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
     <Route path="/services" element={<NotificationProviderUser><ServicesPage/></NotificationProviderUser>}/>
+    <Route path="/register" element={<Register />} />
 
+
+    
      <Route element={<ProtectedRoute requiredRole="user" />}> 
    
-     <Route path="/register" element={<Register />} />
+     
       <Route path="/book/:serviceId" element={<NotificationProviderUser><BookingPage /></NotificationProviderUser>} />
       <Route path="/payment" element={<PaymentPage/>}/>
       <Route path="/booking-list" element={<NotificationProviderUser><BookingList/></NotificationProviderUser>}/>
