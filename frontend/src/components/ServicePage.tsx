@@ -124,12 +124,27 @@ if (loading) {
             <h3 className="text-xl font-semibold text-center mb-2">{service.name}</h3>
             <p className="text-gray-300 text-center text-sm mb-4">{service.description}</p>
             <button 
-            className="w-full bg-gray-300 text-black py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg relative overflow-hidden group"
-            onClick={() => navigate(`/book/${service._id}`, { state: { serviceName: service.name, serviceImage: service.image, serviceDescription: service.description } })}
-          >
-            <span className="relative z-10 font-semibold">Book Now</span>
-            <span className="absolute inset-0 bg-gradient-to-r from-gray-400 to-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-          </button>
+  className="w-full bg-gray-300 text-black py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg relative overflow-hidden group"
+  onClick={() => {
+    const token = localStorage.getItem("accessToken");
+    const userId = localStorage.getItem("user_Id");
+
+    if (!token || !userId) {
+      navigate("/login");
+    } else {
+      navigate(`/book/${service._id}`, { 
+        state: { 
+          serviceName: service.name, 
+          serviceImage: service.image, 
+          serviceDescription: service.description 
+        } 
+      });
+    }
+  }}
+>
+  <span className="relative z-10 font-semibold">Book Now</span>
+  <span className="absolute inset-0 bg-gradient-to-r from-gray-400 to-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+</button>
           </div>
         ))}
       </div>
