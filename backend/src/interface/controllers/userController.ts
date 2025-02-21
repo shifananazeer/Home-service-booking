@@ -485,6 +485,7 @@ class UserController  {
     
         async createCheckoutSession(req: Request, res: Response) {
             const { amount , bookingId , paymentType  , successUrl } = req.body; // Get amount from request body
+            console.log("success url" , successUrl)
            console.log("amount" , amount)
             try {
                 const session = await paymentService.createCheckoutSession(amount , bookingId , paymentType , successUrl);
