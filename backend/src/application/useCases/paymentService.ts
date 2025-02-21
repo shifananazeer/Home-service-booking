@@ -22,13 +22,19 @@ export class PaymentService {
         amount: number, 
         bookingId: string, 
         paymentType: string, 
-        successUrl: string
+    
     ): Promise<Stripe.Checkout.Session> {
         
         const clientUrl = process.env.CLIENT_URL; 
-    
+
         if (!clientUrl) {
             throw new Error("CLIENT_URL is not defined in the environment variables");
+        }
+    
+        // Determine the success URL based on payment type
+        let successUrl = `${clientUrl}/booking-success?bookingId=${bookingId}`;
+        if (paymentType === 'balance') {
+            successUrl = `${clientUrl}/balancePayment-success?bookingId=${bookingId}`;
         }
     
         try {
@@ -45,8 +51,8 @@ export class PaymentService {
                     quantity: 1, 
                 }],
                 mode: 'payment',
-                success_url:successUrl, 
-                cancel_url: `${clientUrl}/cancel`, // Use the stored clientUrl
+                success_url: successUrl, 
+                cancel_url: `${clientUrl}/cancel`,
             });
     
             return session;
