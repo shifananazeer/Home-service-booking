@@ -305,6 +305,7 @@ export const resetPasswordFromPassword = async ( newPassword: string , userId:st
 
 
 export const createCheckoutSession = async (data:{amount:number;bookingId: string; paymentType:string , successUrl:string} ) => {
+  console.log("successUrl", data.successUrl)
   const token = localStorage.getItem('accessToken');
   try{
     const response = await axiosInstance.post('/auth/create-checkout-session',data, {

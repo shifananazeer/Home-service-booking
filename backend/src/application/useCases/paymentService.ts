@@ -18,8 +18,19 @@ export class PaymentService {
         }
     }
 
-    async createCheckoutSession(amount:number , bookingId:string , paymentType:string , successUrl:string): Promise<Stripe.Checkout.Session> {
-        const clientUrl = process.env.CLIENT_URL 
+    async createCheckoutSession(
+        amount: number, 
+        bookingId: string, 
+        paymentType: string, 
+        successUrl: string
+    ): Promise<Stripe.Checkout.Session> {
+        
+        const clientUrl = process.env.CLIENT_URL; 
+    
+        if (!clientUrl) {
+            throw new Error("CLIENT_URL is not defined in the environment variables");
+        }
+    
         try {
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
@@ -34,12 +45,14 @@ export class PaymentService {
                     quantity: 1, 
                 }],
                 mode: 'payment',
-               success_url:  successUrl, 
-               cancel_url: `${process.env.CLIENT_URL}/cancel`, 
+                success_url: successUrl, 
+                cancel_url: `${clientUrl}/cancel`, // Use the stored clientUrl
             });
+    
             return session;
         } catch (error: any) {
             throw new Error(`Failed to create checkout session: ${error.message}`);
         }
     }
+    
 }
