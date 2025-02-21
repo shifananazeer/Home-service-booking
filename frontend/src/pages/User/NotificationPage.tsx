@@ -120,7 +120,7 @@ const NotificationPage: React.FC = () => {
           amount: balanceAmount * 100,
           bookingId: bookingId,
           paymentType: 'balance',
-          successUrl: `${import.meta.env.VITE_FRONTEND_URL}/balancePayment-success?bookingId=${bookingId}`,
+          successUrl: `https://www.homeservicebooking.xyz/balancePayment-success?bookingId=${bookingId}`,
         });
 
         console.log("Checkout session created:", checkoutResponse);
