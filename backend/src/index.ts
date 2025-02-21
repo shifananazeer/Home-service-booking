@@ -43,6 +43,9 @@ app.use('/api/workers',workerRoutes)
 app.use('/api/admin',adminRoutes)
 
 
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
 
 
 // Database connection
