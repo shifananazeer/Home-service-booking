@@ -488,7 +488,7 @@ class UserController  {
             console.log("success url" , successUrl)
            console.log("amount" , amount)
             try {
-                const session = await paymentService.createCheckoutSession(amount , bookingId , paymentType , successUrl);
+                const session = await paymentService.createCheckoutSession(amount , bookingId , paymentType );
                 res.status(HttpStatus.OK).json({ url: session.url });
             } catch (error: any) {
                 console.error('Error creating checkout session:', error);
