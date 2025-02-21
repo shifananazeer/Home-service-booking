@@ -153,9 +153,12 @@ const MessageList: React.FC = () => {
       senderModel: "user",
       chatId: selectedChat._id,
       timestamp: new Date().toISOString(),
-      text: text.trim() || undefined, // Trimmed text or undefined
+     
     };
-  
+    if (text.trim() !== "") {
+      messageData.text = text.trim()
+    }
+    sendingMessage
     try {
       // Assuming sendingMessage returns the newly created message
       const newMessage = await sendingMessage(messageData, mediaFile);
@@ -178,10 +181,9 @@ const MessageList: React.FC = () => {
               }
             : chat
         );
-  
-     
+      
         return updatedChats.sort((a, b) =>
-          new Date(b.lastMessage?.createdAt || 0).getTime() -
+          new Date(b.lastMessage?.createdAt || 0).getTime() - 
           new Date(a.lastMessage?.createdAt || 0).getTime()
         );
       });
@@ -197,8 +199,14 @@ const MessageList: React.FC = () => {
 
   useEffect(() => {
     const handleNewMessage = (message: Message) => {
-      setMessages(prev => [...prev, message]);
-      scrollToBottom();
+      if (message.chatId === selectedChat?._id) {
+        setMessages(prev => [...prev, message]);
+        scrollToBottom();
+    
+        if (message.senderId !== userId) {
+          socket.emit("markAsSeen", { unseenMessageIds: [message._id], chatId: message.chatId });
+        }
+      }
     };
 
     socket.on('newMessage', handleNewMessage);

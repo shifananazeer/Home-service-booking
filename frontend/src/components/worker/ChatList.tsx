@@ -98,8 +98,10 @@ const ChatList: React.FC = () => {
         setUnreadCounts(counts)
         const sortedChats = chats.sort(
           (a, b) =>
-            new Date(b.lastMessage?.createdAt || 0).getTime() - new Date(a.lastMessage?.createdAt || 0).getTime(),
-        )
+            new Date(b.lastMessage?.createdAt || 0).getTime() -
+            new Date(a.lastMessage?.createdAt || 0).getTime()
+        );
+  
 
         setChats(sortedChats)
       } catch (error) {
@@ -111,9 +113,9 @@ const ChatList: React.FC = () => {
   }, [workerId])
 
   const loadMessages = async (chatId: string) => {
-    if (selectedChat) {
-      socket.emit("leaveChat", { chatId: selectedChat._id })
-    }
+    // if (selectedChat) {
+    //   socket.emit("leaveChat", { chatId: selectedChat._id })
+    // }
 
     try {
       const messages = await fetchMessages(chatId)
@@ -180,16 +182,31 @@ const ChatList: React.FC = () => {
 
   useEffect(() => {
     const handleNewMessage = (message: Message) => {
-      setMessages((prev) => [...prev, message])
-      scrollToBottom()
-    }
-
-    socket.on("newMessage", handleNewMessage)
-
+      setMessages((prev) => [...prev, message]);
+  
+      // If the chat is open, mark the message as seen
+      if (selectedChat && selectedChat._id === message.chatId) {
+        socket.emit("markAsSeen", { unseenMessageIds: [message._id], chatId: message.chatId });
+  
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === message._id ? { ...msg, isSeen: true } : msg
+          )
+        );
+      } else {
+        setUnreadCounts((prevCounts) => ({
+          ...prevCounts,
+          [message.chatId]: (prevCounts[message.chatId] || 0) + 1,
+        }));
+      }
+    };
+  
+    socket.on("newMessage", handleNewMessage);
+  
     return () => {
-      socket.off("newMessage", handleNewMessage)
-    }
-  }, [])
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [selectedChat]);
 
   useEffect(() => {
     scrollToBottom()
